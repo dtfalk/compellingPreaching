@@ -85,12 +85,6 @@ I have configured my code (as a result of needing to test the code on my own dev
 Writing Permissions in this server:
 The code on the server is stored in the "server/compellingPreaching/public" folder. The data from the users is stored in the "server/data" folder. The "server/compellingPreaching/public" folder needs permission to write to the "server/data" folder. This should be the only permissions requirement, assuming that every folder is allowed to read from every other folder. 
 
-==========================================================================================
-cd compellingPreaching
-mkdir -p httpsInfo
-(Then move your private.key and certificate.crt files into this directory.)
-==========================================================================================
-
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
