@@ -79,8 +79,11 @@ If the "compellingPreaching/public/stimuli" directory does not exist, then creat
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
-Configuring HTTPS:
-For secure communication, you need to set up HTTPS by placing your private key and https certificate in the designated directory: "compellingPreaching/httpsInfo". I have created two skeleton files in this directory: "private.key" and "certificate.crt". You can either add the key + certificate to these files or delete them and add your own private key file and certificate file. If you decide to delete the existing files and add your own, then please rename them to "private.key" and "certificate.crt" so that the code in "app.js" will know where to find them. Alternatively, you can rename the "key" and "cert" entries in the "options" structure within "app.js" to reflect the filenames of the files that you added. You just need to make sure that "app.js" is looking for the files you added correctly. If the "compellingPreaching/httpsInfo" directory does not exist then create it using the following code (potentially):
+Configuring the server:
+I have configured my code (as a result of needing to test the code on my own device) with a locally hosted node.js/node.express server. The uchicago servers use Apache to run their servers. In order to get this code working you will need to take a reverse-proxy mentality. You will need to run the node server on the server and then reroute the data to this local server once it reaches the uchicago server. So the user connects to the server with Apache (https), and then Apache reroutes the get/post requests to the locally hosted node server (http). I do not know how exactly to do this, but Eric Hoy was able to get this to work.
+
+Writing Permissions in this server:
+The code on the server is stored in the "server/compellingPreaching/public" folder. The data from the users is stored in the "server/data" folder. The "server/compellingPreaching/public" folder needs permission to write to the "server/data" folder. This should be the only permissions requirement, assuming that every folder is allowed to read from every other folder. 
 
 ==========================================================================================
 cd compellingPreaching
@@ -99,7 +102,7 @@ With all dependencies installed and files in place, you're ready to run the appl
 ==========================================================================================
 cd compellingPreaching
 npm start
-(This command initiates the server, making the application accessible)
+(This command initiates the server by running "app.js")
 ==========================================================================================
 
 -----------------------------------------------------------------------------
