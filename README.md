@@ -65,15 +65,8 @@ Setting Up Media Files:
 The application serves audio and video files from specific directories within the project. Here's how to set them up:
 
 You will be able to find the audio and video files that should be uploaded to the server in the following locations:
-INSERT LOCATION TO FIND THE AUDIO AND VIDEO FILES HERE
-
-You will need to drop the two stimuli folders (audioFiles and videoFiles) into the "stimuli" folder on the server. The location to drop these files/folders is "compellingPreaching/public/stimuli".
-
-Audio Files:
-Place the audioFiles folder in the public/stimuli directory. In this audioFiles folder there should be a couple of subfolders. As it stands, there are four subfolders in the audioFiles folder: one that contains all of the audio files, one that contains all of the "strong" audio files, one that contains all of the "weak" audio files, and a folder containing the audio files that we are actually going to distribute to the experimental subjects ("servingFiles" is the name of this folder). The reason for this setup is that this experiment will change over time and we are only using a subset of our audio files for the time being, but that may need to be changed later. Once we settle on a location for the audioFiles (location above), all you need to do is transfer the audioFiles folder to the CompellingPreaching/public/stimuli directory.
-
-Video Files:
-Symmetrically, video files (coming from the videoFiles folder at the location described above) should be placed in the compellingPreaching/public/stimuli directory according to the "Audio Files:" instructions above.
+(https://uchicago.box.com/s/k58tmfurnqpd5217yuc2in4aa3f4urdv).
+If you do not have access to this folder then please request it.
 
 If the "compellingPreaching/public/stimuli" directory does not exist, then create it and put the files into the directory accordingly. The end result should be that there is a "compellingPreaching/public/stimuli/audioFiles" folder and a "compellingPreaching/public/stimuli/videoFiles" folder. The audio files will be mp3 and the video files will be mp4.
 
