@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset = 'UTF-8'>
+    <meta name = 'viewport' content = "width = device-width, initial-scale = 1.0">
+    <title>Homily Review</title>
+    <style>
+        body {
+          margin: 0;
+          display: flex;
+          overflow: hidden;
+          justify-content: center;
+          align-items: top;
+          height: 100vh;
+        }
+        #background {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: lightblue;
+          z-index: -1;
+        }
+        .prompt-container {
+          display: none;
+          position: absolute;
+          top: 25%; /* Center vertically */
+          left: 50%; /* Center horizontally */
+          transform: translate(-50%, -50%); 
+          padding: 30px;
+          background-color: white;
+          z-index: 1;
+        }
+        p{
+            text-align: center;
+        }
+        text{
+            color: red;
+        }
+      </style>
+</head>
+
+<body onload = "showPrompt()">
+    <div id = "background"></div>
+    <div id="promptContainer" class="prompt-container"></div>
+</body>
+
+<script>
+
+    // show the user their options (expert or laymen)
+    function showPrompt() {
+      const promptContainer = document.getElementById('promptContainer');
+      promptContainer.innerHTML = generatePromptHTML();
+      promptContainer.style.display = 'block';
+    }
+
+
+    // generates the text the user will see
+    function generatePromptHTML() {
+        return `
+            <p><b>Were you provided a UserId number or did you access this page through Prolific?</b></p>
+            <label>
+                <input type = "checkbox" name = "experimentType" value = "1" onclick = "uncheckOthers('experimentType', this)"> I was provided a UserId number.
+            </label>
+            <br>
+            <br>
+            <label>
+                <input type = "checkbox" name = "experimentType" value = "2" onclick = "uncheckOthers('experimentType', this)"> I accessed this page through Prolific.
+            </label>
+
+            <!-- Submit button -->
+            <br>
+            <br>
+            <center>
+                <text id = 'errorMessage'> </text>
+            </center>
+            <br>
+            <center>
+                <button onclick="submitForm()">Submit</button>
+            </center>
+            <br>
+            <br>
+            `;
+    }
+
+
+    // Only allow for one selection at a time 
+    function uncheckOthers(groupName, currentCheckbox) {
+        const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+        checkboxes.forEach(checkbox => {
+          if (checkbox !== currentCheckbox) {
+            checkbox.checked = false;
+          }
+        })
+    };
+
+    // check if user gave a response (helper for submitForm())
+    function validateForm() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        let valid = true;
+        name_dict = {}
+
+        // collect all checkboxes of a given name into a list
+        for (let i = 0; i < checkboxes.length; i++){
+            name = checkboxes[i].name;
+            try {
+                name_dict[name].push(checkboxes[i]);
+            } catch (error){
+                name_dict[name] = [checkboxes[i]];
+            }}
+        
+        for (const [key, value] of Object.entries(name_dict)){
+            let responded = false;
+            for (let i = 0; i < value.length; i++){
+                if (value[i].checked){
+                    responded = true;
+                }}
+            if (!responded){
+                valid = false;
+                break;
+            }
+        }
+        return valid;
+      }
+  
+
+      // check if user gave response, proceed to instructions if so
+      function submitForm() {
+        const isValid = validateForm();
+        if (!isValid) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = 'Please select an option';
+            setTimeout(function() {errorMessage.textContent = '';}, 3000);
+        }
+        else{
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            let checkbox = checkboxes[0];
+            if (checkbox.value == 1 && checkbox.checked){
+                sessionStorage.setItem('userType', 'expert');
+                window.location.href = 'expert/av/enter_user_number.html';
+            }
+            else{
+                sessionStorage.setItem('userType', 'laymen');
+                window.location.href = 'laymen/sona/av/enter_user_number.html'
+            }
+        }
+      }
+
+
+    // prevent the user from navigating backwards through the experiment
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function (event) {
+    history.pushState(null, document.title, location.href);});
+
+</script>
+</html>

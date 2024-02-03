@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homily Review</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 0;
+      overflow: auto;
+    }
+    #background {
+      font-family: 'Times New Roman', Times, serif;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color:#800000;
+      z-index: -1;
+    }
+    .questionnaire-container {
+      font-family: 'Times New Roman', Times, serif;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 20px;
+      background-color: white;
+      z-index: 1;
+      }
+      h1{
+        font-family: 'Times New Roman', Times, serif;
+        text-align: center;
+        text-decoration: underline;
+      }
+      button{
+        font-family: 'Times New Roman', Times, serif;
+        justify-content: center;
+      }
+      text{
+        font-family: 'Times New Roman', Times, serif;
+        color: red;
+      }
+  </style>
+</head>
+<body onload="showQuestionnaire()">
+  <div id="background"></div>
+  <div id="questionnaireContainer" class="questionnaire-container">
+  </div>
+
+  <script>
+    sessionStorage.setItem('userType', 'laymen');
+    sessionStorage.setItem('experimentSource', 'sona');
+    sessionStorage.setItem('experimentType', 'audio');
+
+    // this block of code creates and displays the questionnaire
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+
+    function showQuestionnaire() {
+      const questionnaireContainer = document.getElementById('questionnaireContainer');
+      questionnaireContainer.innerHTML = generateQuestionnaireHTML();
+
+      // Display the questionnaire
+      questionnaireContainer.style.display = 'block';
+    }
+
+
+    function generateQuestionnaireHTML() {
+      // You can customize the questionnaire HTML generation based on your requirements
+      return `
+        
+        <h1> Demographic Survey </h1>
+
+        <h1>Instructions </h1>
+        <p>Please respond to the following questions about your background.
+          You must respond to all of the required questions before submitting the form.
+          Any unrequired question will be tagged as "optional".
+        </p>
+
+        <!-- Age -->
+        <label for="age">1. Age:</label>
+        <input type="number" id="age" placeholder="Enter your age"> 
+        <br>
+
+        <!-- Gender -->
+        <p>2. What is your gender?</p>
+        <label>
+          <input type="checkbox" name="gender" value="Male" onclick="uncheckOthers('gender', this)"> Male
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="gender" value="Female" onclick="uncheckOthers('gender', this)"> Female
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="gender" value="Prefer not to answer or prefer to self-describe" onclick="uncheckOthers('gender', this)"> Prefer not to answer or prefer to self-describe
+        </label>
+        <br>
+        <label for="selfDescribeGender">Prefer to self-describe:</label>
+        <input type="text" name = "selfDescribeGender" id="selfDescribeGender"> 
+        <br> <br> <br>
+
+
+        <!-- Racial/Ethnic Identity-->
+        <p>3. Which of the following describes your ethnic and/or racial identity?</p>
+        <label>
+            <input type="checkbox" name="ethnicity" value="Hispanic or Latino" onclick="uncheckOthers('ethnicity', this)"> Hispanic or Latino
+        </label>
+        <br>
+        <label>
+            <input type="checkbox" name="ethnicity" value="Black or African American" onclick="uncheckOthers('ethnicity', this)"> Black or African American
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="ethnicity" value="White" onclick="uncheckOthers('ethnicity', this)"> White
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "ethnicity" value="Asian" onclick="uncheckOthers('ethnicity', this)"> Asian
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="ethnicity" value="American Indian or Alaskan Native" onclick="uncheckOthers('ethnicity', this)"> American Indian or Alaskan Native
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="ethnicity" value="Native Hawaiian or Pacific Islander" onclick="uncheckOthers('ethnicity', this)"> Native Hawaiian or Pacific Islander
+        </label>
+        <br>
+        <input type="checkbox" name= "ethnicity" value="Two or more" onclick="uncheckOthers('ethnicity', this)"> Two or more
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="ethnicity" value="Prefer not to answer or prefer to self-describe" onclick="uncheckOthers('ethnicity', this)"> Prefer not to answer or prefer to self-describe
+        </label>
+        <br>
+        <label for="selfDescribeEthnicity">Prefer to self-describe:</label>
+        <input type="text" name = "selfDescribeEthnicity" id="selfDescribeEthnicity"> 
+        <br> <br> <br>
+
+
+        <!-- Economic Class-->
+        <p>4. Do you consider yourself to come from a:</p>
+        <label>
+            <input type="checkbox" name="economicClass" value="Low income background" onclick="uncheckOthers('economicClass', this)"> Low income background
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="economicClass" value="Lower-middle income background" onclick="uncheckOthers('economicClass', this)"> Lower-middle income background
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "economicClass" value="Middle income background" onclick="uncheckOthers('economicClass', this)"> Middle income background
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="economicClass" value="Upper-middle income background" onclick="uncheckOthers('economicClass', this)"> Upper-middle income background
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="economicClass" value="High income background" onclick="uncheckOthers('economicClass', this)"> High income background
+        </label>
+        <br><br><br>
+
+
+        <!-- International Student-->
+        <p>5. Are you an international student?</p>
+        <label>
+            <input type="checkbox" name="internationalStudent" value="Yes" onclick="uncheckOthers('internationalStudent', this)"> Yes
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="internationalStudent" value="No" onclick="uncheckOthers('internationalStudent', this)"> No
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="internationalStudent" value="N/A" onclick="uncheckOthers('internationalStudent', this)"> N/A
+        </label>
+        <br><br><br>
+
+
+        <!-- US residence duration -->
+        <label for="USAResidenceDuration">5. How many years have you lived in the US? </label>
+        <input type="number" id="USAResidenceDuration" placeholder="Number of years"> 
+        <br> <br> <br>
+
+
+        <!-- English first language-->
+        <p>6. Is English your first language? </p>
+        <label>
+            <input type="checkbox" name="englishFirstLanguage" value="Yes" onclick="uncheckOthers('englishFirstLanguage', this)"> Yes
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="englishFirstLanguage" value="No" onclick="uncheckOthers('englishFirstLanguage', this)"> No
+        </label>
+        <br><br>
+
+        <label for="otherLanguages">7. Please list any other languages, if any, that you speak fluently:</label>
+        <br>
+        <textarea id="otherLanguages" name="otherLanguages" rows="4" cols="50"></textarea>
+        <br><br><br>
+
+        
+        <!-- Submit button -->
+        <br> <br>
+        <center>
+          <text id = 'errorMessage'> </text>
+        </center>
+        <br>
+        <center>
+          <button onclick="submitForm()">Submit</button>
+        </center>
+        <br>
+      `;
+    }
+
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------
+
+
+
+    // this block of code checks if user has completed the form and if so,
+    // sends that data to the server to be stored as a csv file. 
+    // If not, an error message is displayed.
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+
+    // submits the form and send data if complete, otherwise gives error message
+    function submitForm() {
+      const isValid = validateForm();
+      if (!isValid) { // if response is not valid (missing responses etc...)
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = 'You must respond to all questions';
+        setTimeout(function() {
+          errorMessage.textContent = '';
+        }, 3000);
+      }
+      else{ // if responses are valid
+
+          // get header and data and store as csv
+          header = getHeader();
+          data = getData();
+          console.log(sendResults(header, data));
+          window.location.href = 'exit_screen.html';
+          }
+      }
+
+
+    // validates that the user answered all questions
+    // (helper for submit form)
+    function validateForm() {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const textboxes = document.querySelectorAll('input[type="text"]');
+      const numberBoxes = document.querySelectorAll('input[type="number"]');
+      
+      let valid = true;
+      let checkbox_name_dict = {};
+      let textbox_name_dict = {};
+
+
+
+      // collect all names of checkboxes
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        try {
+          checkbox_name_dict[name].push(checkboxes[i]);
+        } catch (error){
+          checkbox_name_dict[name] = [checkboxes[i]];
+        }}
+
+      // collect all names of textboxes
+      for (let i = 0; i < textboxes.length; i++){
+        name = textboxes[i].name;
+        try {
+          textbox_name_dict[name].push(textboxes[i]);
+        } catch (error){
+          textbox_name_dict[name] = [textboxes[i]];
+        }}
+      
+      // check that each checkbox has a response
+      for (const [key, value] of Object.entries(checkbox_name_dict)){
+        let responded = false;
+        for (let i = 0; i < value.length; i++){
+          if (value[i].checked){
+            responded = true;}}
+
+          if (!responded){
+            valid = false;
+            break;
+          }
+        }
+
+    // make sure each numberbox has a response
+    for (let i = 0; i < numberBoxes.length; i++){
+      let response = numberBoxes[i].value;
+
+      if (response.length == 0){
+        valid = false;
+      }
+    }
+
+      return valid;
+    }
+
+
+    // sends the user response to the server to be stored as a csv
+    // (helper for submit form)
+    async function sendResults(header, data){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const homilyId = sessionStorage.getItem('homilyId');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+      const url = `/api/storeUserDemographicResults`;
+
+      // package the results in an Object to later stringify
+      let results = {}
+      for (let i = 0; i < header.length; i++){
+        results[String(header[i])] = String(data[i]);
+      }
+
+      console.log('here');
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({
+              'userId' : userId, 
+              'userType' : userType,
+              'homilyId' : homilyId,
+              'experimentSource' : experimentSource,
+              'experimentType' : experimentType,
+              'results' : JSON.stringify(results)})
+        });
+        return await response.json();
+      } 
+
+
+    // gets the header for the soon-to-be csv file on the server
+    // (helper for "submitForm())
+    function getHeader(){
+
+      // variables for storing names of variables and their responses to such variables
+      let checkboxNames = [];
+      let textboxNames = [];
+      let bigTextboxNames = []
+      let numberboxNames = [];
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const textboxes = document.querySelectorAll('input[type="text"]');
+      const numberboxes = document.querySelectorAll('input[type="number"]');
+      const bigTextboxes = document.querySelectorAll('textarea');
+
+      // collect all check box names in order
+      for (let i = 0; i < checkboxes.length; i++){
+        let name = checkboxes[i].name;
+        if (!checkboxNames.includes(name)){
+          checkboxNames.push(name);
+        }
+      }
+
+      // collect all textbox names
+      for (let i = 0; i < textboxes.length; i++){
+        let name = textboxes[i].id;
+        textboxNames.push(name);
+      }
+
+      // collect all numberbox names
+      for (let i = 0; i < numberboxes.length; i++){
+        let name = numberboxes[i].id;
+        numberboxNames.push(name);
+      }
+
+      // collect all big textbox names
+      for (let i = 0; i < bigTextboxes.length; i++){
+        let name = bigTextboxes[i].id;
+        bigTextboxNames.push(name);
+      }
+
+      return checkboxNames.concat(textboxNames, numberboxNames, bigTextboxNames);
+    }
+
+    
+    // gets the header for the soon-to-be csv file on the server
+    // (helper for "submitForm())
+    function getData(){
+      // places to store names and data
+      let name_dict = {};
+      let checkboxData = [];
+      let textboxData = [];
+      let numberboxData = [];
+      let bigTextboxData = [];
+
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const textboxes = document.querySelectorAll('input[type="text"]');
+      const numberboxes = document.querySelectorAll('input[type="number"]');
+      const bigTextboxes = document.querySelectorAll('textarea');
+
+      // collect all checkboxes of a given name into a list
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        try {
+          name_dict[name].push(checkboxes[i]);
+          } catch (error){
+            name_dict[name] = [checkboxes[i]];}}
+            
+      // iterate over all checkbox questions
+      for (const [key, value] of Object.entries(name_dict)){
+        // iterate over each checkbox in a given question
+        for (let i = 0; i < value.length; i++){
+          let option = value[i];
+          // add all values of checked checkboxes to the list
+          if (option.checked){
+            checkboxData.push(String(option.value));}}}
+
+      // iterate over all textbox questions
+        for (let i = 0; i < textboxes.length; i++){
+          let textEntry = textboxes[i].value;
+          textboxData.push(textEntry);}
+
+      // iterate over all numberbox questions
+      for (let i = 0; i < numberboxes.length; i++){
+          let textEntry = numberboxes[i].value;
+          numberboxData.push(textEntry);}
+
+      // iterate over all textbox questions
+      for (let i = 0; i < bigTextboxes.length; i++){
+          let textEntry = bigTextboxes[i].value;
+          bigTextboxData.push(textEntry);}
+
+      return checkboxData.concat(textboxData, numberboxData, bigTextboxData); 
+    }
+
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+
+
+    
+    // ensures that the user has at most one checkbox selected at a time
+    function uncheckOthers(groupName, currentCheckbox) {
+      const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+      checkboxes.forEach(checkbox => {
+        if (checkbox !== currentCheckbox) {
+          checkbox.checked = false;
+        }})};
+
+
+    // prevents the user from navigating backwards through the experiment
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function (event) {
+      history.pushState(null, document.title, location.href);});
+  </script>
+</body>
+</html>

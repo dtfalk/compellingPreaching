@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 0;
+      overflow: auto;
+    }
+    #background {
+      font-family: 'Times New Roman', Times, serif;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color:#800000;
+      z-index: -1;
+    }
+    .questionnaire-container {
+      font-family: 'Times New Roman', Times, serif;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 20px;
+      background-color: white;
+      z-index: 1;
+      }
+      h1{
+        font-family: 'Times New Roman', Times, serif;
+        text-decoration: underline;
+        text-align: center;
+      }
+      text{
+        font-family: 'Times New Roman', Times, serif;
+        color: red;
+      }
+  </style>
+
+</head>
+<body onload="showQuestionnaire()">
+  <div id="background"></div>
+  <div id="questionnaireContainer" class="questionnaire-container">
+  </div>
+
+  <script>
+
+    sessionStorage.setItem('userType', 'expert');
+    sessionStorage.setItem('experimentSource', 'na');
+    sessionStorage.setItem('experimentType', 'audio');
+
+
+    // This block of code displays the preaching experience form to the user
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+
+    // displays the questionnaire to the user
+    function showQuestionnaire() {
+      const questionnaireContainer = document.getElementById('questionnaireContainer');
+      questionnaireContainer.innerHTML = generateQuestionnaireHTML();
+
+      // Display the questionnaire
+      questionnaireContainer.style.display = 'block';
+    }
+
+    // generates the questionnaire
+    function generateQuestionnaireHTML() {
+      // You can customize the questionnaire HTML generation based on your requirements
+      return `
+        <h1>Preaching Experience</h1>
+
+        <h1>Instructions </h1>
+        <p> These questions are about your experience as a preacher.
+          You are required to respond to all of the required questions before submitting the form.
+          Any unrequired question will be tagged as "optional".
+          </p>
+        
+        <h1> Questions </h1>
+
+        <!-- Preaching Duration -->
+
+        <p>How many years have you been preaching?</p>
+        <label>
+          <input type="checkbox" name="preaching_duration" value="Less than 1 year" onclick="uncheckOthers('preaching_duration', this)"> Less than 1 year
+        </label> <br>
+        <label>
+          <input type="checkbox" name="preaching_duration" value="1 - 5 years" onclick="uncheckOthers('preaching_duration', this)"> 1 - 5 years
+        </label> <br>
+        <label>
+          <input type="checkbox" name= "preaching_duration" value="6 - 10 years" onclick="uncheckOthers('preaching_duration', this)"> 5 - 10 years
+        </label> <br>
+        <label>
+          <input type="checkbox" name="preaching_duration" value="11 - 15 years" onclick="uncheckOthers('preaching_duration', this)"> 10 - 15 years
+        </label> <br>
+        <label>
+          <input type="checkbox" name="preaching_duration" value="16 - 20 years" onclick="uncheckOthers('preaching_duration', this)"> 15 - 20 years
+        </label> <br>
+        <label>
+          <input type="checkbox" name="preaching_duration" value="More than 20 years" onclick="uncheckOthers('preaching_duration', this)"> More than 20 years
+        </label> <br> <br>
+        <label for="freeform">Additional Comments (optional):</label>
+        <textarea id="PreachingDurationAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
+        <br> <br> <br> 
+
+
+        <!-- Teaching Duration -->
+
+        <p>How many years have you been teaching how to preach?</p>
+        <label>
+          <input type="checkbox" name="teaching_duration" value="Less than 1 year" onclick="uncheckOthers('teaching_duration', this)"> Less than 1 year
+        </label> <br>
+        <label>
+          <input type="checkbox" name="teaching_duration" value="1 - 5 years" onclick="uncheckOthers('teaching_duration', this)"> 1 - 5 years
+        </label> <br>
+        <label>
+          <input type="checkbox" name= "teaching_duration" value="5 - 10 years" onclick="uncheckOthers('teaching_duration', this)"> 5 - 10 years
+        </label> <br>
+        <label>
+          <input type="checkbox" name="teaching_duration" value="10 - 15 years" onclick="uncheckOthers('teaching_duration', this)"> 10 - 15 years
+        </label> <br>
+        <label>
+          <input type="checkbox" name="teaching_duration" value="15 - 20 years" onclick="uncheckOthers('teaching_duration', this)"> 15 - 20 years
+        </label> <br>
+        <label>
+          <input type="checkbox" name="teaching_duration" value="More than 20 years" onclick="uncheckOthers('teaching_duration', this)"> More than 20 years
+        </label> <br> <br>
+        <label for="freeform">Additional Comments (optional):</label>
+        <textarea id="teachingDurationAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
+        <br> <br> <br>
+
+
+        <!-- Preaching Regularity -->
+
+        <p>How often do you preach to a congregation?</p>
+        <label>
+          <input type="checkbox" name="preaching_regularity" value="Once a day" onclick="uncheckOthers('preaching_regularity', this)"> Once a day
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "preaching_regularity" value="A few times a week" onclick="uncheckOthers('preaching_regularity', this)"> A few times a week
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="preaching_regularity" value="Once a week" onclick="uncheckOthers('preaching_regularity', this)"> Once a week
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="preaching_regularity" value="A few times a month" onclick="uncheckOthers('preaching_regularity', this)"> A few times a month
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "preaching_regularity" value="Once a month" onclick="uncheckOthers('preaching_regularity', this)"> Once a month
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="preaching_regularity" value="A few times a year" onclick="uncheckOthers('preaching_regularity', this)"> A few times a year
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "preaching_regularity" value="Once a year" onclick="uncheckOthers('preaching_regularity', this)"> Once a year
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="preaching_regularity" value="Seldom" onclick="uncheckOthers('preaching_regularity', this)"> Seldom
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="preaching_regularity" value="Never" onclick="uncheckOthers('preaching_regularity', this)"> Never
+        </label>
+        <br> <br>
+        <label for="freeform">Additional Comments (optional):</label>
+        <textarea id="preachingRegularityAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
+        <br> <br> <br>
+
+
+        </label> <br>
+        <label for="freeform">Other valuable information relating to your preaching/teaching experience (optional):</label> <br>
+        <br>
+
+        <textarea id="OtherValuableInfo" name="freeform" rows="4" cols="50"></textarea>
+
+        <br> <br>
+        <center>
+          <text id = 'errorMessage'> </text>
+        </center>
+        
+
+        <!-- Submit button -->
+        <br>
+        <br>
+        <center>
+          <button onclick="submitForm()">Submit</button>
+        </center>
+        <br>
+      `;
+    }
+
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+
+
+    // If the form is completed this block of code submits the questionnaire, 
+    // sends results to the server, and navigates the user to the exit screen.
+    // Otherwise, an error message is displayed.
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+
+    // If completed, data is sent to server and user is redirected to exit screen
+    function submitForm() {
+        const isValid = validateForm();
+        if (!isValid) {
+          const errorMessage = document.getElementById('errorMessage');
+          errorMessage.textContent = 'You must respond to all required questions before submitting';
+          setTimeout(function() {
+            errorMessage.textContent = '';
+          }, 3000);
+        }
+        else{
+            header = getHeader();
+            data = getData();
+            console.log(sendResults(header, data))
+            window.location.href = 'userDemographics.html';
+        }
+      }
+
+
+    // ensures that the user responds to all required questions
+    // helper for "submitForm()"
+    function validateForm() {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      let valid = true;
+      name_dict = {}
+
+      // collect all checkboxes of a given name into a list
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        try {
+          name_dict[name].push(checkboxes[i]);
+        } catch (error){
+          name_dict[name] = [checkboxes[i]];}}
+        
+      for (const [key, value] of Object.entries(name_dict)){
+        let responded = false;
+        for (let i = 0; i < value.length; i++){
+          if (value[i].checked){
+            responded = true;}}
+            
+        if (!responded){
+          valid = false;
+          break;}
+      }
+      return valid;}
+
+    
+    // send the user's results to the server to be stored as a csv
+    // helper for "submitForm()"
+    async function sendResults(header, data){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      const url = `/api/storePreachingExperience`;
+
+      // package the results in an Object to later stringify
+      let results = {}
+      for (let i = 0; i < header.length; i++){
+        results[String(header[i])] = String(data[i]);
+      }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({
+          'userId' : userId, 
+          'userType' : userType,
+          'experimentSource' : experimentSource,
+          'experimentType' : experimentType,
+          'results' : JSON.stringify(results)})
+          });
+        return await response.json();
+    } 
+
+
+    // retrieves the header for the soon-to-be csv file
+    // helper for "submitForm()"
+    function getHeader(){
+      let checkboxNames = [];
+      let textboxNames = [];
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const textboxes = document.querySelectorAll('textarea');
+
+      // collect all check box names in order
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        if (checkboxNames.includes(name)){
+          continue;}
+        checkboxNames.push(name);}
+
+      // collect all textbox names
+      for (let i = 0; i < textboxes.length; i++){
+        name = textboxes[i].id;
+        textboxNames.push(name);}
+
+      return checkboxNames.concat(textboxNames);}
+
+
+    // retrieves the header for the soon-to-be csv file
+    // helper for "submitForm()"
+    function getData(){
+      let name_dict = {};
+      let checkboxData = [];
+      let textboxData = [];
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const textboxes = document.querySelectorAll('textarea');
+
+      // collect all checkboxes of a given name into a list
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        try {
+          name_dict[name].push(checkboxes[i]);
+        } catch (error){
+          name_dict[name] = [checkboxes[i]];
+        }}
+            
+      // iterate over all checkbox questions
+      for (const [key, value] of Object.entries(name_dict)){
+        // iterate over each checkbox in a given question
+        for (let i = 0; i < value.length; i++){
+          let option = value[i];
+          // add all values of checked checkboxes to the list
+          if (option.checked){
+            checkboxData.push(String(option.value));}
+        }
+      }
+
+      // iterate over all textbox questions
+      for (let i = 0; i < textboxes.length; i++){
+        let textEntry = textboxes[i].value;
+        textboxData.push(textEntry);}
+
+      return checkboxData.concat(textboxData);}
+
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+
+
+    // ensures that at most one checkbox is selected at a time for each question
+    function uncheckOthers(groupName, currentCheckbox) {
+      const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+      checkboxes.forEach(checkbox => {
+      if (checkbox !== currentCheckbox) {
+        checkbox.checked = false;}})
+    };
+
+
+    // prevents the user from navigating backwards through the experiment
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function (event) {
+        history.pushState(null, document.title, location.href);});
+    
+
+  </script>
+</body>
+</html>

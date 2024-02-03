@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head onload="initialSetup()">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homily Review</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            font-family: 'Arial', sans-serif;
+            background-color:#800000;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        main {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            font-family: 'Times New Roman', Times, serif;
+        text-decoration: underline;
+        text-align: center;
+      }
+
+        p {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+    </style>
+</head>
+<body id = "mainBody" onload="initialSetup()">
+
+<main id="instructionsSection">
+    <h1>University of Chicago Non-Consent Statement</h1>
+    <h2><b>Study Number: </b> IRB24-0068</h2>
+    <h2><b>Study Title: </b> Understanding Preaching</h2>
+    <h2><b>Researcher(s): </b> Howard Nusbaum</h2>
+    <h2><b>Sponsor: </b> Catholic Theological Union</h2><br>
+
+    <p>Thank you for taking the time to consider our study. If you wish to consent, then please reenter your user number by following the link to the study you were given.</p>
+
+    <h2><b>Contacts and Questions </b></h2>
+    <p>If you have questions or concerns about the study, you can contact the researchers at Jean Matelski Boulware at (312) 860-9260 or at matelskiboulware@uchicago.edu.</p>
+    <p>If you have any questions about your rights as a participant in this research, or to discuss other study-related concerns with someone who is not part of the research team, 
+        you can contact the University of Chicago Social & Behavioral Sciences Institutional Review Board (IRB) Office by phone at (773) 702-2915, or by email at sbs-irb@uchicago.edu.</p>
+
+    <br><br>
+    <p>Press the Finish button below and exit your browser to terminate the homily review.</p>
+    <br>
+    <center>
+        <button onclick="submitForm()">Finish</button>
+    </center> 
+<br>
+</main>
+
+
+<script>
+    sessionStorage.setItem('userType', 'laymen');
+    sessionStorage.setItem('experimentSource', 'prolific');
+    sessionStorage.setItem('experimentType', 'audio');
+    
+    // script to be called on runtime
+    function initialSetup() {
+        document.getElementById("mainBody").focus();
+        preventBackNavigation();
+    }
+
+
+    // prevent the user from navigating backwards through the experiment
+    function preventBackNavigation() {
+    history.pushState(null, document.title, location.href);
+    window.onpopstate = function (event) {
+        console.log("Back navigation attempted");
+        history.pushState(null, document.title, location.href);
+        };
+    }
+
+    // hides the screen to suggest to the user that they ought to quit out of the window
+    function submitForm() {
+    // Hide the header and instructions sections
+    document.getElementById("instructionsSection").style.display = "none";
+
+    // Hide the submit button
+    document.querySelector("button").style.display = "none";
+    }
+
+</script>
+
+</body>
+</html>

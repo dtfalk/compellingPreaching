@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homily Review</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            font-family: 'Arial', sans-serif;
+            background-color:#800000;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        main {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            color: #3498db;
+        }
+        p {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<main id="instructionsSection">
+    <p>Welcome to the homily review. Your thorough review of the homilies will help us understand the effectivenesss of each homily and the mechanisms for that effectiveness.</p>
+    <p><b>Follow the instructions below carefully:</b></p>
+    <p>You will listen to four homilies from different preachers.
+      After each homily you will be asked a series of questions about the homily.
+    Please pay attention during each homily and answer all of the questions.
+    After listening to the homilies there will be two additional questionnaires.</p>
+    <p>If you decide to take a break, then please break after completing the homily and its matched questions, 
+      not in the middle of a homily or before you have completed the questions for that homily. If you take 
+      a break before a homily and its questions are completed, then you will need to rewatch that homily. 
+      To resume your review after a break you only need to reenter your user ID number.</p>
+    <p>Thank you for your participation. If you have any questions, please feel free to contact us at
+      matelskiboulware@uchicago.edu. </p>
+      
+    <br>
+    <p>Press the "continue" button below to continue.</p>
+
+    <br>
+    <center>
+        <button onclick="submitForm()">Continue</button>
+    </center>
+    <br>
+</main>
+
+<script> 
+    sessionStorage.setItem('userType', 'expert');
+    sessionStorage.setItem('experimentSource', 'na');
+    sessionStorage.setItem('experimentType', 'audio');
+
+    // prevents the user from navigating backwards through the experiment
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function (event) {
+        history.pushState(null, document.title, location.href);
+    });
+    
+
+
+    // this block of code checks where the user is in the experiment
+    // and redirects them accordingly
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
+
+    // redirects user according to progress
+    function submitForm() {
+      checkHomiliesCompleted().then(completed => {
+      if (!completed){
+        window.location.href = 'new_homily_wait_screen.html';
+      } else{ // if homilies are completed
+        checkPreachingExperienceCompleted().then(submitted => {
+          if (!submitted) { 
+            window.location.href = 'preaching_experience.html';
+          } else { // if religious demographic completed
+            checkUserDemographicCompleted().then(done => {
+              if (!done) {
+                window.location.href = 'userDemographics.html';
+              } else { // if user demographic completed
+                window.location.href = 'exit_screen.html';
+              }});
+            }
+          });
+        }});
+    }
+
+
+    // checks if the expert has viewed all of the homilies for proper redirection
+    // (helper for submitForm())
+    async function checkHomiliesCompleted(){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+      
+      const url = `/api/allHomiliesViewed/${userId}/${userType}/${experimentSource}/${experimentType}`;
+
+      try{
+        const response = await fetch(url);
+        if (!response.ok){
+              throw new Error('HTTP error! status: ${completed.status}');
+          }
+          const completed = await response.json()
+          return await completed.done;
+      } catch (error) {
+          console.error("Unable to fetch completion data");
+          return null;
+        }
+    }
+
+
+    // checks if the laymen has completed the religious demographic survey
+    // (helper for submitForm())
+    async function checkPreachingExperienceCompleted(){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      const url = `/api/preachingExperienceCompleted/${userId}/${userType}/${experimentSource}/${experimentType}`;
+
+      try{
+        const response = await fetch(url);
+        if (!response.ok){
+              throw new Error('HTTP error! status: ${completed.status}');
+          }
+          const completed = await response.json()
+          return await completed.done;
+      } catch (error) {
+          console.error("Unable to fetch completion data");
+          return null;
+        }
+    }
+
+    // checks if the laymen has completed the user demographic survey
+    // (helper for submitForm())
+    async function checkUserDemographicCompleted(){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      const url = `/api/userDemographicCompleted/${userId}/${userType}/${experimentSource}/${experimentType}`;
+
+      try{
+        const response = await fetch(url);
+        if (!response.ok){
+              throw new Error('HTTP error! status: ${completed.status}');
+          }
+          const completed = await response.json()
+          return await completed.done;
+      } catch (error) {
+          console.error("Unable to fetch completion data");
+          return null;
+        }
+    }
+
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------
+
+</script>
+
+</body>
+</html>

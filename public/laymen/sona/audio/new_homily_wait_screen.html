@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homily Review</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            font-family: 'Arial', sans-serif;
+            background-color:#800000;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        main {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        p {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<main id="instructionsSection">
+    <p>You will now listen to a homily.</p>
+    <p>Press the "continue" button when you are ready to proceed.</p>
+    <br> <br> <br>
+    <center>
+        <button onclick="submitForm()">Continue</button>
+    </center>
+    <br>
+</main>
+
+
+<script> 
+    sessionStorage.setItem('userType', 'laymen');
+    sessionStorage.setItem('experimentSource', 'sona');
+    sessionStorage.setItem('experimentType', 'audio');
+    
+    // prevents the user from navigating backwards through the experiment
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function (event) {
+        history.pushState(null, document.title, location.href);
+    });
+    
+
+    // navigates the user to the homily
+    function submitForm() {
+        window.location.href = 'show_homily.html';
+    }
+</script>
+
+</body>
+</html>

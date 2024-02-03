@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homily Review</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 0;
+      display: flex;
+      overflow: hidden;
+      justify-content: center;
+      align-items: top;
+      height: 100vh;
+    }
+    #background {
+      font-family: 'Times New Roman', Times, serif;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color:#800000;
+      z-index: -1;
+    }
+    main {
+      font-family: 'Times New Roman', Times, serif;
+      display: block;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    p {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 16pt;
+      text-align: center;
+    }
+      
+
+  </style>
+</head>
+<body>
+  <div id="background"></div>
+  <div id="userIdForm">
+    <!-- retrieve the user's number-->
+    <main>
+    <form id="userForm">
+    <p><b>Enter your Prolific ID then click submit</b></p>
+    <br>
+      <center>
+      <label for ="userid">Prolific ID:</label>
+      <input type="text" id="userid" name="userid"><br><br>
+      <input type="button" value="Submit" onclick="validateUser()">
+      </center>
+    <br>
+
+    <p id="errorMessage" style="color: red;"></p>
+    </form>
+  </main>
+  </div>
+
+  <script>
+
+    sessionStorage.setItem('userType', 'laymen');
+    sessionStorage.setItem('experimentSource', 'prolific');
+    sessionStorage.setItem('experimentType', 'av');
+
+    // This block of code ensures the user enters a valid user number before continuing
+    // -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
+    // check if user enters valid user number
+    async function validateUser() {
+      const userId = document.getElementById('userid').value;
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+      const errorMessage = document.getElementById('errorMessage');
+      checkValidID(userId, userType, experimentSource, experimentType).then(async exists => {
+        if (exists) {
+          sessionStorage.setItem('userId', userId); // store user number in session
+          await new Promise(resolve => setTimeout(resolve, 0.1)); // Introduce a delay using Promise
+
+          checkConsentFormCompleted().then(consented => {
+            console.log(consented);
+            if (consented){
+              window.location.href = 'introduction.html';
+            } else {
+              window.location.href = 'consentScreen.html';
+            }
+          });
+        } else {
+          errorMessage.textContent = 'Invalid user number entered. Please try again.';
+          setTimeout(function() {
+            errorMessage.textContent = '';
+          }, 2000);
+        }});
+    }
+
+    // helper for "validateUser()"
+    // makes call to server to check if a valid ID was entered
+    async function checkValidID(userId, userType, experimentSource, experimentType){
+      valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-';
+      for (let i = 0; i < String(userId).length; i++) {
+        char = String(userId)[i];
+        if (!valid_chars.includes(char)) {
+          return false;
+        }
+      }
+      const url = `/api/checkExists/${userId}/${userType}/${experimentSource}/${experimentType}`;
+      
+      try {
+        if (userId == ''){return false;}
+        const response = await fetch(url);
+        const parsedResponse = await response.json();
+        const valid = parsedResponse.exists;
+        if (!response.ok){
+          console.error('An error occurred trying to check if the entered ID is valid');
+        }
+        return valid;
+      } catch (error) {
+        console.error('Error:', error);
+        return null;
+      }}
+
+    // checks if the user has completed the consent form
+    // (helper for submitForm())
+    async function checkConsentFormCompleted(){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      const url = `/api/consentFormCompleted/${userId}/${userType}/${experimentSource}/${experimentType}`;
+
+      try{
+        const response = await fetch(url);
+        console.log(response)
+        if (!response.ok){
+              throw new Error('HTTP error! status: ${completed.status}');
+          }
+          const completed = await response.json()
+          return await completed.done;
+      } catch (error) {
+          console.error("Unable to fetch completion data");
+          return null;
+        }
+    }
+
+    // -----------------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------
+
+
+    // prevents the user from navigating backwards through the experiment
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function (event) {
+        history.pushState(null, document.title, location.href);
+    });
+
+  </script>
+</body>
+</html>
+
+

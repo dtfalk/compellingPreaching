@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homily Review</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 0;
+      overflow: auto;
+    }
+    #background {
+      font-family: 'Times New Roman', Times, serif;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color:#800000;
+      z-index: -1;
+    }
+    .questionnaire-container {
+      font-family: 'Times New Roman', Times, serif;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 20px;
+      background-color: white;
+      z-index: 1;
+      }
+      h1, h2, h3 {
+        font-family: 'Times New Roman', Times, serif;
+        text-decoration: underline;
+        text-align: center;
+      }
+      text{
+        font-family: 'Times New Roman', Times, serif;
+        color: red;
+      }
+    
+  </style>
+</head>
+<body onload="showQuestionnaire()">
+  <div id="background"></div>
+  <div id="questionnaireContainer" class="questionnaire-container">
+  </div>
+
+  <script>
+
+    sessionStorage.setItem('userType', 'laymen');
+    sessionStorage.setItem('experimentSource', 'prolific');
+    sessionStorage.setItem('experimentType', 'audio');  
+
+    // this block of code creates and displays the questionnaire to the subject
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
+    // shows the questionnaire
+    function showQuestionnaire() {
+      const questionnaireContainer = document.getElementById('questionnaireContainer');
+      questionnaireContainer.innerHTML = generateQuestionnaireHTML();
+
+      // Display the questionnaire
+      questionnaireContainer.style.display = 'block';
+    }
+
+    // generates the HTML for the questionnaire
+    function generateQuestionnaireHTML() {
+      // You can customize the questionnaire HTML generation based on your requirements
+      return `
+        <h1>Religious Demographic</h1>
+
+        <h1>Instructions </h1>
+        <p>Please respond to the following questions about your religious background.
+          You must respond to all of the required questions before submitting the form.
+          Any unrequired question will have an "(optional)" tag attached to it.
+        </p>
+
+        <!-- Present Religion -->
+        <p>What is your present religion, if any?</p>
+        <label>
+          <input type="checkbox" name="religion" value="Protestant" onclick="uncheckOthers('religion', this)"> 
+          Protestant (e.g. Baptist, Methodist, Non-denominational, Lutheran, Presbyterian, Pentecostal, Episcopalian, Reformed, Church of Christ, etc.)
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="religion" value="Roman Catholic" onclick="uncheckOthers('religion', this)"> Roman Catholic
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="religion" value="Mormon" onclick="uncheckOthers('religion', this)"> Mormon (Church of Jesus Christ of Latter-day Saints or LDS)
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="religion" value="Orthodox" onclick="uncheckOthers('religion', this)"> Orthodox (such as Greek, Russian, or some other Orthodox church)
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="religion" value="Jewish" onclick="uncheckOthers('religion', this)"> Jewish
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="religion" value="Muslim" onclick="uncheckOthers('religion', this)"> Muslim
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="religion" value="Buddhist" onclick="uncheckOthers('religion', this)"> Buddhist
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="religion" value="Hindu" onclick="uncheckOthers('religion', this)"> Hindu
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="religion" value="Atheist" onclick="uncheckOthers('religion', this)"> Atheist
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="religion" value="Agnostic" onclick="uncheckOthers('religion', this)"> Agnostic
+        </label>
+        <br>
+        <label>
+        <input type="checkbox" name="religion" value="Nothing in Particular" onclick="uncheckOthers('religion', this)"> Nothing in Particular
+        </label>
+        <br>
+        <label>
+        <input type="checkbox" name="religion" value="Prefer not to answer" onclick="uncheckOthers('religion', this)"> Prefer not to answer
+        </label>
+        <br>
+        <label for="otherReligion"> Something else, Specify:</label>
+        <input type="text" id="otherReligion" name="userid"><br>
+        
+
+
+
+        <!-- If Something Else or Unspecified-->
+        <h2> If you answered either "Something else" or "Prefer not to answer" </h2>
+        <p>Do you think of yourself as a Christian or not?</p>
+        <label>
+            <input type="checkbox" name="christian" value="Yes" onclick="uncheckOthers('christian', this)"> Yes
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="christian" value="No" onclick="uncheckOthers('christian', this)"> No
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="christian" value="N/A" onclick="uncheckOthers('christian', this)"> N/A
+        </label>
+
+
+        <!-- Type of Christian -->
+        <h2> If you answered yes to the previous question </h2>
+        <p>If you consider yourself a Christian, would you describe yourself as born-again evangelical Christian, or not?</p>
+        <label>
+            <input type="checkbox" name="bornAgain" value="Yes" onclick="uncheckOthers('bornAgain', this)"> Yes, born-again or evangelical Christian
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="bornAgain" value="No" onclick="uncheckOthers('bornAgain', this)"> No, not born-again or evangelical Christian
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="bornAgain" value="N/A" onclick="uncheckOthers('bornAgain', this)"> N/A
+        </label>
+
+
+
+        <!-- General Questions-->
+        <h2>General Questions</h2>
+        <p>Aside from weddings and funerals, how often do you attend religious services?</p>
+        <label>
+            <input type="checkbox" name="attendance" value="More than once a week" onclick="uncheckOthers('attendance', this)"> More than once a week
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="attendance" value="Once a week" onclick="uncheckOthers('attendance', this)"> Once a week
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "attendance" value="Once or twice a month" onclick="uncheckOthers('attendance', this)"> Once or twice a month
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="attendance" value="A few times a year" onclick="uncheckOthers('attendance', this)"> A few times a year
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="attendance" value="Seldom" onclick="uncheckOthers('attendance', this)"> Seldom
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="attendance" value="Never" onclick="uncheckOthers('attendance', this)"> Never
+        </label>
+
+
+        <p>How important is religion in your life?</p>
+        <label>
+            <input type="checkbox" name="importance" value="Very important" onclick="uncheckOthers('importance', this)"> Very important
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="importance" value="Somewhat important" onclick="uncheckOthers('importance', this)"> Somewhat important
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "importance" value="Not too important" onclick="uncheckOthers('importance', this)"> Not too important
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="importance" value="Not at all important" onclick="uncheckOthers('importance', this)"> Not at all important
+        </label>
+
+        <p>Outside of attending religious services, how often do you pray?</p>
+        <label>
+            <input type="checkbox" name="prayer" value="Several times a day" onclick="uncheckOthers('prayer', this)"> Several times a day
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="prayer" value="Once a day" onclick="uncheckOthers('prayer', this)"> Once a day
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "prayer" value="A few times a week" onclick="uncheckOthers('prayer', this)"> A few times a week
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="prayer" value="Once a week" onclick="uncheckOthers('prayer', this)"> Once a week
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="prayer" value="A few times a month" onclick="uncheckOthers('prayer', this)"> A few times a month
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "prayer" value="Seldom" onclick="uncheckOthers('prayer', this)"> Seldom
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="prayer" value="Never" onclick="uncheckOthers('prayer', this)"> Never
+        </label>
+
+        <br>
+        <br>
+        <label for="AdditionalComments">Additional Comments (optional):</label>
+        <br>
+        <textarea id="AdditionalComments" name="freeform" rows="4" cols="50"></textarea>
+
+        <!-- Submit button -->
+        <br>
+        <br>
+        <center>
+          <text id = 'errorMessage'> </text>
+        </center>
+        <br>
+        <center>
+          <button onclick="submitForm()">Submit</button>
+        </center>
+        <br>
+      `;
+    }
+    
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
+
+
+    // this block of code checks if the user has completed the form and redirects 
+    // the user appropriately (e.g. error message or form submitted to server)
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    
+    // submits the form and send data if complete, otherwise gives error message
+    function submitForm() {
+      const isValid = validateForm();
+      if (!isValid) {
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = 'You must respond to all questions and meet all minimum required word counts';
+        setTimeout(function() {
+          errorMessage.textContent = '';
+        }, 3000);
+      }
+      else{         
+          // get header and data and store as csv
+          header = getHeader();
+          data = getData();
+          sendResults(header, data);
+          window.location.href = 'userDemographics.html';
+        }
+      }
+    
+
+    // ensures that the user has responded to all questions and met all required minimum wordcounts
+    function validateForm() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        let valid = true;
+        name_dict = {};
+        let religionCheckboxes = [];
+
+        // collect all checkboxes of a given name into a list
+        for (let i = 0; i < checkboxes.length; i++){
+            name = checkboxes[i].name;
+            if (name === 'religion'){
+              religionCheckboxes.push(checkboxes[i]);
+              continue;
+            }
+            try {
+                name_dict[name].push(checkboxes[i]);
+            } catch (error){
+                name_dict[name] = [checkboxes[i]];
+            }}
+        
+        for (const [key, value] of Object.entries(name_dict)){
+
+            let responded = false;
+            for (let i = 0; i < value.length; i++){
+                if (value[i].checked){
+                    responded = true;
+                }}
+            if (!responded){
+                valid = false;
+                break;
+            }
+        }
+
+        let religionChecked = false;
+        const religionTextbox = document.getElementById('otherReligion').value;
+        console.log(religionTextbox === '');
+
+        if (religionTextbox === ''){
+          for (let i = 0; i < religionCheckboxes.length; i++){
+            if (religionCheckboxes[i].checked) {
+              religionChecked = true;
+            }
+          }
+          if (!religionChecked){
+            valid = false;
+          }
+        }
+        return valid;
+      }
+  
+
+    // sends the user response to the server to be stored as a csv
+    // (helper for submit form)
+    async function sendResults(header, data){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      const url = `/api/storeReligiousDemographic`;
+
+      // package the results in an Object to later stringify
+      let results = {}
+      for (let i = 0; i < header.length; i++){
+        results[String(header[i])] = String(data[i]);
+      }
+
+      console.log(results);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({
+              'userId' : userId, 
+              'userType' : userType,
+              'experimentSource' : experimentSource,
+              'experimentType' : experimentType,
+              'results' : JSON.stringify(results)})
+        });
+        return await response.json();
+      } 
+
+
+    // gets the header for the soon-to-be csv file on the server
+    // (helper for "submitForm())
+    function getHeader(){
+      let homilyName = sessionStorage.getItem('homilyId');
+      let checkboxNames = [];
+      let textboxNames = [];
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const textboxes = document.querySelectorAll('textarea');
+
+      // collect all check box names in order
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        if (checkboxNames.includes(name)){
+          continue;
+        }
+        checkboxNames.push(name);
+      }
+
+      // collect all textbox names
+      for (let i = 0; i < textboxes.length; i++){
+        name = textboxes[i].id;
+        textboxNames.push(name);
+      }
+      console.log(textboxNames)
+      return checkboxNames.concat('otherReligion', textboxNames);
+    }
+
+
+    // gets the header for the soon-to-be csv file on the server
+    // (helper for "submitForm())
+    function getData(){
+      let name_dict = {};
+      let checkboxData = [];
+      let textboxData = [];
+      let religionChecked = false;
+      let otherReligion = document.getElementById('otherReligion').value;
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const textboxes = document.querySelectorAll('textarea');
+
+      // collect all checkboxes of a given name into a list
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        try {
+          name_dict[name].push(checkboxes[i]);
+          } catch (error){
+            name_dict[name] = [checkboxes[i]];}}
+            
+        // iterate over all checkbox questions
+        for (const [key, value] of Object.entries(name_dict)){
+          // iterate over each checkbox in a given question
+          for (let i = 0; i < value.length; i++){
+            let option = value[i];
+
+            if (key === 'religion'){
+              if (option.checked){
+                religionChecked = true;
+              }
+            }
+            // add all values of checked checkboxes to the list
+            if (option.checked){
+              checkboxData.push(String(option.value));}}
+
+          if (key === 'religion' && !religionChecked){
+            checkboxData.push('0');
+          }
+            }
+
+          // iterate over all textbox questions
+          for (let i = 0; i < textboxes.length; i++){
+            let textEntry = textboxes[i].value;
+            textboxData.push(textEntry);}
+
+      return checkboxData.concat(otherReligion, textboxData); 
+    }
+
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+  
+
+    // ensures that only one checkbox is selected at a time for a given question
+    function uncheckOthers(groupName, currentCheckbox) {
+      const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+      checkboxes.forEach(checkbox => {
+        if (checkbox !== currentCheckbox) {
+           checkbox.checked = false;
+          }
+        });
+    };
+
+    // prevents back navigation through experiment to best of my ability
+    history.pushState(null, document.title, location.href);
+    window.onpopstate = function (event) {
+        console.log("Back navigation attempted");
+        history.pushState(null, document.title, location.href);
+        };
+  </script>
+</body>
+</html>

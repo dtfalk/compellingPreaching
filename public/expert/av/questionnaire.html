@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 0;
+      overflow: auto;
+    }
+    #background {
+      font-family: 'Times New Roman', Times, serif;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color:#800000;
+      z-index: -1;
+    }
+    .questionnaire-container {
+      font-family: 'Times New Roman', Times, serif;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 20px;
+      background-color: white;
+      z-index: 1;
+      }
+      h1{
+        font-family: 'Times New Roman', Times, serif;
+        text-decoration: underline;
+        text-align: center;
+      }
+      text{
+        font-family: 'Times New Roman', Times, serif;
+        text-align: center;
+        color: red;
+      }
+  </style>
+</head>
+<body onload="showQuestionnaire()">
+  <div id="background"></div>
+  <div id="questionnaireContainer" class="questionnaire-container"></div>
+
+  <script>
+
+    sessionStorage.setItem('userType', 'expert');
+    sessionStorage.setItem('experimentSource', 'na');
+    sessionStorage.setItem('experimentType', 'av');
+
+
+    // this block of code generates and displays the form for the user
+    // ----------------------------------------------------------------
+    // ----------------------------------------------------------------
+    // ----------------------------------------------------------------
+    function showQuestionnaire() {
+      const questionnaireContainer = document.getElementById('questionnaireContainer');
+      questionnaireContainer.innerHTML = generateQuestionnaireHTML();
+
+      // Display the questionnaire
+      questionnaireContainer.style.display = 'block';
+    }
+
+
+    function generateQuestionnaireHTML() {
+      // You can customize the questionnaire HTML generation based on your requirements
+      return `
+        <h1>Instructions </h1>
+        <p>Please respond to the following questions about the homily you were just shown.
+          You must respond to all of the required questions before submitting the form.
+          Any unrequired question will be tagged as "optional". 
+          Some questions will ask you to rate a particular feature of the homily on a scale from 1 to 6.
+          Other questions will require a text entry with a minimum word count. 
+          </p>
+        
+        <h1> Questions </h1>
+
+        <!-- Compelling-ness -->
+        <p>1. How compelling did you find this homily?</p>
+        <label>
+          <input type="checkbox" name="compelling" value="Not at all" onclick="uncheckOthers('compelling', this)"> Not at all
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="compelling" value="A little" onclick="uncheckOthers('compelling', this)"> A little
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="compelling" value="Somewhat" onclick="uncheckOthers('compelling', this)"> Somewhat
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="compelling" value="Very" onclick="uncheckOthers('compelling', this)"> Very
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="compelling" value="Extremely" onclick="uncheckOthers('compelling', this)"> Extremely
+        </label> 
+        <br> <br>
+        
+
+        <!-- Understanding-->
+        <p>2. Do you understand the message being preached?</p>
+        <label>
+          <input type="checkbox" name="understanding" value="Not at all" onclick="uncheckOthers('understanding', this)"> Not at all
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="understanding" value="A little" onclick="uncheckOthers('understanding', this)"> A little
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="understanding" value="Somewhat" onclick="uncheckOthers('understanding', this)"> Somewhat
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="understanding" value="A lot" onclick="uncheckOthers('understanding', this)"> A lot
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="understanding" value="Completely" onclick="uncheckOthers('understanding', this)"> Completely
+        </label> 
+        <br> <br>
+
+        <br>
+        <br>
+        <label for="freeform">3. What do you believe was the message of the homily? (25 word minimum): </label>
+        <br>
+        <textarea id="messageMeaning" name="freeform" rows="4" cols="50"></textarea>
+
+        <!-- Agreement-->
+        <p>4. Do you agree with the homily's message?</p>
+        <label>
+            <input type="checkbox" name="agreement" value="Totally disagree" onclick="uncheckOthers('agreement', this)"> Totally disagree
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="agreement" value="Disagree" onclick="uncheckOthers('agreement', this)"> Disagree
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "agreement" value="Slightly disagree" onclick="uncheckOthers('agreement', this)"> Slightly disagree
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="agreement" value="Slightly agree" onclick="uncheckOthers('agreement', this)"> Slightly agree
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="agreement" value="Agree" onclick="uncheckOthers('agreement', this)"> Agree
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="agreement" value="Totally agree" onclick="uncheckOthers('agreement', this)"> Totally agree
+        </label>
+        <br> <br>
+
+        <!-- Change in Thinking-->
+        <p>5. Did the homily change your thinking about this message?</p>
+        <label>
+            <input type="checkbox" name="thinking" value="Not at all" onclick="uncheckOthers('thinking', this)"> Not at all
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="thinking" value="A little" onclick="uncheckOthers('thinking', this)"> A little
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "thinking" value="Somewhat" onclick="uncheckOthers('thinking', this)"> Somewhat
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="thinking" value="A lot" onclick="uncheckOthers('thinking', this)"> A lot
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="thinking" value="Completely" onclick="uncheckOthers('thinking', this)"> Completely
+        </label>
+        <br> <br>
+
+        <!-- Accepting of the message-->
+        <p>6. Were you more or less accepting of the message being preached after watching the homily?</p>
+        <label>
+            <input type="checkbox" name="accepting" value="Much less accepting" onclick="uncheckOthers('accepting', this)"> Much less accepting
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="accepting" value="Somewhat less accepting" onclick="uncheckOthers('accepting', this)"> Somewhat less accepting
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "accepting" value="Just as accepting as I was before watching the homily" onclick="uncheckOthers('accepting', this)"> Just as accepting as I was before watching the homily
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="accepting" value="Somewhat more accepting" onclick="uncheckOthers('accepting', this)"> Somewhat more accepting
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="accepting" value="Much more accepting" onclick="uncheckOthers('accepting', this)"> Much more accepting
+        </label>
+
+
+        <!-- Change in Feelings -->
+        <p>7. Did the homily change your feelings in any way?</p>
+        <label>
+            <input type="checkbox" name="feeling" value="Not at all" onclick="uncheckOthers('feeling', this)"> Not at all
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="feeling" value="A little" onclick="uncheckOthers('feeling', this)"> A little
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "feeling" value="Somewhat" onclick="uncheckOthers('feeling', this)"> Somewhat
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="feeling" value="A lot" onclick="uncheckOthers('feeling', this)"> A lot
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="feeling" value="Completely" onclick="uncheckOthers('feeling', this)"> Completely
+        </label>
+
+        <!-- Direction of feeling change-->
+        <p>8. Was the homily's effect on your feelings positive or negative?</p>
+        <label>
+            <input type="checkbox" name="direction" value="Much more negative" onclick="uncheckOthers('direction', this)"> Much more negative
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="direction" value="Somewhat more negative" onclick="uncheckOthers('direction', this)"> Somewhat more negative
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "direction" value="No change to my feelings" onclick="uncheckOthers('direction', this)"> No change to my feelings
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="direction" value="Somewhat more positive" onclick="uncheckOthers('direction', this)"> Somewhat more positive
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="direction" value="Much more positive" onclick="uncheckOthers('direction', this)"> Much more positive
+        </label>
+
+        <!-- receptiveness-->
+        <p>9. How receptive do you anticipate the congregation would have been to the homily's message?</p>
+        <label>
+            <input type="checkbox" name="receptiveness" value="Not at all" onclick="uncheckOthers('receptiveness', this)"> Not at all
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="receptiveness" value="A little" onclick="uncheckOthers('receptiveness', this)"> A little
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "receptiveness" value="Somewhat" onclick="uncheckOthers('receptiveness', this)"> Somewhat
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="receptiveness" value="Very" onclick="uncheckOthers('receptiveness', this)"> Very
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="receptiveness" value="Completely" onclick="uncheckOthers('receptiveness', this)"> Completely
+        </label>
+
+        <!-- Engagement-->
+        <p>10. How engaged did you feel while watching the homily?</p>
+        <label>
+            <input type="checkbox" name="engaged" value="Not at all" onclick="uncheckOthers('engaged', this)"> Not at all
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="engaged" value="A little" onclick="uncheckOthers('engaged', this)"> A little
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "engaged" value="Somewhat" onclick="uncheckOthers('engaged', this)"> Somewhat
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="engaged" value="Very" onclick="uncheckOthers('engaged', this)"> Very
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="engaged" value="Completely" onclick="uncheckOthers('engaged', this)"> Completely
+        </label>
+
+        <!-- Effectiveness-->
+        <p>11. How effectively was the message communicated?</p>
+        <label>
+            <input type="checkbox" name="effectiveness" value="Not at all" onclick="uncheckOthers('effectiveness', this)"> Not at all
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="effectiveness" value="Not very" onclick="uncheckOthers('effectiveness', this)"> Not very
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "effectiveness" value="Somewhat" onclick="uncheckOthers('effectiveness', this)"> Somewhat
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="effectiveness" value="Very" onclick="uncheckOthers('effectiveness', this)"> Very
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="effectiveness" value="Completely" onclick="uncheckOthers('effectiveness', this)"> Completely
+        </label>
+
+        <!-- Achievement of homilist's goals-->
+        <p>12. Do you feel that the homilist achieved their goals in this homily?</p>
+        <label>
+            <input type="checkbox" name="goals" value="Not at all" onclick="uncheckOthers('goals', this)"> Not at all
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="goals" value="A little" onclick="uncheckOthers('goals', this)"> A little
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name= "goals" value="Somewhat" onclick="uncheckOthers('goals', this)"> Somewhat
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="goals" value="A lot" onclick="uncheckOthers('goals', this)"> A lot
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="goals" value="Completely" onclick="uncheckOthers('goals', this)"> Completely
+        </label>
+
+
+        <!--
+        // <br>
+        // <br>
+        // <label for="freeform">12. How do you believe that the audience received the message of this Homily? How receptive do you anticipate they would have been to its message? (25 word minimum): </label>
+        // <br>
+        // <textarea id="receptiveness" name="freeform" rows="4" cols="50"></textarea>
+        -->
+
+
+        <br>
+        <br>
+        <label for="freeform">13. Additional Comments (optional):</label>
+        <br>
+        <textarea id="generalAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
+
+        <h1>Organization and Content</h1>
+
+        <p>14. Engaging Introduction</p>
+        <label>
+            <input type="checkbox" name="engaging" value="1" onclick="uncheckOthers('engaging', this)"> 1 (worst)
+        </label><br>
+        <label>
+          <input type="checkbox" name="engaging" value="2" onclick="uncheckOthers('engaging', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "engaging" value="3" onclick="uncheckOthers('engaging', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="engaging" value="4" onclick="uncheckOthers('engaging', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="engaging" value="5" onclick="uncheckOthers('engaging', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="engaging" value="6" onclick="uncheckOthers('engaging', this)"> 6 (best)
+        </label>
+
+        <p>15. Main Points Clearly Stated</p>
+        <label>
+            <input type="checkbox" name="clarity" value="1" onclick="uncheckOthers('clarity', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="clarity" value="2" onclick="uncheckOthers('clarity', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "clarity" value="3" onclick="uncheckOthers('clarity', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="clarity" value="4" onclick="uncheckOthers('clarity', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="clarity" value="5" onclick="uncheckOthers('clarity', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="clarity" value="6" onclick="uncheckOthers('clarity', this)"> 6
+        </label>
+
+
+        <p>16. Well Organized</p>
+        <label>
+            <input type="checkbox" name="organization" value="1" onclick="uncheckOthers('organization', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="organization" value="2" onclick="uncheckOthers('organization', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "organization" value="3" onclick="uncheckOthers('organization', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="organization" value="4" onclick="uncheckOthers('organization', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="organization" value="5" onclick="uncheckOthers('organization', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="organization" value="6" onclick="uncheckOthers('organization', this)"> 6
+        </label>
+
+        <p>17. Appropriately Contextual</p>
+        <label>
+            <input type="checkbox" name="contextual" value="1" onclick="uncheckOthers('contextual', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="contextual" value="2" onclick="uncheckOthers('contextual', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "contextual" value="3" onclick="uncheckOthers('contextual', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="contextual" value="4" onclick="uncheckOthers('contextual', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="contextual" value="5" onclick="uncheckOthers('contextual', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="contextual" value="6" onclick="uncheckOthers('contextual', this)"> 6
+        </label>
+
+        <p>18. Engaging/Persuasive</p>
+        <label>
+            <input type="checkbox" name="persuasive" value="1" onclick="uncheckOthers('persuasive', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="persuasive" value="2" onclick="uncheckOthers('persuasive', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "persuasive" value="3" onclick="uncheckOthers('persuasive', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="persuasive" value="4" onclick="uncheckOthers('persuasive', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="persuasive" value="5" onclick="uncheckOthers('persuasive', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="persuasive" value="6" onclick="uncheckOthers('persuasive', this)"> 6
+        </label>
+
+        <p>19. Theological/Liturgical Literacy</p>
+        <label>
+            <input type="checkbox" name="theology" value="1" onclick="uncheckOthers('theology', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="theology" value="2" onclick="uncheckOthers('theology', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "theology" value="3" onclick="uncheckOthers('theology', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="theology" value="4" onclick="uncheckOthers('theology', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="theology" value="5" onclick="uncheckOthers('theology', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="theology" value="6" onclick="uncheckOthers('theology', this)"> 6
+        </label>
+
+        <p>20. Pastoral Accessibility</p>
+        <label>
+            <input type="checkbox" name="accessibility" value="1" onclick="uncheckOthers('accessibility', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="accessibility" value="2" onclick="uncheckOthers('accessibility', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "accessibility" value="3" onclick="uncheckOthers('accessibility', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="accessibility" value="4" onclick="uncheckOthers('accessibility', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="accessibility" value="5" onclick="uncheckOthers('accessibility', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="accessibility" value="6" onclick="uncheckOthers('accessibility', this)"> 6
+        </label>
+
+        <br>
+        <br>
+        <label for="freeform">21. Additional Comments (optional):</label>
+        <br>
+
+        <textarea id="organizationAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
+
+
+
+
+        
+        <h1>Language</h1>
+
+        <p>22. Appropriate to Oral Communication</p>
+        <label>
+            <input type="checkbox" name="communication" value="1" onclick="uncheckOthers('communication', this)"> 1 (worst)
+        </label><br>
+        <label>
+          <input type="checkbox" name="communication" value="2" onclick="uncheckOthers('communication', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "communication" value="3" onclick="uncheckOthers('communication', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="communication" value="4" onclick="uncheckOthers('communication', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="communication" value="5" onclick="uncheckOthers('communication', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="communication" value="6" onclick="uncheckOthers('communication', this)"> 6 (best)
+        </label>
+
+        <p>23. Naturalness</p>
+        <label>
+            <input type="checkbox" name="naturalness" value="1" onclick="uncheckOthers('naturalness', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="naturalness" value="2" onclick="uncheckOthers('naturalness', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "naturalness" value="3" onclick="uncheckOthers('naturalness', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="naturalness" value="4" onclick="uncheckOthers('naturalness', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="naturalness" value="5" onclick="uncheckOthers('naturalness', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="naturalness" value="6" onclick="uncheckOthers('naturalness', this)"> 6
+        </label>
+
+        <p>24. Grammar</p>
+        <label>
+            <input type="checkbox" name="grammar" value="1" onclick="uncheckOthers('grammar', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="grammar" value="2" onclick="uncheckOthers('grammar', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "grammar" value="3" onclick="uncheckOthers('grammar', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="grammar" value="4" onclick="uncheckOthers('grammar', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="grammar" value="5" onclick="uncheckOthers('grammar', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="grammar" value="6" onclick="uncheckOthers('grammar', this)"> 6
+        </label>
+
+        <p>25. Rhetorical/Poetic Richness</p>
+        <label>
+            <input type="checkbox" name="rhetoric" value="1" onclick="uncheckOthers('rhetoric', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="rhetoric" value="2" onclick="uncheckOthers('rhetoric', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "rhetoric" value="3" onclick="uncheckOthers('rhetoric', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="rhetoric" value="4" onclick="uncheckOthers('rhetoric', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="rhetoric" value="5" onclick="uncheckOthers('rhetoric', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="rhetoric" value="6" onclick="uncheckOthers('rhetoric', this)"> 6
+        </label>
+
+        <p>26. Accessibility to Assembly</p>
+        <label>
+            <input type="checkbox" name="assembly" value="1" onclick="uncheckOthers('assembly', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="assembly" value="2" onclick="uncheckOthers('assembly', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "assembly" value="3" onclick="uncheckOthers('assembly', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="assembly" value="4" onclick="uncheckOthers('assembly', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="assembly" value="5" onclick="uncheckOthers('assembly', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="assembly" value="6" onclick="uncheckOthers('assembly', this)"> 6
+        </label>
+
+        <br>
+        <br>
+        <label for="freeform">27. Additional Comments (optional):</label>
+        <br>
+
+        <textarea id="languageAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
+
+
+
+
+        <h1>Voice</h1>
+
+        <p>28. Volume</p>
+        <label>
+            <input type="checkbox" name="volume" value="1" onclick="uncheckOthers('volume', this)"> 1 (worst)
+        </label><br>
+        <label>
+          <input type="checkbox" name="volume" value="2" onclick="uncheckOthers('volume', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "volume" value="3" onclick="uncheckOthers('volume', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="volume" value="4" onclick="uncheckOthers('volume', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="volume" value="5" onclick="uncheckOthers('volume', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="volume" value="6" onclick="uncheckOthers('volume', this)"> 6 (best)
+        </label>
+
+        <p>29. Rate/Pacing</p>
+        <label>
+            <input type="checkbox" name="rate" value="1" onclick="uncheckOthers('rate', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="rate" value="2" onclick="uncheckOthers('rate', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "rate" value="3" onclick="uncheckOthers('rate', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="rate" value="4" onclick="uncheckOthers('rate', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="rate" value="5" onclick="uncheckOthers('rate', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="rate" value="6" onclick="uncheckOthers('rate', this)"> 6
+        </label>
+
+        <p>30. Pitch</p>
+        <label>
+            <input type="checkbox" name="pitch" value="1" onclick="uncheckOthers('pitch', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="pitch" value="2" onclick="uncheckOthers('pitch', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "pitch" value="3" onclick="uncheckOthers('pitch', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="pitch" value="4" onclick="uncheckOthers('pitch', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="pitch" value="5" onclick="uncheckOthers('pitch', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="pitch" value="6" onclick="uncheckOthers('pitch', this)"> 6
+        </label>
+
+        <p>31. Vocal Variety</p>
+        <label>
+            <input type="checkbox" name="variety" value="1" onclick="uncheckOthers('variety', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="variety" value="2" onclick="uncheckOthers('variety', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "variety" value="3" onclick="uncheckOthers('variety', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="variety" value="4" onclick="uncheckOthers('variety', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="variety" value="5" onclick="uncheckOthers('variety', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="variety" value="6" onclick="uncheckOthers('variety', this)"> 6
+        </label>
+
+        <p>32. Enunciation</p>
+        <label>
+            <input type="checkbox" name="enunciation" value="1" onclick="uncheckOthers('enunciation', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="enunciation" value="2" onclick="uncheckOthers('enunciation', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "enunciation" value="3" onclick="uncheckOthers('enunciation', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="enunciation" value="4" onclick="uncheckOthers('enunciation', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="enunciation" value="5" onclick="uncheckOthers('enunciation', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="enunciation" value="6" onclick="uncheckOthers('enunciation', this)"> 6
+        </label>
+
+        <p>33. Pronunciation</p>
+        <label>
+            <input type="checkbox" name="pronunciation" value="1" onclick="uncheckOthers('pronunciation', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="pronunciation" value="2" onclick="uncheckOthers('pronunciation', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name= "pronunciation" value="3" onclick="uncheckOthers('pronunciation', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="pronunciation" value="4" onclick="uncheckOthers('pronunciation', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="pronunciation" value="5" onclick="uncheckOthers('pronunciation', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="pronunciation" value="6" onclick="uncheckOthers('pronunciation', this)"> 6
+        </label>
+        <br>
+        <br>
+        <label for="freeform">34. Additional Comments (optional):</label>
+        <br>
+
+        <textarea id="voiceAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
+
+        <h1>Body</h1>
+
+        <!-- Posture -->
+        <p>35. Posture</p>
+        <label>
+          <input type="checkbox" name="posture" value="1" onclick="uncheckOthers('posture', this)"> 1 (worst)
+        </label><br>
+        <label>
+          <input type="checkbox" name="posture" value="2" onclick="uncheckOthers('posture', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name="posture" value="3" onclick="uncheckOthers('posture', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="posture" value="4" onclick="uncheckOthers('posture', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="posture" value="5" onclick="uncheckOthers('posture', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="posture" value="6" onclick="uncheckOthers('posture', this)"> 6 (best)
+        </label>
+
+        <!-- Control -->
+        <p>36. Control</p>
+        <label>
+          <input type="checkbox" name="control" value="1" onclick="uncheckOthers('control', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="control" value="2" onclick="uncheckOthers('control', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name="control" value="3" onclick="uncheckOthers('control', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="control" value="4" onclick="uncheckOthers('control', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="control" value="5" onclick="uncheckOthers('control', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="control" value="6" onclick="uncheckOthers('control', this)"> 6
+        </label>
+
+        <!-- Movement -->
+        <p>37. Effectiveness of Movement</p>
+        <label>
+          <input type="checkbox" name="movement" value="1" onclick="uncheckOthers('movement', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="movement" value="2" onclick="uncheckOthers('movement', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name="movement" value="3" onclick="uncheckOthers('movement', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="movement" value="4" onclick="uncheckOthers('movement', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="movement" value="5" onclick="uncheckOthers('movement', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="movement" value="6" onclick="uncheckOthers('movement', this)"> 6
+        </label>
+
+        <!-- gestures -->
+        <p>38. Effectiveness of Gestures</p>
+        <label>
+          <input type="checkbox" name="gestures" value="1" onclick="uncheckOthers('gestures', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="gestures" value="2" onclick="uncheckOthers('gestures', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name="gestures" value="3" onclick="uncheckOthers('gestures', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="gestures" value="4" onclick="uncheckOthers('gestures', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="gestures" value="5" onclick="uncheckOthers('gestures', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="gestures" value="6" onclick="uncheckOthers('gestures', this)"> 6
+        </label>
+
+        <!-- eye contact -->
+        <p>39. Effectiveness of Eye Contact</p>
+        <label>
+          <input type="checkbox" name="eyeContact" value="1" onclick="uncheckOthers('eyeContact', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="eyeContact" value="2" onclick="uncheckOthers('eyeContact', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name="eyeContact" value="3" onclick="uncheckOthers('eyeContact', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="eyeContact" value="4" onclick="uncheckOthers('eyeContact', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="eyeContact" value="5" onclick="uncheckOthers('eyeContact', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="eyeContact" value="6" onclick="uncheckOthers('eyeContact', this)"> 6
+        </label>
+
+        <!-- Emotional Connection -->
+        <p>40. Emotional Connection</p>
+        <label>
+          <input type="checkbox" name="emotionalConnection" value="1" onclick="uncheckOthers('emotionalConnection', this)"> 1
+        </label><br>
+        <label>
+          <input type="checkbox" name="emotionalConnection" value="2" onclick="uncheckOthers('emotionalConnection', this)"> 2
+        </label><br>
+        <label>
+          <input type="checkbox" name="emotionalConnection" value="3" onclick="uncheckOthers('emotionalConnection', this)"> 3
+        </label><br>
+        <label>
+          <input type="checkbox" name="emotionalConnection" value="4" onclick="uncheckOthers('emotionalConnection', this)"> 4
+        </label><br>
+        <label>
+          <input type="checkbox" name="emotionalConnection" value="5" onclick="uncheckOthers('emotionalConnection', this)"> 5
+        </label><br>
+        <label>
+          <input type="checkbox" name="emotionalConnection" value="6" onclick="uncheckOthers('emotionalConnection', this)"> 6
+        </label>
+        
+        <br>
+        <br>
+        <label for="freeform">41. Additional Comments (optional):</label>
+        <br>
+
+        <textarea id="additionalCommentsBody" name="freeform" rows="4" cols="50"></textarea>
+
+
+        </label>
+        <br>
+        <br>
+        <label for="otherComments">42. Other Valuable Commendations/Reccomendations (optional):</label>
+        <br>
+
+        <textarea id="otherComments" name="otherComments" rows="4" cols="50"></textarea>
+
+        <br>
+        <br>
+        <center>
+          <text id = 'errorMessage'></text>
+        </center>
+
+        <br>
+        <center>
+          <button onclick="submitForm()">Submit</button>
+        </center>
+        <br>
+      `;
+    }
+    // ----------------------------------------------------------------
+    // ----------------------------------------------------------------
+    // ----------------------------------------------------------------
+
+
+
+  
+    // this block of code checks if user has completed the form and if so,
+    // sends that data to the server to be stored as a csv file. 
+    // If not, an error message is displayed.
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+
+    // submits the form and send data if complete, otherwise gives error message
+    function submitForm() {
+      const isValid = validateForm();
+      if (!isValid) {
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = 'You must respond to all questions and meet all minimum required word counts';
+        setTimeout(function() {
+          errorMessage.textContent = '';
+        }, 3000);
+      }
+      else{         
+        // update viewed homilies on the server for that user and print server response
+        updateViewedHomilies().then(response => {
+          // get header and data and store as csv
+          header = getHeader();
+          data = getData();
+          sendResults(header, data);
+          updateHomilyCount();
+
+          // check if expert has reviewed all homilies and redirect appropriately
+          checkHomiliesCompleted().then(completed => {
+          console.log(completed);
+          if (!completed){
+            window.location.href = 'new_homily_wait_screen.html';
+          }
+          else{
+            window.location.href = 'preaching_experience.html';
+          }
+          });
+        });
+      }
+    }
+
+
+    // validates that the user answered all questions
+    // (helper for submit form)
+    function validateForm() {
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      let valid = true;
+      let name_dict = {};
+
+      // check for required textboxes meeting minimum word count
+      const responseHomilyMessage = document.getElementById("messageMeaning").value;
+      if (wordCount(responseHomilyMessage) < 25){
+        return false;
+      }
+
+      // collect all checkboxes of a given name into a list
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        try {
+          name_dict[name].push(checkboxes[i]);
+        } catch (error){
+          name_dict[name] = [checkboxes[i]];
+        }}
+        
+      for (const [key, value] of Object.entries(name_dict)){
+        let responded = false;
+        for (let i = 0; i < value.length; i++){
+          if (value[i].checked){
+            responded = true;}}
+
+          if (!responded){
+            valid = false;
+            break;
+          }
+        }
+      return valid;
+    }
+
+
+    // returns the word count of a string
+    // (helper for validate form)
+    function wordCount(string){
+      const words = string.split(" ");
+      return words.length;
+    }
+    
+    
+    // sends the user response to the server to be stored as a csv
+    // (helper for submit form)
+    async function sendResults(header, data){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const homilyId = sessionStorage.getItem('homilyId');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+      const url = `/api/storeQuestionnaireResults`;
+
+      // package the results in an Object to later stringify
+      let results = {}
+      for (let i = 0; i < header.length; i++){
+        results[String(header[i])] = String(data[i]);
+      }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({
+              'userId' : userId, 
+              'userType' : userType,
+              'homilyId' : homilyId,
+              'experimentSource' : experimentSource,
+              'experimentType' : experimentType,
+              'results' : JSON.stringify(results)})
+        });
+        return await response.json();
+      } 
+      
+    // updates the total homily count on the server
+    // helper for submitForm()
+    async function updateHomilyCount() {
+      const homilyId = sessionStorage.getItem('homilyId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+      const url = `/api/updateHomilyCount`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({'homilyId' : String(homilyId), 'userType': userType, 'experimentSource' : experimentSource, 'experimentType' : experimentType})
+      });
+      return await response.json();
+    }
+
+
+    // checks if the expert has viewed all of the homilies for proper redirection
+    // (helper for submitForm)
+    async function checkHomiliesCompleted(){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+      
+      const url = `/api/allHomiliesViewed/${userId}/${userType}/${experimentSource}/${experimentType}`;
+
+      try{
+        const response = await fetch(url);
+        if (!response.ok){
+              throw new Error('HTTP error! status: ${completed.status}');
+          }
+          const completed = await response.json()
+          return await completed.done;
+      } catch (error) {
+          console.error("Unable to fetch completion data");
+          return null;
+        }
+    }
+
+    
+    // update the list of homilies that the user has seen on the server 
+    // (helper for "submitForm()")
+    async function updateViewedHomilies(){
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const homilyId = sessionStorage.getItem('homilyId');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      console.log('session storage: ', userId, userType, homilyId)
+      const url = '/api/updateViewedHomilies';
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({
+              'userId' : userId, 
+              'userType' : userType,
+              'experimentSource' : experimentSource,
+              'experimentType' : experimentType,
+              'homilyId' : homilyId})
+      });
+
+      return await response.json();
+    }
+
+
+    // gets the header for the soon-to-be csv file on the server
+    // (helper for "submitForm())
+    function getHeader(){
+      let homilyName = sessionStorage.getItem('homilyId');
+      let checkboxNames = [];
+      let textboxNames = [];
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const textboxes = document.querySelectorAll('textarea');
+
+      // collect all check box names in order
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        if (checkboxNames.includes(name)){
+          continue;
+        }
+        checkboxNames.push(name);
+      }
+
+      // collect all textbox names
+      for (let i = 0; i < textboxes.length; i++){
+        name = textboxes[i].id;
+        textboxNames.push(name);
+      }
+
+      return checkboxNames.concat(textboxNames);
+    }
+
+    
+    // gets the header for the soon-to-be csv file on the server
+    // (helper for "submitForm())
+    function getData(){
+      let name_dict = {};
+      let checkboxData = [];
+      let textboxData = [];
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      const textboxes = document.querySelectorAll('textarea');
+
+      // collect all checkboxes of a given name into a list
+      for (let i = 0; i < checkboxes.length; i++){
+        name = checkboxes[i].name;
+        try {
+          name_dict[name].push(checkboxes[i]);
+          } catch (error){
+            name_dict[name] = [checkboxes[i]];}}
+            
+        // iterate over all checkbox questions
+        for (const [key, value] of Object.entries(name_dict)){
+          // iterate over each checkbox in a given question
+          for (let i = 0; i < value.length; i++){
+            let option = value[i];
+            // add all values of checked checkboxes to the list
+            if (option.checked){
+              checkboxData.push(String(option.value));}}}
+
+          // iterate over all textbox questions
+          for (let i = 0; i < textboxes.length; i++){
+            let textEntry = textboxes[i].value;
+            textboxData.push(textEntry);}
+
+      return checkboxData.concat(textboxData); 
+    }
+
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+
+
+    
+    // ensures that the user has at most one checkbox selected at a time
+    function uncheckOthers(groupName, currentCheckbox) {
+      const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+      checkboxes.forEach(checkbox => {
+        if (checkbox !== currentCheckbox) {
+          checkbox.checked = false;
+        }})};
+
+
+    // prevents the user from navigating backwards through the experiment
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function (event) {
+      history.pushState(null, document.title, location.href);});
+
+  </script>
+</body>
+</html>

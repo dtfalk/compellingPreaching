@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homily Review</title>
+    <style>
+        .video-container {
+            font-family: 'Times New Roman', Times, serif;
+            width: 50%; /* or any width you prefer */
+            height: 50%; /* or any height you prefer */
+            border: 1px solid #000; /* optional: for styling */
+            margin: auto; /* centers the video container */
+            position: relative; /* for positioning the video element */
+        }
+        video{
+            font-family: 'Times New Roman', Times, serif;
+            width: 100%;
+            height: 100%
+        }
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            justify-content: center;
+            align-items: center;
+            display: block;
+            font-family: 'Arial', sans-serif;
+            background-color:#800000;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        header {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        main {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            color: #3498db;
+        }
+        p {
+            font-family: 'Times New Roman', Times, serif;
+            display: block;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+        }
+        text {
+            font-family: 'Times New Roman', Times, serif;
+            display: none;
+            font-size: 16px;
+            line-height: 1.6;
+            color:red
+        }
+    </style>
+</head>
+<body onload="initialize()">
+
+<main id="instructionsSection">
+    <div class = "video-container">
+        <video id = 'homilyVideo' controls disablePictureInPicture controlsList="nodownload noplaybackrate"></video>
+    </div>
+    <p>Press the "continue" button below to continue to the questionnaire once you have completed the homily.</p>
+    <text id = 'errorMessage'>You must complete the entire homily before continuing.</text>
+
+    <br> <br> <br>
+    <button onclick="submitForm()">Continue</button>
+<br>
+</main>
+
+<script>
+
+    sessionStorage.setItem('userType', 'laymen');
+    sessionStorage.setItem('experimentSource', 'sona');
+    sessionStorage.setItem('experimentType', 'av');
+
+
+    // this block of code fetches a random unused homily and displays it
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    const userId = sessionStorage.getItem('userId');
+    const userType = sessionStorage.getItem('userType');
+    const experimentSource = sessionStorage.getItem('experimentSource');
+    const experimentType = sessionStorage.getItem('experimentType');
+    const url = `/api/randomHomily/${userId}/${userType}/${experimentSource}/${experimentType}`;
+
+    // initialize by getting a random video and setting session variable
+    function initialize(){
+        fetchRandomVideo().then(homily => {
+            if(homily){
+                console.log(homily.media);
+                document.getElementById('homilyVideo').src = homily.media;
+                sessionStorage.setItem('homilyId', homily.media);
+            } else{
+                console.error('Failed to fetch homily.');
+            }
+        })
+    }
+
+
+    // fetches a random unused homily from server (helper for "initialize()")
+    async function fetchRandomVideo(){
+        try {
+            const homily = await fetch(url);
+            if (!homily.ok){
+                throw new Error('HTTP error! status: ${homily.status}');
+            }
+            return await homily.json();
+        } catch(error){
+            console.error('Error fetching data: ', error);
+            return null;
+        }
+    }
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+
+
+    // This brick of code is for preventing the user from
+    // skipping through the homily
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    let seconds_achieved = [0]; // keeps track of moments a user obtained
+    let furthestPoint = 0; // at beginning of 
+    let isSeeking = false;
+    const video = document.getElementById('homilyVideo');
+
+
+    // update the furthest point attained in the homily
+    video.addEventListener('timeupdate', function() {
+        setTimeout(function() {
+        if ((video.currentTime > furthestPoint)  && !isSeeking) {
+
+            // only update the furthest point attained if the homily's previous second attained
+            if ((Math.floor(video.currentTime) - 1) == seconds_achieved[seconds_achieved.length - 1]){
+                furthestPoint = video.currentTime; // update furthest point
+
+                // add a given value to the attained times only once
+                if (!(Math.floor(video.currentTime) == seconds_achieved[seconds_achieved.length - 1])){
+                    seconds_achieved.push(Math.floor(video.currentTime));
+                }
+            }};}, 1);
+    });
+
+
+    // check if the user is trying to navigate through the homily
+    video.addEventListener('seeking', function(event) {
+        isSeeking = true;
+    });
+
+
+    // check when the user has stopped trying to navigate through the homily
+    video.addEventListener('seeked', function(event){
+        if (video.currentTime > furthestPoint){
+            video.currentTime = furthestPoint;
+        }
+        isSeeking = false;
+    });
+
+    // prevents the user from changing the rate of playback
+    document.addEventListener("DOMContentLoaded", function() {
+        var homilyVideo = document.getElementById('homilyVideo');
+
+        homilyVideo.addEventListener('ratechange', function() {
+        if (homilyVideo.playbackRate != 1) {
+            homilyVideo.playbackRate = 1;
+        }
+    });
+});
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+
+
+    // see if user has completed homily and if so, allow them to proceed
+    function submitForm() {
+
+        // if not completed, show error message
+        if (furthestPoint < video.duration - 1){ // change to ... < video.duration in final code
+            let text = document.getElementById('errorMessage');
+            text.style.display = 'block';
+            setTimeout(function() {
+                text.style.display = 'none'
+            }, 3000);
+            return
+        }
+        // If completed, then proceed to questionnaire
+        window.location.href = "questionnaire.html";
+    }
+
+    // prevents the user from navigating backwards through the experiment
+    history.pushState(null, document.title, location.href);
+    window.addEventListener('popstate', function (event) {
+        history.pushState(null, document.title, location.href);
+    });
+</script>
+
+</body>
+</html>

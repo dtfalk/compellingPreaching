@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homily Review</title>
+  <style>
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      margin: 0;
+      overflow: auto;
+    }
+    #background {
+      font-family: 'Times New Roman', Times, serif;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color:#800000;
+      z-index: -1;
+    }
+    .questionnaire-container {
+      font-family: 'Times New Roman', Times, serif;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 20px;
+      background-color: white;
+      z-index: 1;
+      }
+      h1, h2 {
+        font-family: 'Times New Roman', Times, serif;
+        text-decoration: underline;
+        text-align: center;
+      }
+      text{
+        font-family: 'Times New Roman', Times, serif;
+        color: red;
+      }
+    
+  </style>
+</head>
+<body onload="showQuestionnaire()">
+  <div id="background"></div>
+  <div id="questionnaireContainer" class="questionnaire-container">
+  </div>
+
+  <script>
+
+    sessionStorage.setItem('userType', 'laymen');
+    sessionStorage.setItem('experimentSource', 'sona');
+    sessionStorage.setItem('experimentType', 'audio');  
+
+    // this block of code creates and displays the questionnaire to the subject
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
+    // shows the questionnaire
+    function showQuestionnaire() {
+      const questionnaireContainer = document.getElementById('questionnaireContainer');
+      questionnaireContainer.innerHTML = generateQuestionnaireHTML();
+
+      // Display the questionnaire
+      questionnaireContainer.style.display = 'block';
+    }
+
+    // generates the HTML for the questionnaire
+    function generateQuestionnaireHTML() {
+      // You can customize the questionnaire HTML generation based on your requirements
+      return `
+        <h1>University of Chicago Online Consent Form for Research Participation </h1>
+        <h2><b>Study Number: </b> IRB24-0068</h2>
+        <h2><b>Study Title: </b> Understanding Preaching</h2>
+        <h2><b>Researcher(s): </b> Howard Nusbaum</h2>
+        <h2><b>Sponsor: </b> Catholic Theological Union</h2><br>
+
+        <h2><b>Description </b> </h2>
+        <p> We are researchers at the University of Chicago doing a research study about understanding preaching. 
+          You will be asked to watch or listen to recordings of homilies (a type of Catholic sermon) 
+          and rate them on different aspects with the use of a questionnaire. You will also be asked for your demographic information.</p>
+        <p> Participation should take approximately 35-45 minutes.</p>
+        <p> Your participation is voluntary.</p>
+
+        <h2><b>Incentives </b></h2>
+        <p> You will be compensated one SONA credit for your participation.</p>
+
+        <h2><b>Risks and Benefits </b> </h2>
+        <p> Your participation in this study does not involve any risk to you beyond that of everyday life.
+           Risks for this task are minimal and include boredom, minor fatigue, and the possibility of a breach of confidentiality.
+           Taking part in this research study may not benefit you personally beyond learning about psychological research, 
+           but we may learn new things that could help others and contribute to the field of psychology.</p>
+
+        <h2><b>Confidentiality </b> </h2>
+        <p>Any identifiable data or information collected by this study will never be shared outside the research team. De-identified 
+          information from this study may be used for future research studies or shared with other researchers for future research 
+          without your additional informed consent. We may also upload your data (in both aggregate and individual form) to public data repositories. 
+          Your study data will be handled as confidentially as possible. If results of this study are published or presented, 
+          your individual name will not be used. If you decide to withdraw from this study, any data already collected will be destroyed.</p>
+        
+        <h2><b>Contacts and Questions </b></h2>
+        <p>If you have questions or concerns about the study, you can contact Jean Matelski Boulware at (312) 860-9260 or at matelskiboulware@uchicago.edu. </p>
+        <p>If you have any questions about your rights as a participant in this research, feel you have been harmed, 
+          or wish to discuss other study-related concerns with someone who is not part of the research team, 
+          you can contact the University of Chicago Social & Behavioral Sciences Institutional Review Board (IRB) Office by phone at (773) 702-2915, 
+          or by email at sbs-irb@uchicago.edu. </p>
+        
+        <h2><b>Consent </b></h2>
+        <p>Participation is voluntary. Refusal to participate or withdrawing from the research will involve no penalty or loss of benefits to which you might otherwise be entitled.</p>
+        <p>By selecting “I agree” below, you confirm that you have read the consent form, are at least 18 years old, and agree to participate in the research. Please print or save a copy of this page for your records.</p>  
+        <p>By selecting “I do NOT agree” you will be taken to a screen that exits you from the survey.</p>
+        
+        
+        <label>
+          <input type = "checkbox" name = "consent" value = "agree" onclick = "uncheckOthers('consent', this)"> I agree
+        </label>
+        <br>
+        <label>
+          <input type = "checkbox" name = "consent" value = "disagree" onclick = "uncheckOthers('consent', this)"> I do NOT agree
+        </label>
+        <br>
+        <br>
+        <label for="email"> UChicago email address: </label>
+        <input type="text" id="email" name="email"><br>
+
+        <!-- Submit button -->
+        <br>
+        <br>
+        <center>
+          <text id = 'errorMessage'> </text>
+        </center>
+        <br>
+        <center>
+          <button onclick="submitForm()">Submit</button>
+        </center>
+        <br>
+      `;
+    }
+    
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+
+
+
+    // this block of code checks if the user has completed the form and redirects 
+    // the user appropriately (e.g. error message or form submitted to server)
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    
+    // submits the form and send data if complete, otherwise gives error message
+    function submitForm() {
+
+      // results relating to the user's input (is it valid and what data did they provide)
+      const resultsArray = validateForm();
+      const isValid = resultsArray[0]; // get info about if the submission was valid
+      const consented = resultsArray[1] // true = consented, false = did not consent
+      const email = resultsArray[2] // the email address that the user entered
+
+      if (!isValid) {
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = 'Please choose an option and enter a UChicago email address';
+        setTimeout(function() {
+          errorMessage.textContent = '';
+        }, 3000);
+      }
+      else{     
+        // if the user has consented to the terms of the homily review
+        if (consented){
+          sendResults(consented, email);
+          window.location.href = 'introduction.html';
+        } 
+        // if the user has not consented to the terms of the homily review
+        else{
+          sendResults(consented, email);
+          window.location.href = 'nonConsent.html';
+          }
+        }
+      }
+    
+
+    // ensures that the user has responded to all questions properly
+    function validateForm() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        const email = document.getElementById("email");
+        let valid = true; // assume valid entry. Check conditions and switch to false if a condition is not met.
+        let resultsArray = [];
+        let consented = false;
+
+        // check that the user has entered something akin to a uchicago email address
+        if (!email.value.includes("@uchicago.edu")){ 
+          valid = false;
+        }
+
+        // checks that the user checked one of the boxes (i agree vs i do not agree)
+        let checked = false;
+        for (let i = 0; i < checkboxes.length; i++) {
+          if (checkboxes[i].checked) {
+            checked = true;
+
+            // if the checked response is "I agree", then update the variable reflecting that the user consented
+            if (checkboxes[i].value == 'agree'){
+              consented = true;
+            }
+          }
+        }
+        
+        // sets valid to false if no checkboxes have been checked
+        if (!checked){
+          valid = false;
+        }
+        resultsArray.push(valid, consented, email.value);
+
+        return resultsArray;
+      }
+  
+
+    // sends the user response to the server to be stored as a csv
+    // (helper for submit form)
+    async function sendResults(consented, email){
+
+      // user data about type of experiment and user ID
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource =  sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      const url = `/api/storeConsentInfo`;
+
+      // package the results in an Object to later stringify
+      let results = {'consented' : consented, 'email' : email};
+
+      console.log(results);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({
+              'userId' : userId, 
+              'userType' : userType,
+              'experimentSource' : experimentSource,
+              'experimentType' : experimentType,
+              'results' : JSON.stringify(results)})
+        });
+        return await response.json();
+      } 
+
+
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+    // --------------------------------------------------------------------------------
+  
+
+    // ensures that only one checkbox is selected at a time for a given question
+    function uncheckOthers(groupName, currentCheckbox) {
+      const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+      checkboxes.forEach(checkbox => {
+        if (checkbox !== currentCheckbox) {
+           checkbox.checked = false;
+          }
+        });
+    };
+
+    // prevents back navigation through experiment to best of my ability
+    history.pushState(null, document.title, location.href);
+    window.onpopstate = function (event) {
+        console.log("Back navigation attempted");
+        history.pushState(null, document.title, location.href);
+        };
+  </script>
+</body>
+</html>
