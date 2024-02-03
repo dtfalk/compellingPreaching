@@ -100,8 +100,18 @@ Running the Application:
 With all dependencies installed and files in place, you're ready to run the application. Ensure you are in the project's root directory (/compellingPreaching), then start the server:
 
 ==========================================================================================
-cd compellingPreaching
-npm start
+
+npm install pm2 -g
+
+pm2 start /var/www/compellingPreaching/app.js --name="compellingPreaching"
+
+pm2 startup
+
+systemctl restart httpd
+
+systemctl enable pm2-root
+
+systemctl start pm2-root
 (This command initiates the server by running "app.js")
 ==========================================================================================
 
