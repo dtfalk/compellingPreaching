@@ -31,7 +31,11 @@
       background-color: white;
       z-index: 1;
       }
-      h1, h2 {
+      h1 {
+        font-family: 'Times New Roman', Times, serif;
+        text-align: center;
+      }
+      h2 {
         font-family: 'Times New Roman', Times, serif;
         text-decoration: underline;
         text-align: center;
@@ -72,6 +76,9 @@
     function generateQuestionnaireHTML() {
       // You can customize the questionnaire HTML generation based on your requirements
       return `
+      <center>
+        <img src="uchicagoInsignia.png" width = 150>
+      </center>
         <h1>University of Chicago Online Consent Form for Research Participation </h1>
         <h2><b>Study Number: </b> IRB24-0068</h2>
         <h2><b>Study Title: </b> Understanding Preaching</h2>
