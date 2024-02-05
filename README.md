@@ -47,13 +47,13 @@ git clone https://github.com/dtfalk/compellingPreaching
 Change into the project directory:
 ========================================================
 cd compellingpreaching
-(or whatever cd commands get you to ../../../compellingPreaching)
 ========================================================
 
 
 3. Install Node Dependencies
 Within the project directory, install the necessary Node.js dependencies specified in the package.json file:
 ========================================================================
+cd compellingPreaching
 npm install
 (This command installs all the required packages to run the CompellingPreaching application according to the package.json file. If I missed a dependency, then you can likely use "npm install missing_dependency_name" to install the missing dependency)
 ========================================================================
@@ -76,7 +76,7 @@ Configuring the server:
 I have configured my code (as a result of needing to test the code on my own device) with a locally hosted node.js/node.express server. The uchicago servers use Apache to run their servers. In order to get this code working you will need to take a reverse-proxy mentality. You will need to run the node server on the server and then reroute the data to this local server once it reaches the uchicago server. So the user connects to the server with Apache (https), and then Apache reroutes the get/post requests to the locally hosted node server (http). I do not know how exactly to do this, but Eric Hoy was able to get this to work.
 
 Writing Permissions in this server:
-The code on the server is stored in the "server/compellingPreaching/public" folder. The data from the users is stored in the "server/data" folder. The "server/compellingPreaching/public" folder needs permission to write to the "server/data" folder. This should be the only permissions requirement, assuming that every folder is allowed to read from every other folder. 
+The code on the server is stored in the "server_name/compellingPreaching/public" folder. The data from the users is stored in the "server_name/data" folder. The "server_name/compellingPreaching/public" folder needs permission to write to the "server_name/data" folder. This should be the only permissions requirement, assuming that every folder is allowed to read from every other folder. 
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
@@ -100,6 +100,22 @@ systemctl enable pm2-root
 
 systemctl start pm2-root
 (This command initiates the server by running "app.js")
+==========================================================================================
+
+==========================================================================================
+npm install pm2 -g
+
+cd /var/www/compellingPreaching
+
+pm2 start app.js --name="app.js"
+
+pm2 startup
+
+systemctl restart httpd
+
+systemctl enable pm2-root
+
+systemctl start pm2-root
 ==========================================================================================
 
 -----------------------------------------------------------------------------
