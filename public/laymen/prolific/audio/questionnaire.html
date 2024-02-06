@@ -649,7 +649,13 @@
     // (helper for validate form)
     function wordCount(string){
       const words = string.split(" ");
-      return words.length;
+      wordcount = 0;
+      for (let i = 0; i < words.length; i++){
+        if (!words[i] == ' ') {
+          wordcount += 1;
+        }
+      }
+      return wordcount;
     }
     
     // updates the total homily count on the server
