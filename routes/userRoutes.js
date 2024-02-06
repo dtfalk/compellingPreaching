@@ -114,18 +114,6 @@ router.get('/checkExists/:userId/:userType/:experimentSource/:experimentType', a
     if (experimentSource == 'na'){ // if it is an expert change the value to an empty string (dumb but quick fix)
       experimentSource = '';
     }
-    await userData.fileQueueLogFile.enqueue(async () => {
-      userData.logToFile(userId, errorPath);
-    });
-    await userData.fileQueueLogFile.enqueue(async () => {
-      userData.logToFile(userType, errorPath);
-    });
-    await userData.fileQueueLogFile.enqueue(async () => {
-      userData.logToFile(experimentType, errorPath);
-    });
-    await userData.fileQueueLogFile.enqueue(async () => {
-      userData.logToFile(experimentSource, errorPath);
-    });
 
     let result;
     let newUserId; // potentially add functionality for multiple people with same prolific IDs?

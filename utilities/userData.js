@@ -537,14 +537,8 @@ async function checkExists(userId, userType, experimentSource, experimentType){
     if (userType == 'laymen') {
       let newUserId = await blippityBloop(String(userId));
       folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId));
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(folderPath, errorPath);
-    });
     } else {
       folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId));
-      await fileQueueLogFile.enqueue(async () => {
-        logToFile(folderPath, errorPath);
-      });
     }
 
     const templatePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), 'templates', 'usedHomilies.json');
