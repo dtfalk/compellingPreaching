@@ -88,107 +88,120 @@
         <!-- Compelling-ness -->
         <p>1. How compelling did you find this homily?</p>
         <label>
-          <input type="checkbox" name="compelling" value="Not at all" onclick="uncheckOthers('compelling', this)"> Not at all
+          <input type="checkbox" name="foundHomilyCompelling" value="1" onclick="uncheckOthers('foundHomilyCompelling', this)"> Not compelling (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="compelling" value="A little" onclick="uncheckOthers('compelling', this)"> A little
+          <input type="checkbox" name="foundHomilyCompelling" value="2" onclick="uncheckOthers('foundHomilyCompelling', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="compelling" value="Somewhat" onclick="uncheckOthers('compelling', this)"> Somewhat
+          <input type="checkbox" name="foundHomilyCompelling" value="3" onclick="uncheckOthers('foundHomilyCompelling', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="compelling" value="Very" onclick="uncheckOthers('compelling', this)"> Very
+          <input type="checkbox" name="foundHomilyCompelling" value="4" onclick="uncheckOthers('foundHomilyCompelling', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="compelling" value="Extremely" onclick="uncheckOthers('compelling', this)"> Extremely
+          <input type="checkbox" name="foundHomilyCompelling" value="5" onclick="uncheckOthers('foundHomilyCompelling', this)"> (5)
+        </label> 
+        <br>
+        <label>
+          <input type="checkbox" name="foundHomilyCompelling" value="6" onclick="uncheckOthers('foundHomilyCompelling', this)"> Very compelling (6)
         </label> 
         <br> <br>
         
 
         <!-- Understanding-->
-        <p>2. Do you understand the message being preached?</p>
+        <p>2. Did you understand the message being preached?</p>
         <label>
-          <input type="checkbox" name="understanding" value="Not at all" onclick="uncheckOthers('understanding', this)"> Not at all
+          <input type="checkbox" name="understandingOfMessagePreached" value="1" onclick="uncheckOthers('understandingOfMessagePreached', this)"> Did not understand it (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="understanding" value="A little" onclick="uncheckOthers('understanding', this)"> A little
+          <input type="checkbox" name="understandingOfMessagePreached" value="2" onclick="uncheckOthers('understandingOfMessagePreached', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="understanding" value="Somewhat" onclick="uncheckOthers('understanding', this)"> Somewhat
+          <input type="checkbox" name="understandingOfMessagePreached" value="3" onclick="uncheckOthers('understandingOfMessagePreached', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="understanding" value="A lot" onclick="uncheckOthers('understanding', this)"> A lot
+          <input type="checkbox" name="understandingOfMessagePreached" value="4" onclick="uncheckOthers('understandingOfMessagePreached', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="understanding" value="Completely" onclick="uncheckOthers('understanding', this)"> Completely
+          <input type="checkbox" name="understandingOfMessagePreached" value="5" onclick="uncheckOthers('understandingOfMessagePreached', this)"> (5)
+        </label> 
+        <br>
+        <label>
+          <input type="checkbox" name="understandingOfMessagePreached" value="6" onclick="uncheckOthers('understandingOfMessagePreached', this)"> Understood it very well (6)
         </label> 
         <br> <br>
 
         <br>
         <br>
-        <label for="freeform">3. What do you believe was the message of the homily? (25 word minimum): </label>
+        <label for="freeform">3. What did you understand the message of the homily to be? (25 word minimum): </label>
         <br>
         <textarea id="messageMeaning" name="freeform" rows="4" cols="50"></textarea>
+        <br> <br>
 
         <!-- Agreement-->
         <p>4. Do you agree with the homily's message?</p>
         <label>
-            <input type="checkbox" name="agreement" value="Totally disagree" onclick="uncheckOthers('agreement', this)"> Totally disagree
+            <input type="checkbox" name="agreementWithHomilyMessage" value="1" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="agreement" value="Disagree" onclick="uncheckOthers('agreement', this)"> Disagree
+          <input type="checkbox" name="agreementWithHomilyMessage" value="2" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "agreement" value="Slightly disagree" onclick="uncheckOthers('agreement', this)"> Slightly disagree
+          <input type="checkbox" name= "agreementWithHomilyMessage" value="3" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="agreement" value="Slightly agree" onclick="uncheckOthers('agreement', this)"> Slightly agree
+          <input type="checkbox" name="agreementWithHomilyMessage" value="4" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="agreement" value="Agree" onclick="uncheckOthers('agreement', this)"> Agree
+          <input type="checkbox" name="agreementWithHomilyMessage" value="5" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> (5)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="agreement" value="Totally agree" onclick="uncheckOthers('agreement', this)"> Totally agree
+          <input type="checkbox" name="agreementWithHomilyMessage" value="6" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> Yes (6)
         </label>
         <br> <br>
 
         <!-- Change in Thinking-->
         <p>5. Did the homily change your thinking about this message?</p>
         <label>
-            <input type="checkbox" name="thinking" value="Not at all" onclick="uncheckOthers('thinking', this)"> Not at all
+            <input type="checkbox" name="DidHomilyChangeYourThinking" value="1" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="thinking" value="A little" onclick="uncheckOthers('thinking', this)"> A little
+          <input type="checkbox" name="DidHomilyChangeYourThinking" value="2" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "thinking" value="Somewhat" onclick="uncheckOthers('thinking', this)"> Somewhat
+          <input type="checkbox" name= "DidHomilyChangeYourThinking" value="3" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="thinking" value="A lot" onclick="uncheckOthers('thinking', this)"> A lot
+          <input type="checkbox" name="DidHomilyChangeYourThinking" value="4" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="thinking" value="Completely" onclick="uncheckOthers('thinking', this)"> Completely
+          <input type="checkbox" name="DidHomilyChangeYourThinking" value="5" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> (5)
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="DidHomilyChangeYourThinking" value="6" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> Yes (6)
         </label>
         <br> <br>
 
-        <!-- Accepting of the message-->
+        <!-- Accepting of the message
         <p>6. Were you more or less accepting of the message being preached after watching the homily?</p>
         <label>
             <input type="checkbox" name="accepting" value="Much less accepting" onclick="uncheckOthers('accepting', this)"> Much less accepting
@@ -208,98 +221,119 @@
         <br>
         <label>
           <input type="checkbox" name="accepting" value="Much more accepting" onclick="uncheckOthers('accepting', this)"> Much more accepting
-        </label>
+        </label> -->
 
 
         <!-- Change in Feelings -->
-        <p>7. Did the homily change your feelings in any way?</p>
+        <p>6. Did the homily change your feelings in any way?</p>
         <label>
-            <input type="checkbox" name="feeling" value="Not at all" onclick="uncheckOthers('feeling', this)"> Not at all
+            <input type="checkbox" name="DidHomilyChangeYourFeelings" value="1" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="feeling" value="A little" onclick="uncheckOthers('feeling', this)"> A little
+          <input type="checkbox" name="DidHomilyChangeYourFeelings" value="2" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "feeling" value="Somewhat" onclick="uncheckOthers('feeling', this)"> Somewhat
+          <input type="checkbox" name= "DidHomilyChangeYourFeelings" value="3" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="feeling" value="A lot" onclick="uncheckOthers('feeling', this)"> A lot
+          <input type="checkbox" name="DidHomilyChangeYourFeelings" value="4" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="feeling" value="Completely" onclick="uncheckOthers('feeling', this)"> Completely
+          <input type="checkbox" name="DidHomilyChangeYourFeelings" value="5" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="DidHomilyChangeYourFeelings" value="6" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> Yes (6)
+        </label>
+        <br> <br>
 
         <!-- Direction of feeling change-->
-        <p>8. Was the homily's effect on your feelings positive or negative?</p>
+        <p>7. Was the homily's effect on your feelings positive or negative?</p>
         <label>
-            <input type="checkbox" name="direction" value="Much more negative" onclick="uncheckOthers('direction', this)"> Much more negative
+            <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="1" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> Negative (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="direction" value="Somewhat more negative" onclick="uncheckOthers('direction', this)"> Somewhat more negative
+          <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="2" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "direction" value="No change to my feelings" onclick="uncheckOthers('direction', this)"> No change to my feelings
+          <input type="checkbox" name= "DirectionOfHomilyFeelingChange" value="3" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="direction" value="Somewhat more positive" onclick="uncheckOthers('direction', this)"> Somewhat more positive
+          <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="4" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="direction" value="Much more positive" onclick="uncheckOthers('direction', this)"> Much more positive
+          <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="5" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="6" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> Positive (6)
+        </label>
+        <br> <br>
+
 
         <!-- Engagement-->
-        <p>9. How engaged did you feel while watching the homily?</p>
+        <p>8. Did you feel engaged while listening the homily?</p>
         <label>
-            <input type="checkbox" name="engaged" value="Not at all" onclick="uncheckOthers('engaged', this)"> Not at all
+            <input type="checkbox" name="engagedDuringHomily" value="1" onclick="uncheckOthers('engagedDuringHomily', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaged" value="A little" onclick="uncheckOthers('engaged', this)"> A little
+          <input type="checkbox" name="engagedDuringHomily" value="2" onclick="uncheckOthers('engagedDuringHomily', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "engaged" value="Somewhat" onclick="uncheckOthers('engaged', this)"> Somewhat
+          <input type="checkbox" name= "engagedDuringHomily" value="3" onclick="uncheckOthers('engagedDuringHomily', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaged" value="Very" onclick="uncheckOthers('engaged', this)"> Very
+          <input type="checkbox" name="engagedDuringHomily" value="4" onclick="uncheckOthers('engagedDuringHomily', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaged" value="Completely" onclick="uncheckOthers('engaged', this)"> Completely
+          <input type="checkbox" name="engagedDuringHomily" value="5" onclick="uncheckOthers('engagedDuringHomily', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="engagedDuringHomily" value="6" onclick="uncheckOthers('engagedDuringHomily', this)"> Yes (6)
+        </label>
+        <br> <br>
 
-        <!-- Effectiveness-->
-        <p>10. How effectively was the message communicated?</p>
+        <!-- Effectiveness -->
+        <p>9. Was the message effectively communicated?</p>
         <label>
-            <input type="checkbox" name="effectiveness" value="Not at all" onclick="uncheckOthers('effectiveness', this)"> Not at all
+            <input type="checkbox" name="effectiveMessageCommunication" value="1" onclick="uncheckOthers('effectiveMessageCommunication', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="effectiveness" value="Not very" onclick="uncheckOthers('effectiveness', this)"> Not very
+          <input type="checkbox" name="effectiveMessageCommunication" value="2" onclick="uncheckOthers('effectiveMessageCommunication', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "effectiveness" value="Somewhat" onclick="uncheckOthers('effectiveness', this)"> Somewhat
+          <input type="checkbox" name= "effectiveMessageCommunication" value="3" onclick="uncheckOthers('effectiveMessageCommunication', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="effectiveness" value="Very" onclick="uncheckOthers('effectiveness', this)"> Very
+          <input type="checkbox" name="effectiveMessageCommunication" value="4" onclick="uncheckOthers('effectiveMessageCommunication', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="effectiveness" value="Completely" onclick="uncheckOthers('effectiveness', this)"> Completely
+          <input type="checkbox" name="effectiveMessageCommunication" value="5" onclick="uncheckOthers('effectiveMessageCommunication', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="effectiveMessageCommunication" value="6" onclick="uncheckOthers('effectiveMessageCommunication', this)"> Yes (6)
+        </label>
+        <br> <br>
 
-        <!-- Mental Picture-->
+        <!-- Mental Picture
         <p>11. While you were listening to the homily, were you able to mentally picture aspects of what was being preached?</p>
         <label>
           <input type="checkbox" name="picturingEvents" value="Not at all" onclick="uncheckOthers('picturingEvents', this)"> Not at all
@@ -319,9 +353,9 @@
         <br>
         <label>
           <input type="checkbox" name="picturingEvents" value="Completely" onclick="uncheckOthers('picturingEvents', this)"> Completely
-        </label> 
+        </label>  -->
 
-        <!-- activity in the room -->
+        <!-- activity in the room
         <p>12. While you were listening to the homily, was activity going on in the room around you on your mind? </p>
         <label>
           <input type="checkbox" name="extraneousActivity" value="Not at all" onclick="uncheckOthers('extraneousActivity', this)"> Not at all
@@ -341,9 +375,9 @@
         <br>
         <label>
           <input type="checkbox" name="extraneousActivity" value="Completely" onclick="uncheckOthers('extraneousActivity', this)"> Completely
-        </label> 
+        </label> -->
 
-        <!-- Placing oneself in the scene -->
+        <!-- Placing oneself in the scene
         <p>13. While you were listening to the homily, could you picture yourself in the scene of the events/narrative described in the homily? </p>
         <label>
           <input type="checkbox" name="mentallyPlacing" value="Not at all" onclick="uncheckOthers('mentallyPlacing', this)"> Not at all
@@ -363,9 +397,9 @@
         <br>
         <label>
           <input type="checkbox" name="mentallyPlacing" value="Completely" onclick="uncheckOthers('mentallyPlacing', this)"> Completely
-        </label>
+        </label> -->
 
-        <!-- Mental Involvement in the Homily -->
+        <!-- Mental Involvement in the Homily
         <p>14. Were you mentally involved in the narrative while you were listening to it? </p>
         <label>
           <input type="checkbox" name="mentalInvolvement" value="Not at all" onclick="uncheckOthers('mentalInvolvement', this)"> Not at all
@@ -385,9 +419,9 @@
         <br>
         <label>
           <input type="checkbox" name="mentalInvolvement" value="Completely" onclick="uncheckOthers('mentalInvolvement', this)"> Completely
-        </label>
+        </label> -->
 
-        <!-- Persistance of Narrative -->
+        <!-- Persistence of Narrative
         <p>15. After finishing the homily, did you find it easy to put it out of your mind? </p>
         <label>
           <input type="checkbox" name="narrativePersistence" value="Not at all" onclick="uncheckOthers('narrativePersistence', this)"> Not at all
@@ -407,53 +441,63 @@
         <br>
         <label>
           <input type="checkbox" name="narrativePersistence" value="Completely" onclick="uncheckOthers('narrativePersistence', this)"> Completely
-        </label>
+        </label> -->
 
         <!-- Excitement relating to the ending -->
-        <p>16. As the homily progressed, did you find yourself interested in how the homily would end? </p>
+        <p>10. As the homily progressed, did you find yourself interested in how the homily would end? </p>
         <label>
-          <input type="checkbox" name="teleologicalExcitement" value="Not at all" onclick="uncheckOthers('teleologicalExcitement', this)"> Not at all
+          <input type="checkbox" name="AnticipationAboutEndingOfHomily" value="1" onclick="uncheckOthers('AnticipationAboutEndingOfHomily', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="teleologicalExcitement" value="A little" onclick="uncheckOthers('teleologicalExcitement', this)"> A little
+          <input type="checkbox" name="AnticipationAboutEndingOfHomily" value="2" onclick="uncheckOthers('AnticipationAboutEndingOfHomily', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="teleologicalExcitement" value="Somewhat" onclick="uncheckOthers('teleologicalExcitement', this)"> Somewhat
+          <input type="checkbox" name="AnticipationAboutEndingOfHomily" value="3" onclick="uncheckOthers('AnticipationAboutEndingOfHomily', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="teleologicalExcitement" value="A lot" onclick="uncheckOthers('teleologicalExcitement', this)"> A lot
+          <input type="checkbox" name="AnticipationAboutEndingOfHomily" value="4" onclick="uncheckOthers('AnticipationAboutEndingOfHomily', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="teleologicalExcitement" value="Completely" onclick="uncheckOthers('teleologicalExcitement', this)"> Completely
+          <input type="checkbox" name="AnticipationAboutEndingOfHomily" value="5" onclick="uncheckOthers('AnticipationAboutEndingOfHomily', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="AnticipationAboutEndingOfHomily" value="6" onclick="uncheckOthers('AnticipationAboutEndingOfHomily', this)"> Yes (6)
+        </label>
+        <br> <br>
 
         <!-- Emotional effect of the homily -->
-        <p>17. Did the homily effect you emotionally? </p>
+        <p>11. Did the homily effect you emotionally? </p>
         <label>
-          <input type="checkbox" name="emotionalEffect" value="Not at all" onclick="uncheckOthers('emotionalEffect', this)"> Not at all
+          <input type="checkbox" name="emotionalEffectOfHomily" value="1" onclick="uncheckOthers('emotionalEffectOfHomily', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="emotionalEffect" value="A little" onclick="uncheckOthers('emotionalEffect', this)"> A little
+          <input type="checkbox" name="emotionalEffectOfHomily" value="2" onclick="uncheckOthers('emotionalEffectOfHomily', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="emotionalEffect" value="Somewhat" onclick="uncheckOthers('emotionalEffect', this)"> Somewhat
+          <input type="checkbox" name="emotionalEffectOfHomily" value="3" onclick="uncheckOthers('emotionalEffectOfHomily', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="emotionalEffect" value="A lot" onclick="uncheckOthers('emotionalEffect', this)"> A lot
+          <input type="checkbox" name="emotionalEffectOfHomily" value="4" onclick="uncheckOthers('emotionalEffectOfHomily', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="emotionalEffect" value="Completely" onclick="uncheckOthers('emotionalEffect', this)"> Completely
+          <input type="checkbox" name="emotionalEffectOfHomily" value="5" onclick="uncheckOthers('emotionalEffectOfHomily', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="emotionalEffectOfHomily" value="6" onclick="uncheckOthers('emotionalEffectOfHomily', this)"> Yes (6)
+        </label>
+        <br> <br>
 
-        <!-- other outcomes -->
+        <!-- other outcomes
         <p>18. After listening to the homily did you find yourself thinking about how it could have turned out differently? </p>
         <label>
           <input type="checkbox" name="changeOfOutcome" value="Not at all" onclick="uncheckOthers('changeOfOutcome', this)"> Not at all
@@ -473,53 +517,64 @@
         <br>
         <label>
           <input type="checkbox" name="changeOfOutcome" value="Completely" onclick="uncheckOthers('changeOfOutcome', this)"> Completely
-        </label>
+        </label> -->
 
         <!-- mind wandering -->
-        <p>19. Did you find your mind wandering while listening to this homily? </p>
+        <p>12. Did you find your mind wandering while listening to this homily? </p>
         <label>
-          <input type="checkbox" name="mindWandering" value="Not at all" onclick="uncheckOthers('mindWandering', this)"> Not at all
+          <input type="checkbox" name="mindWanderingDuringHomily" value="1" onclick="uncheckOthers('mindWanderingDuringHomily', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="mindWandering" value="A little" onclick="uncheckOthers('mindWandering', this)"> A little
+          <input type="checkbox" name="mindWanderingDuringHomily" value="2" onclick="uncheckOthers('mindWanderingDuringHomily', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="mindWandering" value="Somewhat" onclick="uncheckOthers('mindWandering', this)"> Somewhat
+          <input type="checkbox" name="mindWanderingDuringHomily" value="3" onclick="uncheckOthers('mindWanderingDuringHomily', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="mindWandering" value="A lot" onclick="uncheckOthers('mindWandering', this)"> A lot
+          <input type="checkbox" name="mindWanderingDuringHomily" value="4" onclick="uncheckOthers('mindWanderingDuringHomily', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="mindWandering" value="Completely" onclick="uncheckOthers('mindWandering', this)"> Completely
+          <input type="checkbox" name="mindWanderingDuringHomily" value="5" onclick="uncheckOthers('mindWanderingDuringHomily', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="mindWanderingDuringHomily" value="6" onclick="uncheckOthers('mindWanderingDuringHomily', this)"> Yes (6)
+        </label>
+        <br> <br>
+
 
         <!-- Relevance of Homily to subject -->
-        <p>20. Did you find the events/messages/themes in this homily relevant to your everyday life? </p>
+        <p>13. Did you find the this homily relevant to your everyday life? </p>
         <label>
-          <input type="checkbox" name="homilyRelevance" value="Not at all" onclick="uncheckOthers('homilyRelevance', this)"> Not at all
+          <input type="checkbox" name="RelevanceToEverydayLife" value="1" onclick="uncheckOthers('RelevanceToEverydayLife', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="homilyRelevance" value="A little" onclick="uncheckOthers('homilyRelevance', this)"> A little
+          <input type="checkbox" name="RelevanceToEverydayLife" value="2" onclick="uncheckOthers('RelevanceToEverydayLife', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="homilyRelevance" value="Somewhat" onclick="uncheckOthers('homilyRelevance', this)"> Somewhat
+          <input type="checkbox" name="RelevanceToEverydayLife" value="3" onclick="uncheckOthers('RelevanceToEverydayLife', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="homilyRelevance" value="A lot" onclick="uncheckOthers('homilyRelevance', this)"> A lot
+          <input type="checkbox" name="RelevanceToEverydayLife" value="4" onclick="uncheckOthers('RelevanceToEverydayLife', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="homilyRelevance" value="Completely" onclick="uncheckOthers('homilyRelevance', this)"> Completely
+          <input type="checkbox" name="RelevanceToEverydayLife" value="5" onclick="uncheckOthers('RelevanceToEverydayLife', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="RelevanceToEverydayLife" value="6" onclick="uncheckOthers('RelevanceToEverydayLife', this)"> Yes (6)
+        </label>
+        <br> <br>
 
-        <!-- Life changing -->
+        <!-- Life changing
         <p>21. Did the message in this homily have a significant effect on your outlook on life? </p>
         <label>
           <input type="checkbox" name="lifeChanging" value="Not at all" onclick="uncheckOthers('lifeChanging', this)"> Not at all
@@ -539,7 +594,7 @@
         <br>
         <label>
           <input type="checkbox" name="lifeChanging" value="Completely" onclick="uncheckOthers('lifeChanging', this)"> Completely
-        </label>
+        </label> -->
 
         <br>
         <br>
