@@ -82,103 +82,119 @@
         <!-- Compelling-ness -->
         <p>1. How compelling did you find this homily?</p>
         <label>
-          <input type="checkbox" name="compelling" value="Not at all" onclick="uncheckOthers('compelling', this)"> Not at all
+          <input type="checkbox" name="foundHomilyCompelling" value="1" onclick="uncheckOthers('foundHomilyCompelling', this)"> Not compelling (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="compelling" value="A little" onclick="uncheckOthers('compelling', this)"> A little
+          <input type="checkbox" name="foundHomilyCompelling" value="2" onclick="uncheckOthers('foundHomilyCompelling', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="compelling" value="Somewhat" onclick="uncheckOthers('compelling', this)"> Somewhat
+          <input type="checkbox" name="foundHomilyCompelling" value="3" onclick="uncheckOthers('foundHomilyCompelling', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="compelling" value="Very" onclick="uncheckOthers('compelling', this)"> Very
+          <input type="checkbox" name="foundHomilyCompelling" value="4" onclick="uncheckOthers('foundHomilyCompelling', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="compelling" value="Extremely" onclick="uncheckOthers('compelling', this)"> Extremely
+          <input type="checkbox" name="foundHomilyCompelling" value="5" onclick="uncheckOthers('foundHomilyCompelling', this)"> (5)
+        </label> 
+        <br>
+        <label>
+          <input type="checkbox" name="foundHomilyCompelling" value="6" onclick="uncheckOthers('foundHomilyCompelling', this)"> Very compelling (6)
         </label> 
         <br> <br>
         
 
         <!-- Understanding-->
-        <p>2. Do you understand the message being preached?</p>
+        <p>2. Did you understand the message being preached?</p>
         <label>
-          <input type="checkbox" name="understanding" value="Not at all" onclick="uncheckOthers('understanding', this)"> Not at all
+          <input type="checkbox" name="understandingOfMessagePreached" value="1" onclick="uncheckOthers('understandingOfMessagePreached', this)"> Did not understand it (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="understanding" value="A little" onclick="uncheckOthers('understanding', this)"> A little
+          <input type="checkbox" name="understandingOfMessagePreached" value="2" onclick="uncheckOthers('understandingOfMessagePreached', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="understanding" value="Somewhat" onclick="uncheckOthers('understanding', this)"> Somewhat
+          <input type="checkbox" name="understandingOfMessagePreached" value="3" onclick="uncheckOthers('understandingOfMessagePreached', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="understanding" value="A lot" onclick="uncheckOthers('understanding', this)"> A lot
+          <input type="checkbox" name="understandingOfMessagePreached" value="4" onclick="uncheckOthers('understandingOfMessagePreached', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="understanding" value="Completely" onclick="uncheckOthers('understanding', this)"> Completely
+          <input type="checkbox" name="understandingOfMessagePreached" value="5" onclick="uncheckOthers('understandingOfMessagePreached', this)"> (5)
+        </label> 
+        <br>
+        <label>
+          <input type="checkbox" name="understandingOfMessagePreached" value="6" onclick="uncheckOthers('understandingOfMessagePreached', this)"> Understood it very well (6)
         </label> 
         <br> <br>
 
         <br>
         <br>
-        <label for="freeform">3. What do you believe was the message of the homily? (25 word minimum): </label>
+        <label for="freeform">3. What did you understand the message of the homily to be? (25 word minimum): </label>
         <br>
         <textarea id="messageMeaning" name="freeform" rows="4" cols="50"></textarea>
 
         <!-- Agreement-->
         <p>4. Do you agree with the homily's message?</p>
         <label>
-            <input type="checkbox" name="agreement" value="Not at all" onclick="uncheckOthers('agreement', this)"> Not at all
+            <input type="checkbox" name="agreementWithHomilyMessage" value="1" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="agreement" value="A little" onclick="uncheckOthers('agreement', this)"> A little
+          <input type="checkbox" name="agreementWithHomilyMessage" value="2" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "agreement" value="Somewhat" onclick="uncheckOthers('agreement', this)"> Somewhat
+          <input type="checkbox" name= "agreementWithHomilyMessage" value="3" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="agreement" value="A lot" onclick="uncheckOthers('agreement', this)"> A lot
+          <input type="checkbox" name="agreementWithHomilyMessage" value="4" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="agreement" value="Completely" onclick="uncheckOthers('agreement', this)"> Completely
+          <input type="checkbox" name="agreementWithHomilyMessage" value="5" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> (5)
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="agreementWithHomilyMessage" value="6" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> Yes (6)
         </label>
         <br> <br>
 
         <!-- Change in Thinking-->
         <p>5. Did the homily change your thinking about this message?</p>
         <label>
-            <input type="checkbox" name="thinking" value="Not at all" onclick="uncheckOthers('thinking', this)"> Not at all
+            <input type="checkbox" name="DidHomilyChangeYourThinking" value="1" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="thinking" value="A little" onclick="uncheckOthers('thinking', this)"> A little
+          <input type="checkbox" name="DidHomilyChangeYourThinking" value="2" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "thinking" value="Somewhat" onclick="uncheckOthers('thinking', this)"> Somewhat
+          <input type="checkbox" name= "DidHomilyChangeYourThinking" value="3" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="thinking" value="A lot" onclick="uncheckOthers('thinking', this)"> A lot
+          <input type="checkbox" name="DidHomilyChangeYourThinking" value="4" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="thinking" value="Completely" onclick="uncheckOthers('thinking', this)"> Completely
+          <input type="checkbox" name="DidHomilyChangeYourThinking" value="5" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> (5)
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="DidHomilyChangeYourThinking" value="6" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> Yes (6)
         </label>
         <br> <br>
 
-        <!-- Accepting of the message-->
+        <!-- Accepting of the message
         <p>6. Were you more or less accepting of the message being preached after watching the homily?</p>
         <label>
             <input type="checkbox" name="accepting" value="Much less accepting" onclick="uncheckOthers('accepting', this)"> Much less accepting
@@ -198,140 +214,168 @@
         <br>
         <label>
           <input type="checkbox" name="accepting" value="Much more accepting" onclick="uncheckOthers('accepting', this)"> Much more accepting
-        </label>
+        </label> -->
 
 
         <!-- Change in Feelings -->
-        <p>7. Did the homily change your feelings in any way?</p>
+        <p>6. Did the homily change your feelings in any way?</p>
         <label>
-            <input type="checkbox" name="feeling" value="Not at all" onclick="uncheckOthers('feeling', this)"> Not at all
+            <input type="checkbox" name="DidHomilyChangeYourFeelings" value="1" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="feeling" value="A little" onclick="uncheckOthers('feeling', this)"> A little
+          <input type="checkbox" name="DidHomilyChangeYourFeelings" value="2" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "feeling" value="Somewhat" onclick="uncheckOthers('feeling', this)"> Somewhat
+          <input type="checkbox" name= "DidHomilyChangeYourFeelings" value="3" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="feeling" value="A lot" onclick="uncheckOthers('feeling', this)"> A lot
+          <input type="checkbox" name="DidHomilyChangeYourFeelings" value="4" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="feeling" value="Completely" onclick="uncheckOthers('feeling', this)"> Completely
+          <input type="checkbox" name="DidHomilyChangeYourFeelings" value="5" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="DidHomilyChangeYourFeelings" value="6" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> Yes (6)
+        </label>
+        <br> <br>
 
         <!-- Direction of feeling change-->
-        <p>8. Was the homily's effect on your feelings positive or negative?</p>
+        <p>7. Was the homily's effect on your feelings positive or negative?</p>
         <label>
-            <input type="checkbox" name="direction" value="Much more negative" onclick="uncheckOthers('direction', this)"> Much more negative
+            <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="1" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> Negative (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="direction" value="Somewhat more negative" onclick="uncheckOthers('direction', this)"> Somewhat more negative
+          <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="2" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "direction" value="No change to my feelings" onclick="uncheckOthers('direction', this)"> No change to my feelings
+          <input type="checkbox" name= "DirectionOfHomilyFeelingChange" value="3" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="direction" value="Somewhat more positive" onclick="uncheckOthers('direction', this)"> Somewhat more positive
+          <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="4" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="direction" value="Much more positive" onclick="uncheckOthers('direction', this)"> Much more positive
+          <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="5" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="6" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> Positive (6)
+        </label>
+        <br> <br>
 
         <!-- receptiveness-->
-        <p>9. How receptive do you anticipate the congregation would have been to the homily's message?</p>
+        <p>8. Do you believe the congregation would have been receptive to this homily?</p>
         <label>
-            <input type="checkbox" name="receptiveness" value="Not at all" onclick="uncheckOthers('receptiveness', this)"> Not at all
+            <input type="checkbox" name="receptivenessToHomily" value="1" onclick="uncheckOthers('receptivenessToHomily', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="receptiveness" value="A little" onclick="uncheckOthers('receptiveness', this)"> A little
+          <input type="checkbox" name="receptivenessToHomily" value="2" onclick="uncheckOthers('receptivenessToHomily', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "receptiveness" value="Somewhat" onclick="uncheckOthers('receptiveness', this)"> Somewhat
+          <input type="checkbox" name= "receptivenessToHomily" value="3" onclick="uncheckOthers('receptivenessToHomily', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="receptiveness" value="Very" onclick="uncheckOthers('receptiveness', this)"> Very
+          <input type="checkbox" name="receptivenessToHomily" value="4" onclick="uncheckOthers('receptivenessToHomily', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="receptiveness" value="Completely" onclick="uncheckOthers('receptiveness', this)"> Completely
+          <input type="checkbox" name="receptivenessToHomily" value="5" onclick="uncheckOthers('receptivenessToHomily', this)"> (5)
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="receptivenessToHomily" value="6" onclick="uncheckOthers('receptivenessToHomily', this)"> Yes (6)
         </label>
 
 
         <!-- Engagement-->
-        <p>10. How engaged did you feel while watching the homily?</p>
+        <p>9. Did you feel engaged while listening the homily?</p>
         <label>
-            <input type="checkbox" name="engaged" value="Not at all" onclick="uncheckOthers('engaged', this)"> Not at all
+            <input type="checkbox" name="engagedDuringHomily" value="1" onclick="uncheckOthers('engagedDuringHomily', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaged" value="A little" onclick="uncheckOthers('engaged', this)"> A little
+          <input type="checkbox" name="engagedDuringHomily" value="2" onclick="uncheckOthers('engagedDuringHomily', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "engaged" value="Somewhat" onclick="uncheckOthers('engaged', this)"> Somewhat
+          <input type="checkbox" name= "engagedDuringHomily" value="3" onclick="uncheckOthers('engagedDuringHomily', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaged" value="Very" onclick="uncheckOthers('engaged', this)"> Very
+          <input type="checkbox" name="engagedDuringHomily" value="4" onclick="uncheckOthers('engagedDuringHomily', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaged" value="Completely" onclick="uncheckOthers('engaged', this)"> Completely
+          <input type="checkbox" name="engagedDuringHomily" value="5" onclick="uncheckOthers('engagedDuringHomily', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="engagedDuringHomily" value="6" onclick="uncheckOthers('engagedDuringHomily', this)"> Yes (6)
+        </label>
+        <br> <br>
 
-        <!-- Effectiveness-->
-        <p>11. How effectively was the message communicated?</p>
+        <!-- Effectiveness -->
+        <p>10. Was the message effectively communicated?</p>
         <label>
-            <input type="checkbox" name="effectiveness" value="Not at all" onclick="uncheckOthers('effectiveness', this)"> Not at all
+            <input type="checkbox" name="effectiveMessageCommunication" value="1" onclick="uncheckOthers('effectiveMessageCommunication', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="effectiveness" value="Not very" onclick="uncheckOthers('effectiveness', this)"> Not very
+          <input type="checkbox" name="effectiveMessageCommunication" value="2" onclick="uncheckOthers('effectiveMessageCommunication', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "effectiveness" value="Somewhat" onclick="uncheckOthers('effectiveness', this)"> Somewhat
+          <input type="checkbox" name= "effectiveMessageCommunication" value="3" onclick="uncheckOthers('effectiveMessageCommunication', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="effectiveness" value="Very" onclick="uncheckOthers('effectiveness', this)"> Very
+          <input type="checkbox" name="effectiveMessageCommunication" value="4" onclick="uncheckOthers('effectiveMessageCommunication', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="effectiveness" value="Completely" onclick="uncheckOthers('effectiveness', this)"> Completely
+          <input type="checkbox" name="effectiveMessageCommunication" value="5" onclick="uncheckOthers('effectiveMessageCommunication', this)"> (5)
         </label>
+        <br>
+        <label>
+          <input type="checkbox" name="effectiveMessageCommunication" value="6" onclick="uncheckOthers('effectiveMessageCommunication', this)"> Yes (6)
+        </label>
+        <br> <br>
 
-        <!-- Achievement of homilist's goals-->
-        <p>12. Do you feel that the homilist achieved their goals in this homily?</p>
+        <!-- Achievement of speaker's goals-->
+        <p>11. Do you feel that the speaker achieved their goals in this homily?</p>
         <label>
-            <input type="checkbox" name="goals" value="Not at all" onclick="uncheckOthers('goals', this)"> Not at all
+            <input type="checkbox" name="AchievementOfSpeakersGoals" value="1" onclick="uncheckOthers('AchievementOfSpeakersGoals', this)"> No (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="goals" value="A little" onclick="uncheckOthers('goals', this)"> A little
+          <input type="checkbox" name="AchievementOfSpeakersGoals" value="2" onclick="uncheckOthers('AchievementOfSpeakersGoals', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "goals" value="Somewhat" onclick="uncheckOthers('goals', this)"> Somewhat
+          <input type="checkbox" name= "AchievementOfSpeakersGoals" value="3" onclick="uncheckOthers('AchievementOfSpeakersGoals', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="goals" value="A lot" onclick="uncheckOthers('goals', this)"> A lot
+          <input type="checkbox" name="AchievementOfSpeakersGoals" value="4" onclick="uncheckOthers('AchievementOfSpeakersGoals', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="goals" value="Completely" onclick="uncheckOthers('goals', this)"> Completely
+          <input type="checkbox" name="AchievementOfSpeakersGoals" value="5" onclick="uncheckOthers('AchievementOfSpeakersGoals', this)"> (5)
+        </label>
+        <br>
+        <label>
+          <input type="checkbox" name="AchievementOfSpeakersGoals" value="6" onclick="uncheckOthers('AchievementOfSpeakersGoals', this)"> Yes (6)
         </label>
 
 
@@ -346,168 +390,168 @@
 
         <br>
         <br>
-        <label for="freeform">13. Additional Comments (optional):</label>
+        <label for="freeform">12. Additional Comments (optional):</label>
         <br>
         <textarea id="generalAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
 
         <h1>Organization and Content</h1>
 
-        <p>14. Engaging Introduction</p>
+        <p>13. Engaging Introduction</p>
         <label>
-            <input type="checkbox" name="engaging" value="1" onclick="uncheckOthers('engaging', this)"> 1 (worst)
+            <input type="checkbox" name="engaging" value="1" onclick="uncheckOthers('engaging', this)"> Worst (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaging" value="2" onclick="uncheckOthers('engaging', this)"> 2
+          <input type="checkbox" name="engaging" value="2" onclick="uncheckOthers('engaging', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "engaging" value="3" onclick="uncheckOthers('engaging', this)"> 3
+          <input type="checkbox" name= "engaging" value="3" onclick="uncheckOthers('engaging', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaging" value="4" onclick="uncheckOthers('engaging', this)"> 4
+          <input type="checkbox" name="engaging" value="4" onclick="uncheckOthers('engaging', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaging" value="5" onclick="uncheckOthers('engaging', this)"> 5
+          <input type="checkbox" name="engaging" value="5" onclick="uncheckOthers('engaging', this)"> (5)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="engaging" value="6" onclick="uncheckOthers('engaging', this)"> 6 (best)
+          <input type="checkbox" name="engaging" value="6" onclick="uncheckOthers('engaging', this)"> Best (6)
         </label>
 
-        <p>15. Main Points Clearly Stated</p>
+        <p>14. Main Points Clearly Stated</p>
         <label>
-            <input type="checkbox" name="clarity" value="1" onclick="uncheckOthers('clarity', this)"> 1
+            <input type="checkbox" name="clarity" value="1" onclick="uncheckOthers('clarity', this)"> Worst (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="clarity" value="2" onclick="uncheckOthers('clarity', this)"> 2
+          <input type="checkbox" name="clarity" value="2" onclick="uncheckOthers('clarity', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "clarity" value="3" onclick="uncheckOthers('clarity', this)"> 3
+          <input type="checkbox" name= "clarity" value="3" onclick="uncheckOthers('clarity', this)"> (3)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="clarity" value="4" onclick="uncheckOthers('clarity', this)"> 4
+          <input type="checkbox" name="clarity" value="4" onclick="uncheckOthers('clarity', this)"> (4)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="clarity" value="5" onclick="uncheckOthers('clarity', this)"> 5
+          <input type="checkbox" name="clarity" value="5" onclick="uncheckOthers('clarity', this)"> (5)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="clarity" value="6" onclick="uncheckOthers('clarity', this)"> 6
+          <input type="checkbox" name="clarity" value="6" onclick="uncheckOthers('clarity', this)"> Best (6)
         </label>
 
 
-        <p>16. Well Organized</p>
+        <p>15. Well Organized</p>
         <label>
-            <input type="checkbox" name="organization" value="1" onclick="uncheckOthers('organization', this)"> 1
+            <input type="checkbox" name="organization" value="1" onclick="uncheckOthers('organization', this)"> Worst (1)
         </label>
         <br>
         <label>
-          <input type="checkbox" name="organization" value="2" onclick="uncheckOthers('organization', this)"> 2
+          <input type="checkbox" name="organization" value="2" onclick="uncheckOthers('organization', this)"> (2)
         </label>
         <br>
         <label>
-          <input type="checkbox" name= "organization" value="3" onclick="uncheckOthers('organization', this)"> 3
+          <input type="checkbox" name= "organization" value="3" onclick="uncheckOthers('organization', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="organization" value="4" onclick="uncheckOthers('organization', this)"> 4
+          <input type="checkbox" name="organization" value="4" onclick="uncheckOthers('organization', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="organization" value="5" onclick="uncheckOthers('organization', this)"> 5
+          <input type="checkbox" name="organization" value="5" onclick="uncheckOthers('organization', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="organization" value="6" onclick="uncheckOthers('organization', this)"> 6
+          <input type="checkbox" name="organization" value="6" onclick="uncheckOthers('organization', this)"> Best (6)
         </label>
 
-        <p>17. Appropriately Contextual</p>
+        <p>16. Appropriately Contextual</p>
         <label>
-            <input type="checkbox" name="contextual" value="1" onclick="uncheckOthers('contextual', this)"> 1
+            <input type="checkbox" name="contextual" value="1" onclick="uncheckOthers('contextual', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="contextual" value="2" onclick="uncheckOthers('contextual', this)"> 2
+          <input type="checkbox" name="contextual" value="2" onclick="uncheckOthers('contextual', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "contextual" value="3" onclick="uncheckOthers('contextual', this)"> 3
+          <input type="checkbox" name= "contextual" value="3" onclick="uncheckOthers('contextual', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="contextual" value="4" onclick="uncheckOthers('contextual', this)"> 4
+          <input type="checkbox" name="contextual" value="4" onclick="uncheckOthers('contextual', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="contextual" value="5" onclick="uncheckOthers('contextual', this)"> 5
+          <input type="checkbox" name="contextual" value="5" onclick="uncheckOthers('contextual', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="contextual" value="6" onclick="uncheckOthers('contextual', this)"> 6
+          <input type="checkbox" name="contextual" value="6" onclick="uncheckOthers('contextual', this)"> Best (6)
         </label>
 
-        <p>18. Engaging/Persuasive</p>
+        <p>17. Engaging/Persuasive</p>
         <label>
-            <input type="checkbox" name="persuasive" value="1" onclick="uncheckOthers('persuasive', this)"> 1
+            <input type="checkbox" name="persuasive" value="1" onclick="uncheckOthers('persuasive', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="persuasive" value="2" onclick="uncheckOthers('persuasive', this)"> 2
+          <input type="checkbox" name="persuasive" value="2" onclick="uncheckOthers('persuasive', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "persuasive" value="3" onclick="uncheckOthers('persuasive', this)"> 3
+          <input type="checkbox" name= "persuasive" value="3" onclick="uncheckOthers('persuasive', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="persuasive" value="4" onclick="uncheckOthers('persuasive', this)"> 4
+          <input type="checkbox" name="persuasive" value="4" onclick="uncheckOthers('persuasive', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="persuasive" value="5" onclick="uncheckOthers('persuasive', this)"> 5
+          <input type="checkbox" name="persuasive" value="5" onclick="uncheckOthers('persuasive', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="persuasive" value="6" onclick="uncheckOthers('persuasive', this)"> 6
+          <input type="checkbox" name="persuasive" value="6" onclick="uncheckOthers('persuasive', this)"> Best (6)
         </label>
 
-        <p>19. Theological/Liturgical Literacy</p>
+        <p>18. Theological/Liturgical Literacy</p>
         <label>
-            <input type="checkbox" name="theology" value="1" onclick="uncheckOthers('theology', this)"> 1
+            <input type="checkbox" name="theology" value="1" onclick="uncheckOthers('theology', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="theology" value="2" onclick="uncheckOthers('theology', this)"> 2
+          <input type="checkbox" name="theology" value="2" onclick="uncheckOthers('theology', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "theology" value="3" onclick="uncheckOthers('theology', this)"> 3
+          <input type="checkbox" name= "theology" value="3" onclick="uncheckOthers('theology', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="theology" value="4" onclick="uncheckOthers('theology', this)"> 4
+          <input type="checkbox" name="theology" value="4" onclick="uncheckOthers('theology', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="theology" value="5" onclick="uncheckOthers('theology', this)"> 5
+          <input type="checkbox" name="theology" value="5" onclick="uncheckOthers('theology', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="theology" value="6" onclick="uncheckOthers('theology', this)"> 6
+          <input type="checkbox" name="theology" value="6" onclick="uncheckOthers('theology', this)"> Best (6)
         </label>
 
-        <p>20. Pastoral Accessibility</p>
+        <p>19. Pastoral Accessibility</p>
         <label>
-            <input type="checkbox" name="accessibility" value="1" onclick="uncheckOthers('accessibility', this)"> 1
+            <input type="checkbox" name="accessibility" value="1" onclick="uncheckOthers('accessibility', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="accessibility" value="2" onclick="uncheckOthers('accessibility', this)"> 2
+          <input type="checkbox" name="accessibility" value="2" onclick="uncheckOthers('accessibility', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "accessibility" value="3" onclick="uncheckOthers('accessibility', this)"> 3
+          <input type="checkbox" name= "accessibility" value="3" onclick="uncheckOthers('accessibility', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="accessibility" value="4" onclick="uncheckOthers('accessibility', this)"> 4
+          <input type="checkbox" name="accessibility" value="4" onclick="uncheckOthers('accessibility', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="accessibility" value="5" onclick="uncheckOthers('accessibility', this)"> 5
+          <input type="checkbox" name="accessibility" value="5" onclick="uncheckOthers('accessibility', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="accessibility" value="6" onclick="uncheckOthers('accessibility', this)"> 6
+          <input type="checkbox" name="accessibility" value="6" onclick="uncheckOthers('accessibility', this)"> Best (6)
         </label>
 
         <br>
         <br>
-        <label for="freeform">21. Additional Comments (optional):</label>
+        <label for="freeform">20. Additional Comments (optional):</label>
         <br>
 
         <textarea id="organizationAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
@@ -518,109 +562,109 @@
         
         <h1>Language</h1>
 
-        <p>22. Appropriate to Oral Communication</p>
+        <p>21. Appropriate to Oral Communication</p>
         <label>
-            <input type="checkbox" name="communication" value="1" onclick="uncheckOthers('communication', this)"> 1 (worst)
+            <input type="checkbox" name="communication" value="1" onclick="uncheckOthers('communication', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="communication" value="2" onclick="uncheckOthers('communication', this)"> 2
+          <input type="checkbox" name="communication" value="2" onclick="uncheckOthers('communication', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "communication" value="3" onclick="uncheckOthers('communication', this)"> 3
+          <input type="checkbox" name= "communication" value="3" onclick="uncheckOthers('communication', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="communication" value="4" onclick="uncheckOthers('communication', this)"> 4
+          <input type="checkbox" name="communication" value="4" onclick="uncheckOthers('communication', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="communication" value="5" onclick="uncheckOthers('communication', this)"> 5
+          <input type="checkbox" name="communication" value="5" onclick="uncheckOthers('communication', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="communication" value="6" onclick="uncheckOthers('communication', this)"> 6 (best)
+          <input type="checkbox" name="communication" value="6" onclick="uncheckOthers('communication', this)"> Best (6)
         </label>
 
-        <p>23. Naturalness</p>
+        <p>22. Naturalness</p>
         <label>
-            <input type="checkbox" name="naturalness" value="1" onclick="uncheckOthers('naturalness', this)"> 1
+            <input type="checkbox" name="naturalness" value="1" onclick="uncheckOthers('naturalness', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="naturalness" value="2" onclick="uncheckOthers('naturalness', this)"> 2
+          <input type="checkbox" name="naturalness" value="2" onclick="uncheckOthers('naturalness', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "naturalness" value="3" onclick="uncheckOthers('naturalness', this)"> 3
+          <input type="checkbox" name= "naturalness" value="3" onclick="uncheckOthers('naturalness', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="naturalness" value="4" onclick="uncheckOthers('naturalness', this)"> 4
+          <input type="checkbox" name="naturalness" value="4" onclick="uncheckOthers('naturalness', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="naturalness" value="5" onclick="uncheckOthers('naturalness', this)"> 5
+          <input type="checkbox" name="naturalness" value="5" onclick="uncheckOthers('naturalness', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="naturalness" value="6" onclick="uncheckOthers('naturalness', this)"> 6
+          <input type="checkbox" name="naturalness" value="6" onclick="uncheckOthers('naturalness', this)"> Best (6)
         </label>
 
-        <p>24. Grammar</p>
+        <p>23. Grammar</p>
         <label>
-            <input type="checkbox" name="grammar" value="1" onclick="uncheckOthers('grammar', this)"> 1
+            <input type="checkbox" name="grammar" value="1" onclick="uncheckOthers('grammar', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="grammar" value="2" onclick="uncheckOthers('grammar', this)"> 2
+          <input type="checkbox" name="grammar" value="2" onclick="uncheckOthers('grammar', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "grammar" value="3" onclick="uncheckOthers('grammar', this)"> 3
+          <input type="checkbox" name= "grammar" value="3" onclick="uncheckOthers('grammar', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="grammar" value="4" onclick="uncheckOthers('grammar', this)"> 4
+          <input type="checkbox" name="grammar" value="4" onclick="uncheckOthers('grammar', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="grammar" value="5" onclick="uncheckOthers('grammar', this)"> 5
+          <input type="checkbox" name="grammar" value="5" onclick="uncheckOthers('grammar', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="grammar" value="6" onclick="uncheckOthers('grammar', this)"> 6
+          <input type="checkbox" name="grammar" value="6" onclick="uncheckOthers('grammar', this)"> Best (6)
         </label>
 
-        <p>25. Rhetorical/Poetic Richness</p>
+        <p>24. Rhetorical/Poetic Richness</p>
         <label>
-            <input type="checkbox" name="rhetoric" value="1" onclick="uncheckOthers('rhetoric', this)"> 1
+            <input type="checkbox" name="rhetoric" value="1" onclick="uncheckOthers('rhetoric', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="rhetoric" value="2" onclick="uncheckOthers('rhetoric', this)"> 2
+          <input type="checkbox" name="rhetoric" value="2" onclick="uncheckOthers('rhetoric', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "rhetoric" value="3" onclick="uncheckOthers('rhetoric', this)"> 3
+          <input type="checkbox" name= "rhetoric" value="3" onclick="uncheckOthers('rhetoric', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="rhetoric" value="4" onclick="uncheckOthers('rhetoric', this)"> 4
+          <input type="checkbox" name="rhetoric" value="4" onclick="uncheckOthers('rhetoric', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="rhetoric" value="5" onclick="uncheckOthers('rhetoric', this)"> 5
+          <input type="checkbox" name="rhetoric" value="5" onclick="uncheckOthers('rhetoric', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="rhetoric" value="6" onclick="uncheckOthers('rhetoric', this)"> 6
+          <input type="checkbox" name="rhetoric" value="6" onclick="uncheckOthers('rhetoric', this)"> Best (6)
         </label>
 
-        <p>26. Accessibility to Assembly</p>
+        <p>25. Accessibility to Assembly</p>
         <label>
-            <input type="checkbox" name="assembly" value="1" onclick="uncheckOthers('assembly', this)"> 1
+            <input type="checkbox" name="assembly" value="1" onclick="uncheckOthers('assembly', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="assembly" value="2" onclick="uncheckOthers('assembly', this)"> 2
+          <input type="checkbox" name="assembly" value="2" onclick="uncheckOthers('assembly', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "assembly" value="3" onclick="uncheckOthers('assembly', this)"> 3
+          <input type="checkbox" name= "assembly" value="3" onclick="uncheckOthers('assembly', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="assembly" value="4" onclick="uncheckOthers('assembly', this)"> 4
+          <input type="checkbox" name="assembly" value="4" onclick="uncheckOthers('assembly', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="assembly" value="5" onclick="uncheckOthers('assembly', this)"> 5
+          <input type="checkbox" name="assembly" value="5" onclick="uncheckOthers('assembly', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="assembly" value="6" onclick="uncheckOthers('assembly', this)"> 6
+          <input type="checkbox" name="assembly" value="6" onclick="uncheckOthers('assembly', this)"> Best (6)
         </label>
 
         <br>
         <br>
-        <label for="freeform">27. Additional Comments (optional):</label>
+        <label for="freeform">26. Additional Comments (optional):</label>
         <br>
 
         <textarea id="languageAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
@@ -630,128 +674,128 @@
 
         <h1>Voice</h1>
 
-        <p>28. Volume</p>
+        <p>27. Volume</p>
         <label>
-            <input type="checkbox" name="volume" value="1" onclick="uncheckOthers('volume', this)"> 1 (worst)
+            <input type="checkbox" name="volume" value="1" onclick="uncheckOthers('volume', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="volume" value="2" onclick="uncheckOthers('volume', this)"> 2
+          <input type="checkbox" name="volume" value="2" onclick="uncheckOthers('volume', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "volume" value="3" onclick="uncheckOthers('volume', this)"> 3
+          <input type="checkbox" name= "volume" value="3" onclick="uncheckOthers('volume', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="volume" value="4" onclick="uncheckOthers('volume', this)"> 4
+          <input type="checkbox" name="volume" value="4" onclick="uncheckOthers('volume', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="volume" value="5" onclick="uncheckOthers('volume', this)"> 5
+          <input type="checkbox" name="volume" value="5" onclick="uncheckOthers('volume', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="volume" value="6" onclick="uncheckOthers('volume', this)"> 6 (best)
+          <input type="checkbox" name="volume" value="6" onclick="uncheckOthers('volume', this)"> Best (6)
         </label>
 
-        <p>29. Rate/Pacing</p>
+        <p>28. Rate of Speech/Pacing</p>
         <label>
-            <input type="checkbox" name="rate" value="1" onclick="uncheckOthers('rate', this)"> 1
+            <input type="checkbox" name="rate" value="1" onclick="uncheckOthers('rate', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="rate" value="2" onclick="uncheckOthers('rate', this)"> 2
+          <input type="checkbox" name="rate" value="2" onclick="uncheckOthers('rate', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "rate" value="3" onclick="uncheckOthers('rate', this)"> 3
+          <input type="checkbox" name= "rate" value="3" onclick="uncheckOthers('rate', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="rate" value="4" onclick="uncheckOthers('rate', this)"> 4
+          <input type="checkbox" name="rate" value="4" onclick="uncheckOthers('rate', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="rate" value="5" onclick="uncheckOthers('rate', this)"> 5
+          <input type="checkbox" name="rate" value="5" onclick="uncheckOthers('rate', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="rate" value="6" onclick="uncheckOthers('rate', this)"> 6
+          <input type="checkbox" name="rate" value="6" onclick="uncheckOthers('rate', this)"> Best (6)
         </label>
 
-        <p>30. Pitch</p>
+        <p>29. Pitch</p>
         <label>
-            <input type="checkbox" name="pitch" value="1" onclick="uncheckOthers('pitch', this)"> 1
+            <input type="checkbox" name="pitch" value="1" onclick="uncheckOthers('pitch', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="pitch" value="2" onclick="uncheckOthers('pitch', this)"> 2
+          <input type="checkbox" name="pitch" value="2" onclick="uncheckOthers('pitch', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "pitch" value="3" onclick="uncheckOthers('pitch', this)"> 3
+          <input type="checkbox" name= "pitch" value="3" onclick="uncheckOthers('pitch', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="pitch" value="4" onclick="uncheckOthers('pitch', this)"> 4
+          <input type="checkbox" name="pitch" value="4" onclick="uncheckOthers('pitch', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="pitch" value="5" onclick="uncheckOthers('pitch', this)"> 5
+          <input type="checkbox" name="pitch" value="5" onclick="uncheckOthers('pitch', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="pitch" value="6" onclick="uncheckOthers('pitch', this)"> 6
+          <input type="checkbox" name="pitch" value="6" onclick="uncheckOthers('pitch', this)"> Best (6)
         </label>
 
-        <p>31. Vocal Variety</p>
+        <p>30. Vocal Variety</p>
         <label>
-            <input type="checkbox" name="variety" value="1" onclick="uncheckOthers('variety', this)"> 1
+            <input type="checkbox" name="variety" value="1" onclick="uncheckOthers('variety', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="variety" value="2" onclick="uncheckOthers('variety', this)"> 2
+          <input type="checkbox" name="variety" value="2" onclick="uncheckOthers('variety', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "variety" value="3" onclick="uncheckOthers('variety', this)"> 3
+          <input type="checkbox" name= "variety" value="3" onclick="uncheckOthers('variety', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="variety" value="4" onclick="uncheckOthers('variety', this)"> 4
+          <input type="checkbox" name="variety" value="4" onclick="uncheckOthers('variety', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="variety" value="5" onclick="uncheckOthers('variety', this)"> 5
+          <input type="checkbox" name="variety" value="5" onclick="uncheckOthers('variety', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="variety" value="6" onclick="uncheckOthers('variety', this)"> 6
+          <input type="checkbox" name="variety" value="6" onclick="uncheckOthers('variety', this)"> Best (6)
         </label>
 
-        <p>32. Enunciation</p>
+        <p>31. Enunciation</p>
         <label>
-            <input type="checkbox" name="enunciation" value="1" onclick="uncheckOthers('enunciation', this)"> 1
+            <input type="checkbox" name="enunciation" value="1" onclick="uncheckOthers('enunciation', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="enunciation" value="2" onclick="uncheckOthers('enunciation', this)"> 2
+          <input type="checkbox" name="enunciation" value="2" onclick="uncheckOthers('enunciation', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "enunciation" value="3" onclick="uncheckOthers('enunciation', this)"> 3
+          <input type="checkbox" name= "enunciation" value="3" onclick="uncheckOthers('enunciation', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="enunciation" value="4" onclick="uncheckOthers('enunciation', this)"> 4
+          <input type="checkbox" name="enunciation" value="4" onclick="uncheckOthers('enunciation', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="enunciation" value="5" onclick="uncheckOthers('enunciation', this)"> 5
+          <input type="checkbox" name="enunciation" value="5" onclick="uncheckOthers('enunciation', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="enunciation" value="6" onclick="uncheckOthers('enunciation', this)"> 6
+          <input type="checkbox" name="enunciation" value="6" onclick="uncheckOthers('enunciation', this)"> Best (6)
         </label>
 
-        <p>33. Pronunciation</p>
+        <p>32. Pronunciation</p>
         <label>
-            <input type="checkbox" name="pronunciation" value="1" onclick="uncheckOthers('pronunciation', this)"> 1
+            <input type="checkbox" name="pronunciation" value="1" onclick="uncheckOthers('pronunciation', this)"> Worst (1)
         </label><br>
         <label>
-          <input type="checkbox" name="pronunciation" value="2" onclick="uncheckOthers('pronunciation', this)"> 2
+          <input type="checkbox" name="pronunciation" value="2" onclick="uncheckOthers('pronunciation', this)"> (2)
         </label><br>
         <label>
-          <input type="checkbox" name= "pronunciation" value="3" onclick="uncheckOthers('pronunciation', this)"> 3
+          <input type="checkbox" name= "pronunciation" value="3" onclick="uncheckOthers('pronunciation', this)"> (3)
         </label><br>
         <label>
-          <input type="checkbox" name="pronunciation" value="4" onclick="uncheckOthers('pronunciation', this)"> 4
+          <input type="checkbox" name="pronunciation" value="4" onclick="uncheckOthers('pronunciation', this)"> (4)
         </label><br>
         <label>
-          <input type="checkbox" name="pronunciation" value="5" onclick="uncheckOthers('pronunciation', this)"> 5
+          <input type="checkbox" name="pronunciation" value="5" onclick="uncheckOthers('pronunciation', this)"> (5)
         </label><br>
         <label>
-          <input type="checkbox" name="pronunciation" value="6" onclick="uncheckOthers('pronunciation', this)"> 6
+          <input type="checkbox" name="pronunciation" value="6" onclick="uncheckOthers('pronunciation', this)"> Best (6)
         </label>
         <br>
         <br>
-        <label for="freeform">34. Additional Comments (optional):</label>
+        <label for="freeform">33. Additional Comments (optional):</label>
         <br>
 
         <textarea id="voiceAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
@@ -759,7 +803,7 @@
         </label>
         <br>
         <br>
-        <label for="freeform">35. Other Valuable Commendations/Reccomendations (optional):</label>
+        <label for="freeform">34. Other Valuable Commendations/Reccomendations (optional):</label>
         <br>
 
         <textarea id="otherComments" name="freeform" rows="4" cols="50"></textarea>

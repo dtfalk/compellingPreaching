@@ -31,9 +31,13 @@
       background-color: white;
       z-index: 1;
       }
-      h1, h2, h3 {
+      h1, h3 {
         font-family: 'Times New Roman', Times, serif;
         text-decoration: underline;
+        text-align: center;
+      }
+      h2 {
+        font-family: 'Times New Roman', Times, serif;
         text-align: center;
       }
       text{
@@ -132,13 +136,14 @@
         </label>
         <br>
         <label for="otherReligion"> Something else, Specify:</label>
-        <input type="text" id="otherReligion" name="userid"><br>
+        <input type="text" id="otherReligion" name="userid"> 
+        <br><br><br><br>
         
 
 
 
         <!-- If Something Else or Unspecified-->
-        <h2> If you answered either "Something else" or "Prefer not to answer" </h2>
+        <h2> If you answered either "Something else" or "Prefer not to answer" in the previous question, please answer this question. If not, skip this question and please select N/A: </h2>
         <p>Do you think of yourself as a Christian or not?</p>
         <label>
             <input type="checkbox" name="christian" value="Yes" onclick="uncheckOthers('christian', this)"> Yes
@@ -151,10 +156,11 @@
         <label>
           <input type="checkbox" name="christian" value="N/A" onclick="uncheckOthers('christian', this)"> N/A
         </label>
+        <br><br><br><br>
 
 
         <!-- Type of Christian -->
-        <h2> If you answered yes to the previous question </h2>
+        <h2> If you answered yes to the previous question, then please answer this question. If not, skip this question and please select N/A: </h2>
         <p>If you consider yourself a Christian, would you describe yourself as born-again evangelical Christian, or not?</p>
         <label>
             <input type="checkbox" name="bornAgain" value="Yes" onclick="uncheckOthers('bornAgain', this)"> Yes, born-again or evangelical Christian
@@ -167,6 +173,7 @@
         <label>
           <input type="checkbox" name="bornAgain" value="N/A" onclick="uncheckOthers('bornAgain', this)"> N/A
         </label>
+        <br><br><br><br>
 
 
 
@@ -196,6 +203,7 @@
         <label>
           <input type="checkbox" name="attendance" value="Never" onclick="uncheckOthers('attendance', this)"> Never
         </label>
+        <br><br>
 
 
         <p>How important is religion in your life?</p>
@@ -214,6 +222,7 @@
         <label>
           <input type="checkbox" name="importance" value="Not at all important" onclick="uncheckOthers('importance', this)"> Not at all important
         </label>
+        <br><br>
 
         <p>Outside of attending religious services, how often do you pray?</p>
         <label>
@@ -243,6 +252,7 @@
         <label>
           <input type="checkbox" name="prayer" value="Never" onclick="uncheckOthers('prayer', this)"> Never
         </label>
+        <br><br>
 
         <br>
         <br>
