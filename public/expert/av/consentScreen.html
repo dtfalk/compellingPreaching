@@ -63,15 +63,6 @@
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
 
-    // shows the questionnaire
-    function showQuestionnaire() {
-      const questionnaireContainer = document.getElementById('questionnaireContainer');
-      questionnaireContainer.innerHTML = generateQuestionnaireHTML();
-
-      // Display the questionnaire
-      questionnaireContainer.style.display = 'block';
-    }
-
     // generates the HTML for the questionnaire
     function generateQuestionnaireHTML() {
       // You can customize the questionnaire HTML generation based on your requirements
@@ -86,16 +77,20 @@
         <h2><b>Sponsor: </b> Catholic Theological Union</h2><br>
 
         <h2><b>Description </b> </h2>
-        <p> We are researchers at the University of Chicago doing a research study about understanding preaching. 
-          You will be asked to watch or listen to recordings of homilies (a type of Catholic sermon) 
-          and rate them on different aspects with the use of a questionnaire. You will also be asked for your demographic information.</p>
-        <p> Participation should take less than 30 minutes per homily. There is a total of four homilies.
-            You will have two weeks to complete the viewing and individual evaluation of the four homilies.
-            The rate at which you go through the content is at your discretion, take as many breaks as needed.</p>
-        <p> Your participation is voluntary.</p>
+        <p> We are researchers at the University of Chicago working with the Catholic Theological Union in Chicago 
+          carrying out a study to understand preaching as communication. There is a collection of homilies taken from 
+          different sources and we would appreciate it greatly if you would review the recordings of these homilies and 
+          rate them using a a questionnaire. We will also ask for your demographic information and information about your
+          preaching experiences and expertise in instruction. </p>
+        <p> You have been asked to review these homilies as an expert of homiletics. Your review is completely
+           voluntary and we would greatly appreciate your participation. </p>
+        <p> Reviews should take less than 30 minutes per homily. There is a total of four homilies.
+            We would appreciate it if you can complete the reviews within two weeks.
+            The rate at which you go through the content is under your control. You may log in and out of the survey and take as many breaks as needed.</p>
 
         <h2><b>Incentives </b></h2>
-        <p> You will be compensated one hundred dollars by the Catholic Theological Union for your participation.</p>
+        <p> We appreciate your expertise and offer compensation of one hundred dollars provided by our research grant that is joint with Catholic Theological Union for
+           your review of the complete set of homilies. In addition, we will provide you with any reports arising from this research based on the data of all the expert homiletic reviewers.</p>
 
         <h2><b>Risks and Benefits </b> </h2>
         <p> Your participation in this study does not involve any risk to you beyond that of everyday life.
@@ -124,11 +119,11 @@
         
         
         <label>
-          <input type = "checkbox" name = "consent" value = "agree" onclick = "uncheckOthers('consent', this)"> I agree
+          <input type = "checkbox" name = "consent" value = "agree" onclick = "uncheckOthers('consent', this)"> I agree to participate in the research
         </label>
         <br>
         <label>
-          <input type = "checkbox" name = "consent" value = "disagree" onclick = "uncheckOthers('consent', this)"> I do NOT agree
+          <input type = "checkbox" name = "consent" value = "disagree" onclick = "uncheckOthers('consent', this)"> I do NOT agree to participate in the research
         </label>
 
         <!-- Submit button -->
