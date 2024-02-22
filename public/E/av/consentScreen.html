@@ -63,6 +63,15 @@
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
 
+    // shows the questionnaire
+    function showQuestionnaire() {
+      const questionnaireContainer = document.getElementById('questionnaireContainer');
+      questionnaireContainer.innerHTML = generateQuestionnaireHTML();
+
+      // Display the questionnaire
+      questionnaireContainer.style.display = 'block';
+    }
+    
     // generates the HTML for the questionnaire
     function generateQuestionnaireHTML() {
       // You can customize the questionnaire HTML generation based on your requirements
