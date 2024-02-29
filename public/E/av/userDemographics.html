@@ -132,6 +132,7 @@
           <input type="checkbox" name="ethnicity" value="Native Hawaiian or Pacific Islander" onclick="uncheckOthers('ethnicity', this)"> Native Hawaiian or Pacific Islander
         </label>
         <br>
+        <label>
         <input type="checkbox" name= "ethnicity" value="Two or more" onclick="uncheckOthers('ethnicity', this)"> Two or more
         </label>
         <br>
@@ -164,22 +165,6 @@
         <br>
         <label>
           <input type="checkbox" name="economicClass" value="High income background" onclick="uncheckOthers('economicClass', this)"> High income background
-        </label>
-        <br><br><br>
-
-
-        <!-- International Student-->
-        <p>5. Are you an international student?</p>
-        <label>
-            <input type="checkbox" name="internationalStudent" value="Yes" onclick="uncheckOthers('internationalStudent', this)"> Yes
-        </label>
-        <br>
-        <label>
-          <input type="checkbox" name="internationalStudent" value="No" onclick="uncheckOthers('internationalStudent', this)"> No
-        </label>
-        <br>
-        <label>
-          <input type="checkbox" name="internationalStudent" value="N/A" onclick="uncheckOthers('internationalStudent', this)"> N/A
         </label>
         <br><br><br>
 
@@ -253,7 +238,19 @@
           }
       }
 
-
+    // returns the word count of a string
+    // (helper for validate form)
+    function wordCount(string){
+      const words = string.split(" ");
+      wordcount = 0;
+      for (let i = 0; i < words.length; i++){
+        if (!words[i] == ' ') {
+          wordcount += 1;
+        }
+      }
+      return wordcount;
+    }
+    
     // validates that the user answered all questions
     // (helper for submit form)
     function validateForm() {
@@ -307,8 +304,24 @@
       }
     }
 
-      return valid;
+    let ethnicityCheckboxes = document.getElementsByName('ethnicity');
+    
+    // If user answers with two or more, make sure they self describe
+    for (let i = 0; i < ethnicityCheckboxes.length; i++){
+      let response = ethnicityCheckboxes[i].value;
+      if (ethnicityCheckboxes[i].checked && response == 'Two or more'){
+        for (let i = 0; i < textboxes.length; i++) {
+          textResponse = textboxes[i].value;
+          name = textboxes[i].name
+          if (name == 'selfDescribeEthnicity' && wordCount(textResponse) == 0){
+            valid = false;
+          }
+        }
+      }
     }
+
+      return valid;
+  }
 
 
     // sends the user response to the server to be stored as a csv

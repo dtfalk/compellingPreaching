@@ -39,14 +39,13 @@
         text-align: center;
       }
         h2 {
-        font-family: 'Times New Roman', Times, serif;
+            font-family: 'Times New Roman', Times, serif;
         text-decoration: underline;
         text-align: center;
       }
 
         p {
             font-family: 'Times New Roman', Times, serif;
-            text-align: center;
             display: block;
             font-size: 16px;
             line-height: 1.6;
@@ -57,13 +56,42 @@
 <body id = "mainBody" onload="initialSetup()">
 
 <main id="instructionsSection">
-    <p>Thank you for taking the time to participate in our study.</p>
-    <p>Please exit this tab.</p>
+    <center>
+        <img src="uchicagoInsignia.png" width = 150>
+    </center>
+    <h1>University of Chicago Debriefing Statement</h1>
+    <h2><b>Study Number: </b> IRB24-0068</h2>
+    <h2><b>Study Title: </b> Understanding Preaching</h2>
+    <h2><b>Researcher(s): </b> Howard Nusbaum</h2>
+    <h2><b>Sponsor: </b> Catholic Theological Union</h2><br>
+
+    <h2><b>Purpose of the Study </b> </h2>
+    <p>This project is designed to investigate the way in which real-time preaching by Roman Catholic clergy affects people.</p>
+    <p> We aim to help those who preach to understand better what actually affects their audiences. We also hope to enable those 
+        who educate preachers to be equipped to shape their teaching more effectively.</p>
+    <p> Your responses to our survey help to inform us about various aspects of preaching.</p>
+    <p>As this study is ongoing, we ask that you not discuss this study with anyone else who is currently participating or might participate at a future time.</p>
+
+    <h2><b>Contacts and Questions </b></h2>
+    <p>If you have questions or concerns about the study, you can contact the researchers at Jean Matelski Boulware at (312) 860-9260 or at matelskiboulware@uchicago.edu.</p>
+    <p>If you have any questions about your rights as a participant in this research, or to discuss other study-related concerns with someone who is not part of the research team, 
+        you can contact the University of Chicago Social & Behavioral Sciences Institutional Review Board (IRB) Office by phone at (773) 702-2915, or by email at sbs-irb@uchicago.edu.</p>
+
+    <!-- Submit button -->
+    <br> <br>
+    <center>
+        <text id = 'errorMessage'> </text>
+    </center>
+    <br>
+    <center>
+        <button onclick="submitForm()">Submit</button>
+    </center>
+    <br>
 </main>
 
 
 <script>
-    sessionStorage.setItem('userType', 'expert');
+    sessionStorage.setItem('userType', 'prolific');
     sessionStorage.setItem('experimentSource', 'na');
     sessionStorage.setItem('experimentType', 'audio');
     
@@ -85,11 +113,7 @@
 
     // hides the screen to suggest to the user that they ought to quit out of the window
     function submitForm() {
-    // Hide the header and instructions sections
-    document.getElementById("instructionsSection").style.display = "none";
-
-    // Hide the submit button
-    document.querySelector("button").style.display = "none";
+    window.location.href = 'exit_screen.html';
     }
 
 </script>
