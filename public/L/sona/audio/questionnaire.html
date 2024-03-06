@@ -31,6 +31,12 @@
       background-color: white;
       z-index: 1;
       }
+      .redText {
+        color: red
+      }
+      .blackText {
+        color: black
+      }
       h1{
         font-family: 'Times New Roman', Times, serif;
         text-align: center;
@@ -86,7 +92,9 @@
         <h1> Questions </h1>
 
         <!-- Compelling-ness -->
-        <p>1. How compelling did you find this homily?</p>
+        <label for = "foundHomilyCompelling">
+          <p>1. How compelling did you find this homily?</p>
+        </label>
         <label>
           <input type="checkbox" name="foundHomilyCompelling" value="1" onclick="uncheckOthers('foundHomilyCompelling', this)"> Not compelling (1)
         </label>
@@ -114,7 +122,9 @@
         
 
         <!-- Understanding-->
-        <p>2. Did you understand the message being preached?</p>
+        <label for = "understandingOfMessagePreached">
+          <p>2. Did you understand the message being preached?</p>
+        </label>
         <label>
           <input type="checkbox" name="understandingOfMessagePreached" value="1" onclick="uncheckOthers('understandingOfMessagePreached', this)"> Did not understand it (1)
         </label>
@@ -140,15 +150,16 @@
         </label> 
         <br> <br>
 
-        <br>
-        <br>
-        <label for="freeform">3. What did you understand the message of the homily to be? (25 word minimum): </label>
-        <br>
-        <textarea id="messageMeaning" name="freeform" rows="4" cols="50"></textarea>
+        
+        <label for="messageMeaning"><p>3. What did you understand the message of the homily to be? (25 word minimum): </p></label>
+        
+        <textarea id="messageMeaning" name="messageMeaning" rows="4" cols="50"></textarea>
         <br> <br>
 
         <!-- Agreement-->
-        <p>4. Do you agree with the homily's message?</p>
+        <label for = "agreementWithHomilyMessage">
+          <p>4. Do you agree with the homily's message?</p>
+        </label>
         <label>
             <input type="checkbox" name="agreementWithHomilyMessage" value="1" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> No (1)
         </label>
@@ -175,8 +186,10 @@
         <br> <br>
 
         <!-- Change in Thinking-->
-        <p>5. Did the homily change your thinking about this message?</p>
-        <label>
+        <label for = "DidHomilyChangeYourThinking">
+          <p>5. Did the homily change your thinking about this message?</p>
+        </label>
+          <label>
             <input type="checkbox" name="DidHomilyChangeYourThinking" value="1" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> No (1)
         </label>
         <br>
@@ -202,7 +215,9 @@
         <br> <br>
 
         <!-- Accepting of the message
-        <p>6. Were you more or less accepting of the message being preached after watching the homily?</p>
+        <label for = "accepting">
+          <p>6. Were you more or less accepting of the message being preached after watching the homily?</p>
+        </label>
         <label>
             <input type="checkbox" name="accepting" value="Much less accepting" onclick="uncheckOthers('accepting', this)"> Much less accepting
         </label>
@@ -225,7 +240,9 @@
 
 
         <!-- Change in Feelings -->
-        <p>6. Did the homily change your feelings in any way?</p>
+        <label for = "DidHomilyChangeYourFeelings">
+          <p>6. Did the homily change your feelings in any way?</p>
+        </label>
         <label>
             <input type="checkbox" name="DidHomilyChangeYourFeelings" value="1" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> No (1)
         </label>
@@ -252,7 +269,9 @@
         <br> <br>
 
         <!-- Direction of feeling change-->
-        <p>7. Was the homily's effect on your feelings positive or negative?</p>
+        <label for = "DirectionOfHomilyFeelingChange">
+          <p>7. Was the homily's effect on your feelings positive or negative?</p>
+        </label>
         <label>
             <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="1" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> Negative (1)
         </label>
@@ -280,7 +299,9 @@
 
 
         <!-- Engagement-->
-        <p>8. Did you feel engaged while listening the homily?</p>
+        <label for = "engagedDuringHomily">
+          <p>8. Did you feel engaged while listening the homily?</p>
+        </label>
         <label>
             <input type="checkbox" name="engagedDuringHomily" value="1" onclick="uncheckOthers('engagedDuringHomily', this)"> No (1)
         </label>
@@ -307,7 +328,9 @@
         <br> <br>
 
         <!-- Effectiveness -->
-        <p>9. Was the message effectively communicated?</p>
+        <label for = "effectiveMessageCommunication">
+          <p>9. Was the message effectively communicated?</p>
+        </label>
         <label>
             <input type="checkbox" name="effectiveMessageCommunication" value="1" onclick="uncheckOthers('effectiveMessageCommunication', this)"> No (1)
         </label>
@@ -444,7 +467,9 @@
         </label> -->
 
         <!-- Excitement relating to the ending -->
-        <p>10. As the homily progressed, did you find yourself interested in how the homily would end? </p>
+        <label for = "AnticipationAboutEndingOfHomily">
+          <p>10. As the homily progressed, did you find yourself interested in how the homily would end? </p>
+        </label>
         <label>
           <input type="checkbox" name="AnticipationAboutEndingOfHomily" value="1" onclick="uncheckOthers('AnticipationAboutEndingOfHomily', this)"> No (1)
         </label>
@@ -471,7 +496,9 @@
         <br> <br>
 
         <!-- Emotional effect of the homily -->
-        <p>11. Did the homily effect you emotionally? </p>
+        <label for = "emotionalEffectOfHomily">
+          <p>11. Did the homily effect you emotionally? </p>
+        </label>
         <label>
           <input type="checkbox" name="emotionalEffectOfHomily" value="1" onclick="uncheckOthers('emotionalEffectOfHomily', this)"> No (1)
         </label>
@@ -520,7 +547,9 @@
         </label> -->
 
         <!-- mind wandering -->
-        <p>12. Did you find your mind wandering while listening to this homily? </p>
+        <label for = "mindWanderingDuringHomily">
+          <p>12. Did you find your mind wandering while listening to this homily? </p>
+        </label>
         <label>
           <input type="checkbox" name="mindWanderingDuringHomily" value="1" onclick="uncheckOthers('mindWanderingDuringHomily', this)"> No (1)
         </label>
@@ -548,7 +577,9 @@
 
 
         <!-- Relevance of Homily to subject -->
-        <p>13. Did you find this homily relevant to your everyday life? </p>
+        <label for="RelevanceToEverydayLife">
+          <p>13. Did you find this homily relevant to your everyday life? </p>
+        </label>
         <label>
           <input type="checkbox" name="RelevanceToEverydayLife" value="1" onclick="uncheckOthers('RelevanceToEverydayLife', this)"> No (1)
         </label>
@@ -575,7 +606,9 @@
         <br> <br>
 
         <!-- Life changing
+        <label for="lifeChanging">
         <p>21. Did the message in this homily have a significant effect on your outlook on life? </p>
+        <label>
         <label>
           <input type="checkbox" name="lifeChanging" value="Not at all" onclick="uncheckOthers('lifeChanging', this)"> Not at all
         </label>
@@ -598,9 +631,9 @@
 
         <br>
         <br>
-        <label for="freeform">Additional Comments (optional):</label>
+        <label for="additionalComments">Additional Comments (optional):</label>
         <br>
-        <textarea id="additionalComments" name="freeform" rows="4" cols="50"></textarea>
+        <textarea id="additionalComments" name="additionalComments" rows="4" cols="50"></textarea>
 
         
         <!-- Submit button -->
@@ -650,6 +683,7 @@
 
           // check if expert has reviewed all homilies and redirect appropriately
           checkHomiliesCompleted().then(completed => {
+          console.log(completed);
           if (!completed){
             window.location.href = 'new_homily_wait_screen.html';
           }
@@ -668,11 +702,17 @@
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
       let valid = true;
       let name_dict = {};
+      let unanswered = [];
+      let answered = [];
 
       // check for required textboxes meeting minimum word count
       const responseHomilyMessage = document.getElementById("messageMeaning").value;
       if (wordCount(responseHomilyMessage) < 25){
-        return false;
+        //console.log('messageMeaning');
+        unanswered.push('messageMeaning');
+        valid = false;
+      } else {
+        answered.push('messageMeaning');
       }
 
       // collect all checkboxes of a given name into a list
@@ -691,11 +731,67 @@
             responded = true;}}
 
           if (!responded){
+            if (!unanswered.includes(key)) {
+              //console.log(key);
+              unanswered.push(key);
+            }
             valid = false;
-            break;
+            //break;
+          } else {
+            if (!answered.includes(key)){
+              //console.log(key);
+            answered.push(key);
+            }
           }
         }
+      
+      colorAnsweredAndUnanswered(answered, unanswered);
+      //console.log('here');
       return valid;
+    }
+
+    // highlights unanswered questions in red and answered questions in black
+    function colorAnsweredAndUnanswered(answered, unanswered) {
+      
+      // color all of the unanswered questions in red
+      for (let i = 0; i < unanswered.length; i++) {
+        if (unanswered[i] == 'messageMeaning') {
+          console.log('here');
+          let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+          questionText.classList.remove('blackText');
+          questionText.classList.add('redText');
+          continue;
+        } 
+        console.log(unanswered[i])
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${unanswered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+        questionText.classList.remove('blackText');
+        questionText.classList.add('redText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('blackText');
+          checkboxes[j].closest('label').classList.add('redText');
+        }
+      }
+
+      // color all of the answered questions in black
+      console.log(answered.length)
+      for (let i = 0; i < answered.length; i++) {
+        if (answered[i] == 'messageMeaning') {
+          console.log('here');
+          let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+          questionText.classList.remove('redText');
+          questionText.classList.add('blackText');
+          continue;
+        } 
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${answered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+        questionText.classList.remove('redText');
+        questionText.classList.add('blackText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('redText');
+          checkboxes[j].closest('label').classList.add('blackText');
+        }
+      }
     }
 
 

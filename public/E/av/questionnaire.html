@@ -30,6 +30,12 @@
       background-color: white;
       z-index: 1;
       }
+      .redText {
+        color: red
+      }
+      .blackText {
+        color: black
+      }
       h1{
         font-family: 'Times New Roman', Times, serif;
         text-decoration: underline;
@@ -80,7 +86,9 @@
         <h1> Questions </h1>
 
         <!-- Compelling-ness -->
+        <label for = "foundHomilyCompelling">
         <p>1. How compelling did you find this homily?</p>
+        </label>
         <label>
           <input type="checkbox" name="foundHomilyCompelling" value="1" onclick="uncheckOthers('foundHomilyCompelling', this)"> Not compelling (1)
         </label>
@@ -108,7 +116,9 @@
         
 
         <!-- Understanding-->
+        <label for = "understandingOfMessagePreached">
         <p>2. Did you understand the message being preached?</p>
+        </label>
         <label>
           <input type="checkbox" name="understandingOfMessagePreached" value="1" onclick="uncheckOthers('understandingOfMessagePreached', this)"> Did not understand it (1)
         </label>
@@ -134,14 +144,13 @@
         </label> 
         <br> <br>
 
-        <br>
-        <br>
-        <label for="freeform">3. What did you understand the message of the homily to be? (25 word minimum): </label>
-        <br>
-        <textarea id="messageMeaning" name="freeform" rows="4" cols="50"></textarea>
+        <label for="messageMeaning"><p>3. What did you understand the message of the homily to be? (25 word minimum): </p></label>
+        <textarea id="messageMeaning" name="messageMeaning" rows="4" cols="50"></textarea>
 
         <!-- Agreement-->
+        <label for = "agreementWithHomilyMessage">
         <p>4. Do you agree with the homily's message?</p>
+        </label>
         <label>
             <input type="checkbox" name="agreementWithHomilyMessage" value="1" onclick="uncheckOthers('agreementWithHomilyMessage', this)"> No (1)
         </label>
@@ -168,7 +177,9 @@
         <br> <br>
 
         <!-- Change in Thinking-->
+        <label for = "DidHomilyChangeYourThinking">
         <p>5. Did the homily change your thinking about this message?</p>
+        </label>
         <label>
             <input type="checkbox" name="DidHomilyChangeYourThinking" value="1" onclick="uncheckOthers('DidHomilyChangeYourThinking', this)"> No (1)
         </label>
@@ -218,7 +229,9 @@
 
 
         <!-- Change in Feelings -->
+        <label for = "DidHomilyChangeYourFeelings">
         <p>6. Did the homily change your feelings in any way?</p>
+        </label>
         <label>
             <input type="checkbox" name="DidHomilyChangeYourFeelings" value="1" onclick="uncheckOthers('DidHomilyChangeYourFeelings', this)"> No (1)
         </label>
@@ -245,7 +258,9 @@
         <br> <br>
 
         <!-- Direction of feeling change-->
+        <label for = "DirectionOfHomilyFeelingChange">
         <p>7. Was the homily's effect on your feelings positive or negative?</p>
+        </label>
         <label>
             <input type="checkbox" name="DirectionOfHomilyFeelingChange" value="1" onclick="uncheckOthers('DirectionOfHomilyFeelingChange', this)"> Negative (1)
         </label>
@@ -272,7 +287,9 @@
         <br> <br>
 
         <!-- receptiveness-->
+        <label for = "receptivenessToHomily">
         <p>8. Do you believe the congregation would have been receptive to this homily?</p>
+        </label>
         <label>
             <input type="checkbox" name="receptivenessToHomily" value="1" onclick="uncheckOthers('receptivenessToHomily', this)"> No (1)
         </label>
@@ -299,7 +316,9 @@
 
 
         <!-- Engagement-->
+        <label for = "engagedDuringHomily">
         <p>9. Did you feel engaged while listening the homily?</p>
+        </label>
         <label>
             <input type="checkbox" name="engagedDuringHomily" value="1" onclick="uncheckOthers('engagedDuringHomily', this)"> No (1)
         </label>
@@ -326,7 +345,9 @@
         <br> <br>
 
         <!-- Effectiveness -->
+        <label for = "effectiveMessageCommunication">
         <p>10. Was the message effectively communicated?</p>
+        </label>
         <label>
             <input type="checkbox" name="effectiveMessageCommunication" value="1" onclick="uncheckOthers('effectiveMessageCommunication', this)"> No (1)
         </label>
@@ -353,7 +374,9 @@
         <br> <br>
 
         <!-- Achievement of speaker's goals-->
+        <label for = "AchievementOfSpeakersGoals">
         <p>11. Do you feel that the speaker achieved their goals in this homily?</p>
+        </label>
         <label>
             <input type="checkbox" name="AchievementOfSpeakersGoals" value="1" onclick="uncheckOthers('AchievementOfSpeakersGoals', this)"> No (1)
         </label>
@@ -396,7 +419,9 @@
 
         <h1>Organization and Content</h1>
 
+        <label for = "engaging">
         <p>13. Engaging Introduction</p>
+        </label>
         <label>
             <input type="checkbox" name="engaging" value="1" onclick="uncheckOthers('engaging', this)"> Worst (1)
         </label>
@@ -421,7 +446,9 @@
           <input type="checkbox" name="engaging" value="6" onclick="uncheckOthers('engaging', this)"> Best (6)
         </label>
 
+        <label for = "clarity">
         <p>14. Main Points Clearly Stated</p>
+        </label>
         <label>
             <input type="checkbox" name="clarity" value="1" onclick="uncheckOthers('clarity', this)"> Worst (1)
         </label>
@@ -446,8 +473,9 @@
           <input type="checkbox" name="clarity" value="6" onclick="uncheckOthers('clarity', this)"> Best (6)
         </label>
 
-
+        <label for = "organization">
         <p>15. Well Organized</p>
+        </label>
         <label>
             <input type="checkbox" name="organization" value="1" onclick="uncheckOthers('organization', this)"> Worst (1)
         </label>
@@ -469,7 +497,9 @@
           <input type="checkbox" name="organization" value="6" onclick="uncheckOthers('organization', this)"> Best (6)
         </label>
 
+        <label for = "contextual">
         <p>16. Appropriately Contextual</p>
+        </label>
         <label>
             <input type="checkbox" name="contextual" value="1" onclick="uncheckOthers('contextual', this)"> Worst (1)
         </label><br>
@@ -489,7 +519,9 @@
           <input type="checkbox" name="contextual" value="6" onclick="uncheckOthers('contextual', this)"> Best (6)
         </label>
 
+        <label for = "persuasive">
         <p>17. Engaging/Persuasive</p>
+        </label>
         <label>
             <input type="checkbox" name="persuasive" value="1" onclick="uncheckOthers('persuasive', this)"> Worst (1)
         </label><br>
@@ -509,7 +541,9 @@
           <input type="checkbox" name="persuasive" value="6" onclick="uncheckOthers('persuasive', this)"> Best (6)
         </label>
 
+        <label for = "theology">
         <p>18. Theological/Liturgical Literacy</p>
+        </label>
         <label>
             <input type="checkbox" name="theology" value="1" onclick="uncheckOthers('theology', this)"> Worst (1)
         </label><br>
@@ -529,7 +563,9 @@
           <input type="checkbox" name="theology" value="6" onclick="uncheckOthers('theology', this)"> Best (6)
         </label>
 
+        <label for = "accessibility">
         <p>19. Pastoral Accessibility</p>
+        </label>
         <label>
             <input type="checkbox" name="accessibility" value="1" onclick="uncheckOthers('accessibility', this)"> Worst (1)
         </label><br>
@@ -562,7 +598,9 @@
         
         <h1>Language</h1>
 
+        <label for = "communication">
         <p>21. Appropriate to Oral Communication</p>
+        </label>
         <label>
             <input type="checkbox" name="communication" value="1" onclick="uncheckOthers('communication', this)"> Worst (1)
         </label><br>
@@ -582,7 +620,9 @@
           <input type="checkbox" name="communication" value="6" onclick="uncheckOthers('communication', this)"> Best (6)
         </label>
 
+        <label for = "naturalness">
         <p>22. Naturalness</p>
+        </label>
         <label>
             <input type="checkbox" name="naturalness" value="1" onclick="uncheckOthers('naturalness', this)"> Worst (1)
         </label><br>
@@ -602,7 +642,9 @@
           <input type="checkbox" name="naturalness" value="6" onclick="uncheckOthers('naturalness', this)"> Best (6)
         </label>
 
+        <label for = "grammar">
         <p>23. Grammar</p>
+        </label>
         <label>
             <input type="checkbox" name="grammar" value="1" onclick="uncheckOthers('grammar', this)"> Worst (1)
         </label><br>
@@ -622,7 +664,9 @@
           <input type="checkbox" name="grammar" value="6" onclick="uncheckOthers('grammar', this)"> Best (6)
         </label>
 
+        <label for = "rhetoric">
         <p>24. Rhetorical/Poetic Richness</p>
+        </label>
         <label>
             <input type="checkbox" name="rhetoric" value="1" onclick="uncheckOthers('rhetoric', this)"> Worst (1)
         </label><br>
@@ -642,7 +686,9 @@
           <input type="checkbox" name="rhetoric" value="6" onclick="uncheckOthers('rhetoric', this)"> Best (6)
         </label>
 
+        <label for = "assembly">
         <p>25. Accessibility to Assembly</p>
+        </label>
         <label>
             <input type="checkbox" name="assembly" value="1" onclick="uncheckOthers('assembly', this)"> Worst (1)
         </label><br>
@@ -674,7 +720,9 @@
 
         <h1>Voice</h1>
 
+        <label for = "volume">
         <p>27. Volume</p>
+        </label>
         <label>
             <input type="checkbox" name="volume" value="1" onclick="uncheckOthers('volume', this)"> Worst (1)
         </label><br>
@@ -694,7 +742,9 @@
           <input type="checkbox" name="volume" value="6" onclick="uncheckOthers('volume', this)"> Best (6)
         </label>
 
+        <label for = "rate">
         <p>28. Rate of Speech/Pacing</p>
+        </label>
         <label>
             <input type="checkbox" name="rate" value="1" onclick="uncheckOthers('rate', this)"> Worst (1)
         </label><br>
@@ -714,7 +764,9 @@
           <input type="checkbox" name="rate" value="6" onclick="uncheckOthers('rate', this)"> Best (6)
         </label>
 
+        <label for = "pitch">
         <p>29. Pitch</p>
+        </label>
         <label>
             <input type="checkbox" name="pitch" value="1" onclick="uncheckOthers('pitch', this)"> Worst (1)
         </label><br>
@@ -734,7 +786,9 @@
           <input type="checkbox" name="pitch" value="6" onclick="uncheckOthers('pitch', this)"> Best (6)
         </label>
 
+        <label for = "variety">
         <p>30. Vocal Variety</p>
+        </label>
         <label>
             <input type="checkbox" name="variety" value="1" onclick="uncheckOthers('variety', this)"> Worst (1)
         </label><br>
@@ -754,7 +808,9 @@
           <input type="checkbox" name="variety" value="6" onclick="uncheckOthers('variety', this)"> Best (6)
         </label>
 
+        <label for = "enunciation">
         <p>31. Enunciation</p>
+        </label>
         <label>
             <input type="checkbox" name="enunciation" value="1" onclick="uncheckOthers('enunciation', this)"> Worst (1)
         </label><br>
@@ -774,7 +830,9 @@
           <input type="checkbox" name="enunciation" value="6" onclick="uncheckOthers('enunciation', this)"> Best (6)
         </label>
 
+        <label for = "pronunciation">
         <p>32. Pronunciation</p>
+        </label>
         <label>
             <input type="checkbox" name="pronunciation" value="1" onclick="uncheckOthers('pronunciation', this)"> Worst (1)
         </label><br>
@@ -800,10 +858,13 @@
 
         <textarea id="voiceAdditionalComments" name="freeform" rows="4" cols="50"></textarea>
 
+        </label>
         <h1>Body</h1>
 
         <!-- Posture -->
+        <label for = "posture">
         <p>34. Posture</p>
+        </label>
         <label>
           <input type="checkbox" name="posture" value="1" onclick="uncheckOthers('posture', this)"> Worst (1)
         </label><br>
@@ -824,7 +885,9 @@
         </label>
 
         <!-- Control -->
+        <label for = "control">
         <p>35. Control</p>
+        </label>
         <label>
           <input type="checkbox" name="control" value="1" onclick="uncheckOthers('control', this)"> Worst (1)
         </label><br>
@@ -845,7 +908,9 @@
         </label>
 
         <!-- Movement -->
+        <label for = "movement">
         <p>36. Effectiveness of Movement</p>
+        </label>
         <label>
           <input type="checkbox" name="movement" value="1" onclick="uncheckOthers('movement', this)"> Worst (1)
         </label><br>
@@ -866,7 +931,9 @@
         </label>
 
         <!-- gestures -->
+        <label for = "gestures">
         <p>37. Effectiveness of Gestures</p>
+        </label>
         <label>
           <input type="checkbox" name="gestures" value="1" onclick="uncheckOthers('gestures', this)"> Worst (1)
         </label><br>
@@ -887,7 +954,9 @@
         </label>
 
         <!-- eye contact -->
+        <label for = "eyeContact">
         <p>38. Effectiveness of Eye Contact</p>
+        </label>
         <label>
           <input type="checkbox" name="eyeContact" value="1" onclick="uncheckOthers('eyeContact', this)"> Worst (1)
         </label><br>
@@ -908,7 +977,9 @@
         </label>
 
         <!-- Emotional Connection -->
+        <label for = "emotionalConnection">
         <p>39. Emotional Connection</p>
+        </label>
         <label>
           <input type="checkbox" name="emotionalConnection" value="1" onclick="uncheckOthers('emotionalConnection', this)"> Worst (1)
         </label><br>
@@ -1011,11 +1082,17 @@
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
       let valid = true;
       let name_dict = {};
+      let unanswered = [];
+      let answered = [];
 
       // check for required textboxes meeting minimum word count
       const responseHomilyMessage = document.getElementById("messageMeaning").value;
       if (wordCount(responseHomilyMessage) < 25){
-        return false;
+        //console.log('messageMeaning');
+        unanswered.push('messageMeaning');
+        valid = false;
+      } else {
+        answered.push('messageMeaning');
       }
 
       // collect all checkboxes of a given name into a list
@@ -1034,11 +1111,67 @@
             responded = true;}}
 
           if (!responded){
+            if (!unanswered.includes(key)) {
+              //console.log(key);
+              unanswered.push(key);
+            }
             valid = false;
-            break;
+            //break;
+          } else {
+            if (!answered.includes(key)){
+              //console.log(key);
+            answered.push(key);
+            }
           }
         }
+      
+      colorAnsweredAndUnanswered(answered, unanswered);
+      //console.log('here');
       return valid;
+    }
+
+    // highlights unanswered questions in red and answered questions in black
+    function colorAnsweredAndUnanswered(answered, unanswered) {
+      
+      // color all of the unanswered questions in red
+      for (let i = 0; i < unanswered.length; i++) {
+        if (unanswered[i] == 'messageMeaning') {
+          console.log('here');
+          let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+          questionText.classList.remove('blackText');
+          questionText.classList.add('redText');
+          continue;
+        } 
+        console.log(unanswered[i])
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${unanswered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+        questionText.classList.remove('blackText');
+        questionText.classList.add('redText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('blackText');
+          checkboxes[j].closest('label').classList.add('redText');
+        }
+      }
+
+      // color all of the answered questions in black
+      console.log(answered.length)
+      for (let i = 0; i < answered.length; i++) {
+        if (answered[i] == 'messageMeaning') {
+          console.log('here');
+          let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+          questionText.classList.remove('redText');
+          questionText.classList.add('blackText');
+          continue;
+        } 
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${answered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+        questionText.classList.remove('redText');
+        questionText.classList.add('blackText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('redText');
+          checkboxes[j].closest('label').classList.add('blackText');
+        }
+      }
     }
 
 

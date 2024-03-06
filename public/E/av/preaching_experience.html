@@ -30,6 +30,12 @@
       background-color: white;
       z-index: 1;
       }
+      .redText {
+        color: red
+      }
+      .blackText {
+        color: black
+      }
       h1{
         font-family: 'Times New Roman', Times, serif;
         text-decoration: underline;
@@ -84,7 +90,9 @@
 
         <!-- Preaching Duration -->
 
+        <label for = "preaching_duration">
         <p>How many years have you been preaching?</p>
+        </label>
         <label>
           <input type="checkbox" name="preaching_duration" value="Less than 1 year" onclick="uncheckOthers('preaching_duration', this)"> Less than 1 year
         </label> <br>
@@ -110,7 +118,9 @@
 
         <!-- Teaching Duration -->
 
+        <label for = "teaching_duration">
         <p>How many years have you been teaching how to preach?</p>
+        </label>
         <label>
           <input type="checkbox" name="teaching_duration" value="Less than 1 year" onclick="uncheckOthers('teaching_duration', this)"> Less than 1 year
         </label> <br>
@@ -135,8 +145,9 @@
 
 
         <!-- Preaching Regularity -->
-
+        <label for = "preaching_regularity">
         <p>How often do you preach to a congregation?</p>
+        </label>
         <label>
           <input type="checkbox" name="preaching_regularity" value="Once a day" onclick="uncheckOthers('preaching_regularity', this)"> Once a day
         </label>
@@ -236,7 +247,9 @@
     function validateForm() {
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
       let valid = true;
-      name_dict = {}
+      let answered = [];
+      let unanswered = [];
+      name_dict = {};
 
       // collect all checkboxes of a given name into a list
       for (let i = 0; i < checkboxes.length; i++){
@@ -246,17 +259,61 @@
         } catch (error){
           name_dict[name] = [checkboxes[i]];}}
         
-      for (const [key, value] of Object.entries(name_dict)){
+          for (const [key, value] of Object.entries(name_dict)){
         let responded = false;
         for (let i = 0; i < value.length; i++){
           if (value[i].checked){
             responded = true;}}
-            
-        if (!responded){
-          valid = false;
-          break;}
+
+          if (!responded){
+            if (!unanswered.includes(key)) {
+              //console.log(key);
+              unanswered.push(key);
+            }
+            valid = false;
+            //break;
+          } else {
+            if (!answered.includes(key)){
+              //console.log(key);
+            answered.push(key);
+            }
+          }
+        }
+      
+      colorAnsweredAndUnanswered(answered, unanswered);
+      //console.log('here');
+      return valid;
+    }
+
+    // highlights unanswered questions in red and answered questions in black
+    function colorAnsweredAndUnanswered(answered, unanswered) {
+      
+      // color all of the unanswered questions in red
+      for (let i = 0; i < unanswered.length; i++) {
+        console.log(unanswered[i])
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${unanswered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+        questionText.classList.remove('blackText');
+        questionText.classList.add('redText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('blackText');
+          checkboxes[j].closest('label').classList.add('redText');
+        }
       }
-      return valid;}
+
+      // color all of the answered questions in black
+      console.log(answered.length)
+      for (let i = 0; i < answered.length; i++) {
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${answered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+        questionText.classList.remove('redText');
+        questionText.classList.add('blackText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('redText');
+          checkboxes[j].closest('label').classList.add('blackText');
+        }
+      }
+    }
 
     
     // send the user's results to the server to be stored as a csv

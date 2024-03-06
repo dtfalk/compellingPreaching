@@ -31,6 +31,12 @@
       background-color: white;
       z-index: 1;
       }
+      .redText {
+        color: red
+      }
+      .blackText {
+        color: black
+      }
       h1{
         font-family: 'Times New Roman', Times, serif;
         text-align: center;
@@ -83,12 +89,14 @@
         </p>
 
         <!-- Age -->
-        <label for="age">1. Age:</label>
-        <input type="number" id="age" placeholder="Enter your age"> 
-        <br>
+        <label for="age"><p>1. Age:</p></label>
+        <input type="number" id="age" name = "age" placeholder="Enter your age"> 
+        <br><br><br>
 
         <!-- Gender -->
+        <label for = "gender">
         <p>2. What is your gender?</p>
+        </label>
         <label>
           <input type="checkbox" name="gender" value="Male" onclick="uncheckOthers('gender', this)"> Male
         </label>
@@ -100,14 +108,15 @@
         <label>
           <input type="checkbox" name="gender" value="Prefer not to answer or prefer to self-describe" onclick="uncheckOthers('gender', this)"> Prefer not to answer or prefer to self-describe
         </label>
-        <br>
-        <label for="selfDescribeGender">Prefer to self-describe:</label>
+        <label for="selfDescribeGender"><p>Prefer to self-describe:</p></label>
         <input type="text" name = "selfDescribeGender" id="selfDescribeGender"> 
         <br> <br> <br>
 
 
         <!-- Racial/Ethnic Identity-->
+        <label for = "ethnicity">
         <p>3. Which of the following describes your ethnic and/or racial identity?</p>
+        </label>
         <label>
             <input type="checkbox" name="ethnicity" value="Hispanic or Latino" onclick="uncheckOthers('ethnicity', this)"> Hispanic or Latino
         </label>
@@ -139,14 +148,15 @@
         <label>
           <input type="checkbox" name="ethnicity" value="Prefer not to answer or prefer to self-describe" onclick="uncheckOthers('ethnicity', this)"> Prefer not to answer or prefer to self-describe
         </label>
-        <br>
-        <label for="selfDescribeEthnicity">Prefer to self-describe:</label>
+        <label for="selfDescribeEthnicity"><p>Two or more or prefer to self-describe:</p></label>
         <input type="text" name = "selfDescribeEthnicity" id="selfDescribeEthnicity"> 
         <br> <br> <br>
 
 
         <!-- Economic Class-->
+        <label for = "economicClass">
         <p>4. Do you consider yourself to come from a:</p>
+        </label>
         <label>
             <input type="checkbox" name="economicClass" value="Low income background" onclick="uncheckOthers('economicClass', this)"> Low income background
         </label>
@@ -169,14 +179,24 @@
         <br><br><br>
 
 
+        <!-- Country of Origin -->
+        <label for = "countryOfOrigin">
+        <p>5. What is your country of origin?</p>
+        </label>
+        <input type="text" name = "countryOfOrigin" id="countryOfOrigin"> 
+        <br><br><br>
+
+
         <!-- US residence duration -->
-        <label for="USAResidenceDuration">5. How many years have you lived in the US? </label>
-        <input type="number" id="USAResidenceDuration" placeholder="Number of years"> 
+        <label for="USAResidenceDuration"><p>6. If you currently live in the United States, how many years have you lived in the US? </p></label>
+        <input type="number" id="USAResidenceDuration" name = "USAResidenceDuration" placeholder="Number of years"> 
         <br> <br> <br>
 
 
         <!-- English first language-->
-        <p>6. Is English your first language? </p>
+        <label for = "englishFirstLanguage">
+        <p>7. Is English your first language? </p>
+        </label>
         <label>
             <input type="checkbox" name="englishFirstLanguage" value="Yes" onclick="uncheckOthers('englishFirstLanguage', this)"> Yes
         </label>
@@ -186,7 +206,7 @@
         </label>
         <br><br>
 
-        <label for="otherLanguages">7. Please list any other languages, if any, that you speak fluently:</label>
+        <label for="otherLanguages"><p>8. Please list any other languages, if any, that you speak fluently:</p></label>
         <br>
         <textarea id="otherLanguages" name="otherLanguages" rows="4" cols="50"></textarea>
         <br><br><br>
@@ -238,6 +258,7 @@
           }
       }
 
+
     // returns the word count of a string
     // (helper for validate form)
     function wordCount(string){
@@ -254,11 +275,13 @@
     // validates that the user answered all questions
     // (helper for submit form)
     function validateForm() {
-      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-      const textboxes = document.querySelectorAll('input[type="text"]');
-      const numberBoxes = document.querySelectorAll('input[type="number"]');
+      const checkboxes = document.querySelectorAll(`input[type="checkbox"]`);
+      const textboxes = document.querySelectorAll(`input[type="text"]`);
+      const numberBoxes = document.querySelectorAll(`input[type="number"]`);
       
       let valid = true;
+      var answered = [];
+      var unanswered = [];
       let checkbox_name_dict = {};
       let textbox_name_dict = {};
 
@@ -267,6 +290,7 @@
       // collect all names of checkboxes
       for (let i = 0; i < checkboxes.length; i++){
         name = checkboxes[i].name;
+        //console.log(name);
         try {
           checkbox_name_dict[name].push(checkboxes[i]);
         } catch (error){
@@ -284,24 +308,51 @@
       
       // check that each checkbox has a response
       for (const [key, value] of Object.entries(checkbox_name_dict)){
+        //console.log(key);
         let responded = false;
         for (let i = 0; i < value.length; i++){
           if (value[i].checked){
             responded = true;}}
 
           if (!responded){
+            if (!unanswered.includes(key)) {
+              //console.log(key);
+              unanswered.push(key);
+            }
             valid = false;
-            break;
+          } else {
+            if (!answered.includes(key)){
+              //console.log(key);
+            answered.push(key);
+            }
           }
         }
 
     // make sure each numberbox has a response
     for (let i = 0; i < numberBoxes.length; i++){
       let response = numberBoxes[i].value;
+      console.log(response);
 
       if (response.length == 0){
-        valid = false;
+        if (!unanswered.includes(numberBoxes[i].name)) {
+              //console.log(key);
+              unanswered.push(numberBoxes[i].name);
       }
+      valid = false;
+    } else {
+          if (!answered.includes(numberBoxes[i].name)){
+              //console.log(key);
+            answered.push(numberBoxes[i].name);
+          }
+            }
+      }
+    
+    let countryOfOriginTextBox = document.querySelector(`input[type="text"][name="countryOfOrigin"]`).value;
+    //console.log(countryOfOriginTextBox);
+    if (wordCount(countryOfOriginTextBox) == 0){
+      unanswered.push('countryOfOrigin');
+    } else {
+      answered.push('countryOfOrigin');
     }
 
     let ethnicityCheckboxes = document.getElementsByName('ethnicity');
@@ -310,20 +361,112 @@
     for (let i = 0; i < ethnicityCheckboxes.length; i++){
       let response = ethnicityCheckboxes[i].value;
       if (ethnicityCheckboxes[i].checked && response == 'Two or more'){
-        for (let i = 0; i < textboxes.length; i++) {
-          textResponse = textboxes[i].value;
-          name = textboxes[i].name
+        for (let j = 0; j < textboxes.length; j++) {
+          textResponse = textboxes[j].value;
+          name = textboxes[j].name
           if (name == 'selfDescribeEthnicity' && wordCount(textResponse) == 0){
+            console.log('here');
+            if (!unanswered.includes('ethnicity')){
+              unanswered.push('ethnicity');
+            }
+            answered = answered.filter(item => item !== 'ethnicity');
+            console.log('new answered: ', answered);
+            //console.log(unanswered);
             valid = false;
           }
         }
       }
     }
 
-      return valid;
+    console.log('unanswered: ', unanswered)
+    console.log('answered: ', answered)
+    console.log('valid: ', valid);
+    colorAnsweredAndUnanswered(answered, unanswered);
+    return valid;
   }
 
+    // highlights unanswered questions in red and answered questions in black
+    function colorAnsweredAndUnanswered(answered, unanswered) {
+      //console.log('here');
+      // color all of the unanswered questions in red
+      for (let i = 0; i < unanswered.length; i++) {
+        //console.log(unanswered[i])
+        // handle country of origin, age and USA residence duration
+        if (unanswered[i] == 'countryOfOrigin' || unanswered[i] == 'age' || unanswered[i] == 'USAResidenceDuration') {
+          let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+          questionText.classList.remove('blackText');
+          questionText.classList.add('redText');
+          continue;
+        } 
 
+        // handle ethnicity questions
+        if (unanswered[i] == 'ethnicity') {
+          // handle ethnicity textbox
+          let questionText = document.querySelector(`label[for="selfDescribeEthnicity"]`).querySelector('p');
+          questionText.classList.remove('blackText');
+          questionText.classList.add('redText');
+        } 
+
+        // handle gender questions
+        if (unanswered[i] == 'gender') {
+          // handle gender textbox
+          let questionText = document.querySelector(`label[for="selfDescribeGender"]`).querySelector('p');
+          questionText.classList.remove('blackText');
+          questionText.classList.add('redText');
+        } 
+        
+        //console.log(unanswered[i])
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${unanswered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+        questionText.classList.remove('blackText');
+        questionText.classList.add('redText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('blackText');
+          checkboxes[j].closest('label').classList.add('redText');
+        }
+      }
+
+      // color all of the answered questions in black
+      //console.log(answered.length)
+      // color all of the unanswered questions in red
+      for (let i = 0; i < answered.length; i++) {
+
+        // handle country of origin, age and USA residence duration
+        if (answered[i] == 'countryOfOrigin' || answered[i] == 'age' || answered[i] == 'USAResidenceDuration') {
+          let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+          questionText.classList.remove('redText');
+          questionText.classList.add('blackText');
+          continue;
+        } 
+
+        // handle ethnicity questions
+        if (answered[i] == 'ethnicity') {
+          // handle ethnicity textbox
+          let questionText = document.querySelector(`label[for="selfDescribeEthnicity"]`).querySelector('p');
+          questionText.classList.remove('redText');
+          questionText.classList.add('blackText');
+        } 
+
+        // handle gender questions
+        if (answered[i] == 'gender') {
+          // handle gender textbox
+          let questionText = document.querySelector(`label[for="selfDescribeGender"]`).querySelector('p');
+          questionText.classList.remove('redText');
+          questionText.classList.add('blackText');
+        } 
+        
+        //console.log(answered[i])
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${answered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+        questionText.classList.remove('redText');
+        questionText.classList.add('blackText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('redText');
+          checkboxes[j].closest('label').classList.add('blackText');
+        }
+      }
+    }
+    
     // sends the user response to the server to be stored as a csv
     // (helper for submit form)
     async function sendResults(header, data){
@@ -340,7 +483,7 @@
         results[String(header[i])] = String(data[i]);
       }
 
-      console.log('here');
+      //console.log('here');
       const response = await fetch(url, {
         method: 'POST',
         headers: {'Content-Type' : 'application/json'},

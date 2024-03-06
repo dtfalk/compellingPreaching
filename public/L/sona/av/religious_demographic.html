@@ -31,9 +31,19 @@
       background-color: white;
       z-index: 1;
       }
-      h1, h2, h3 {
+      .redText {
+        color: red
+      }
+      .blackText {
+        color: black
+      }
+      h1, h3 {
         font-family: 'Times New Roman', Times, serif;
         text-decoration: underline;
+        text-align: center;
+      }
+      h2 {
+        font-family: 'Times New Roman', Times, serif;
         text-align: center;
       }
       text{
@@ -81,7 +91,9 @@
         </p>
 
         <!-- Present Religion -->
+        <label for = "religion">
         <p>What is your present religion, if any?</p>
+        </label>
         <label>
           <input type="checkbox" name="religion" value="Protestant" onclick="uncheckOthers('religion', this)"> 
           Protestant (e.g. Baptist, Methodist, Non-denominational, Lutheran, Presbyterian, Pentecostal, Episcopalian, Reformed, Church of Christ, etc.)
@@ -131,7 +143,7 @@
         <input type="checkbox" name="religion" value="Prefer not to answer" onclick="uncheckOthers('religion', this)"> Prefer not to answer
         </label>
         <br>
-        <label for="otherReligion"> Something else, Specify:</label>
+        <label for="otherReligion"> <p>Something else, Specify:</p></label>
         <input type="text" id="otherReligion" name="userid"> 
         <br><br><br><br>
         
@@ -140,7 +152,9 @@
 
         <!-- If Something Else or Unspecified-->
         <h2> If you answered either "Something else" or "Prefer not to answer" in the previous question, please answer this question. If not, skip this question and please select N/A: </h2>
+        <label for = "christian">
         <p>Do you think of yourself as a Christian or not?</p>
+        </label>
         <label>
             <input type="checkbox" name="christian" value="Yes" onclick="uncheckOthers('christian', this)"> Yes
         </label>
@@ -157,7 +171,9 @@
 
         <!-- Type of Christian -->
         <h2> If you answered yes to the previous question, then please answer this question. If not, skip this question and please select N/A: </h2>
+        <label for = "bornAgain">
         <p>If you consider yourself a Christian, would you describe yourself as born-again evangelical Christian, or not?</p>
+        </label>
         <label>
             <input type="checkbox" name="bornAgain" value="Yes" onclick="uncheckOthers('bornAgain', this)"> Yes, born-again or evangelical Christian
         </label>
@@ -175,7 +191,9 @@
 
         <!-- General Questions-->
         <h2>General Questions</h2>
+        <label for = "attendance">
         <p>Aside from weddings and funerals, how often do you attend religious services?</p>
+        </label>
         <label>
             <input type="checkbox" name="attendance" value="More than once a week" onclick="uncheckOthers('attendance', this)"> More than once a week
         </label>
@@ -202,7 +220,9 @@
         <br><br>
 
 
+        <label for = "importance">
         <p>How important is religion in your life?</p>
+        </label>
         <label>
             <input type="checkbox" name="importance" value="Very important" onclick="uncheckOthers('importance', this)"> Very important
         </label>
@@ -220,7 +240,9 @@
         </label>
         <br><br>
 
+        <label for = "prayer">
         <p>Outside of attending religious services, how often do you pray?</p>
+        </label>
         <label>
             <input type="checkbox" name="prayer" value="Several times a day" onclick="uncheckOthers('prayer', this)"> Several times a day
         </label>
@@ -308,6 +330,8 @@
         let valid = true;
         name_dict = {};
         let religionCheckboxes = [];
+        let answered = [];
+        let unanswered = [];
 
         // collect all checkboxes of a given name into a list
         for (let i = 0; i < checkboxes.length; i++){
@@ -322,36 +346,107 @@
                 name_dict[name] = [checkboxes[i]];
             }}
         
-        for (const [key, value] of Object.entries(name_dict)){
+            for (const [key, value] of Object.entries(name_dict)){
+        let responded = false;
+        for (let i = 0; i < value.length; i++){
+          if (value[i].checked){
+            responded = true;}}
 
-            let responded = false;
-            for (let i = 0; i < value.length; i++){
-                if (value[i].checked){
-                    responded = true;
-                }}
-            if (!responded){
-                valid = false;
-                break;
+          if (!responded){
+            if (!unanswered.includes(key)) {
+              //console.log(key);
+              unanswered.push(key);
             }
+            valid = false;
+            //break;
+          } else {
+            if (!answered.includes(key)){
+              //console.log(key);
+              answered.push(key);
+            }
+          }
         }
 
         let religionChecked = false;
         const religionTextbox = document.getElementById('otherReligion').value;
         console.log(religionTextbox === '');
 
-        if (religionTextbox === ''){
+        if (wordCount(religionTextbox) == 0){
           for (let i = 0; i < religionCheckboxes.length; i++){
             if (religionCheckboxes[i].checked) {
               religionChecked = true;
             }
           }
           if (!religionChecked){
+            unanswered.push('religion');
+            unanswered.push('otherReligion');
             valid = false;
+          } else {
+            answered.push('religion');
+            answered.push('otherReligion');
           }
         }
+
+        colorAnsweredAndUnanswered(answered, unanswered);
         return valid;
       }
-  
+
+    // highlights unanswered questions in red and answered questions in black
+    function colorAnsweredAndUnanswered(answered, unanswered) {
+      
+      // color all of the unanswered questions in red
+      for (let i = 0; i < unanswered.length; i++) {
+        if (unanswered[i] == 'otherReligion') {
+          console.log('here');
+          let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+          questionText.classList.remove('blackText');
+          questionText.classList.add('redText');
+          continue;
+        } 
+        console.log(unanswered[i])
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${unanswered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+        questionText.classList.remove('blackText');
+        questionText.classList.add('redText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('blackText');
+          checkboxes[j].closest('label').classList.add('redText');
+        }
+      }
+
+      // color all of the answered questions in black
+      console.log(answered.length)
+      for (let i = 0; i < answered.length; i++) {
+        if (answered[i] == 'otherReligion') {
+          console.log('here');
+          let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+          questionText.classList.remove('redText');
+          questionText.classList.add('blackText');
+          continue;
+        } 
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${answered[i]}"]`);
+        let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+        questionText.classList.remove('redText');
+        questionText.classList.add('blackText');
+        for (j = 0; j < checkboxes.length; j++ ) {
+          checkboxes[j].closest('label').classList.remove('redText');
+          checkboxes[j].closest('label').classList.add('blackText');
+        }
+      }
+    }
+
+    // returns the word count of a string
+    // (helper for validate form)
+    function wordCount(string){
+      const words = string.split(" ");
+      wordcount = 0;
+      for (let i = 0; i < words.length; i++){
+        if (!words[i] == ' ') {
+          wordcount += 1;
+        }
+      }
+      return wordcount;
+    }
 
     // sends the user response to the server to be stored as a csv
     // (helper for submit form)
