@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homily Review</title>
     <style>
         .video-container {
             font-family: 'Times New Roman', Times, serif;
@@ -65,28 +64,54 @@
             line-height: 1.6;
             color:red
         }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s infinite linear;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -18px; /* Half of height */
+            margin-left: -18px; /* Half of width */
+        }
+
+        @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+        }
+        /* Initially hide the video */
+        #homilyVideo {
+            visibility: hidden;
+        }
+
     </style>
 </head>
 <body onload="initialize()">
 
 <main id="instructionsSection">
-    <div class = "video-container">
-        <video id = 'homilyVideo' controls disablePictureInPicture controlsList="nodownload noplaybackrate"></video>
+    <div class="video-container">
+        <div id="loadingSpinner" class="spinner"></div> <!-- Spinner container -->
+        <video id='homilyVideo' controls disablePictureInPicture controlsList="nodownload noplaybackrate"></video>
     </div>
-    <p>Press the "continue" button below to continue to the questionnaire once you have completed the homily.</p>
-    <text id = 'errorMessage'>You must complete the entire homily before continuing.</text>
-
-    <br> <br> <br>
-    <button onclick="submitForm()">Continue</button>
-<br>
+    <p id= "loadingMessage">Your homily is loading, thank you for your patience.</p>
+    <p id= "loadedMessage" style="display: none;">Press the continue button once you have completed the homily.</p>
+    <text id='errorMessage'>You must complete the entire homily before continuing.</text>
+    <center>
+        <button id= "submitButton" onclick="submitForm()" style = "display:none;">Continue</button>
+    </center>
 </main>
 
 <script>
-
-    sessionStorage.setItem('userType', 'laymen');
-    sessionStorage.setItem('experimentSource', 'sona');
+    sessionStorage.setItem('userType', 'expert');
+    sessionStorage.setItem('experimentSource', 'na');
     sessionStorage.setItem('experimentType', 'av');
-
 
     // this block of code fetches a random unused homily and displays it
     // ---------------------------------------------------------------------------
@@ -102,8 +127,18 @@
         fetchRandomVideo().then(homily => {
             if(homily){
                 console.log(homily.media);
-                document.getElementById('homilyVideo').src = homily.media;
+                const videoElement = document.getElementById('homilyVideo');
+                videoElement.src = homily.media;
                 sessionStorage.setItem('homilyId', homily.media);
+                
+                // hide video and display spinner until video can play through without buffering
+                videoElement.addEventListener('canplaythrough', function() {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    videoElement.style.visibility = 'visible';
+                    document.getElementById('loadedMessage').style.display = 'block';
+                    document.getElementById('submitButton').style.display = 'block';
+                }, {once: true});
             } else{
                 console.error('Failed to fetch homily.');
             }
@@ -160,7 +195,6 @@
         isSeeking = true;
     });
 
-
     // check when the user has stopped trying to navigate through the homily
     video.addEventListener('seeked', function(event){
         if (video.currentTime > furthestPoint){
@@ -169,8 +203,8 @@
         isSeeking = false;
     });
 
-    // prevents the user from changing the rate of playback
-    document.addEventListener("DOMContentLoaded", function() {
+        // prevents the user from changing the rate of playback
+        document.addEventListener("DOMContentLoaded", function() {
         var homilyVideo = document.getElementById('homilyVideo');
 
         homilyVideo.addEventListener('ratechange', function() {
@@ -179,6 +213,7 @@
         }
     });
 });
+    
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
 
