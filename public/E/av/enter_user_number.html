@@ -49,12 +49,12 @@
     <!-- retrieve the user's number-->
     <main>
     <form id="userForm">
-    <p><b>Enter your user ID and then click submit</b></p>
+    <p><b>Enter your User ID and then click submit</b></p>
     <br>
       <center>
       <label for ="userid">User ID:</label>
       <input type="text" id="userid" name="userid"><br><br>
-      <input type="button" value="Submit" onclick="validateUser()">
+      <input type="submit" value="Submit" onclick="validateUser()">
       </center>
     <br>
 
@@ -72,9 +72,23 @@
     // This block of code ensures the user enters a valid user number before continuing
     // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
+
+    document.getElementById('userForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+    validateUser();
+    });
+    
+    // checks if the user presses the enter or return key
+    document.addEventListener('keydown', event => {
+      if (event.key == 'Enter') {
+        validateUser();
+      }
+    });
+
     // check if user enters valid user number
     async function validateUser() {
       const userId = document.getElementById('userid').value;
+      console.log(userId)
       const userType = sessionStorage.getItem('userType');
       const experimentSource = sessionStorage.getItem('experimentSource');
       const experimentType = sessionStorage.getItem('experimentType');
@@ -93,7 +107,7 @@
             }
           });
         } else {
-          errorMessage.textContent = 'Invalid user ID entered. Please try again.';
+          errorMessage.textContent = 'Invalid User ID. Please try again.';
           setTimeout(function() {
             errorMessage.textContent = '';
           }, 2000);
@@ -111,11 +125,10 @@
         }
       }
       const url = `/api/checkExists/${userId}/${userType}/${experimentSource}/${experimentType}`;
-      console.log('url: ', url);
+      
       try {
         if (userId == ''){return false;}
         const response = await fetch(url);
-        console.log('server response: ', response);
         const parsedResponse = await response.json();
         const valid = parsedResponse.exists;
         if (!response.ok){

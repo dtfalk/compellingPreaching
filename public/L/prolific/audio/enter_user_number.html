@@ -54,7 +54,7 @@
       <center>
       <label for ="userid">Prolific ID:</label>
       <input type="text" id="userid" name="userid"><br><br>
-      <input type="button" value="Submit" onclick="validateUser()">
+      <input type="submit" value="Submit" onclick="validateUser()">
       </center>
     <br>
 
@@ -72,9 +72,23 @@
     // This block of code ensures the user enters a valid user number before continuing
     // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
+
+    document.getElementById('userForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+    validateUser();
+    });
+    
+    // checks if the user presses the enter or return key
+    document.addEventListener('keydown', event => {
+      if (event.key == 'Enter') {
+        validateUser();
+      }
+    });
+
     // check if user enters valid user number
     async function validateUser() {
       const userId = document.getElementById('userid').value;
+      console.log(userId)
       const userType = sessionStorage.getItem('userType');
       const experimentSource = sessionStorage.getItem('experimentSource');
       const experimentType = sessionStorage.getItem('experimentType');
