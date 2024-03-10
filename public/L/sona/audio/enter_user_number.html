@@ -96,7 +96,7 @@
       checkValidID(userId, userType, experimentSource, experimentType).then(async exists => {
         if (exists) {
           sessionStorage.setItem('userId', userId); // store user number in session
-          await new Promise(resolve => setTimeout(resolve, 0.1)); // Introduce a delay using Promise
+          await new Promise(resolve => setTimeout(resolve, 5)); // Introduce a delay using Promise
 
           checkConsentFormCompleted().then(consented => {
             console.log(consented);

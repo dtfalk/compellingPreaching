@@ -216,6 +216,41 @@ router.get('/randomHomily/:userId/:userType/:experimentSource/:experimentType', 
 // --------------------------------  RESPONSE STORAGE ROUTES  ---------------------------------------
 // --------------------------------------------------------------------------------------------------
 
+// stores user's behavior while watching homily (rewinds, pauses, tab switchesw)
+router.post('/storeUserBehavior', async (req, res) => {
+  try {
+    console.log('here');
+    const results = req.body.results;
+    const userId = req.body.userId; // user id
+    const userType = req.body.userType; // expert or laymen
+    let tempHomilyId = req.body.homilyId;
+    let homilyId;
+    let experimentSource = req.body.experimentSource; // sona or prolific
+    const experimentType = req.body.experimentType; // audio or av
+    if (experimentSource == 'na'){ // if it is an expert change the value to an empty string (dumb but quick fix)
+      experimentSource = '';
+    }
+    if (experimentType == 'av'){
+      homilyId = path.basename(tempHomilyId, '.mp4');
+    } else {
+      homilyId = path.basename(tempHomilyId, '.mp3');}
+    
+
+    userData.storeBehaviorInfo(userId, userType, experimentSource, experimentType, homilyId, results).then(data => {
+      res.send(JSON.stringify({'success message' : 'Behavior info saved'}));
+      }).catch(async error => {
+        console.error(error);
+        await userData.fileQueueLogFile.enqueue(async () => {
+          userData.logToFile(('Unable to use save behavior info route: ' + error.message), errorPath);
+        });
+        res.status(500).send('Unable to save behavior info');});
+    } catch (error){
+      await userData.fileQueueLogFile.enqueue(async () => {
+        userData.logToFile(('Unable to use save behavior info route: ' + error.message), errorPath);
+      });
+      console.error('unable to use store user behavior route: ', error.message);
+    }
+})
 // stores the results to the user demographic data
 router.post('/storeUserDemographicResults', async (req, res) => {
   try {
@@ -231,16 +266,16 @@ router.post('/storeUserDemographicResults', async (req, res) => {
     
 
     userData.storeUserDemographic(results, userId, userType, experimentSource, experimentType).then(data => {
-      res.send(JSON.stringify({'success message' : 'Consent info saved'}));
+      res.send(JSON.stringify({'success message' : 'Demographic info saved'}));
       }).catch(async error => {
         console.error(error);
         await userData.fileQueueLogFile.enqueue(async () => {
-          userData.logToFile(('Unable to use save consent info route: ' + error.message), errorPath);
+          userData.logToFile(('Unable to use save demographic info route: ' + error.message), errorPath);
         });
-        res.status(500).send('Unable to save consent info');});
+        res.status(500).send('Unable to save demographic info');});
     } catch (error){
       await userData.fileQueueLogFile.enqueue(async () => {
-        userData.logToFile(('Unable to use save consent info route: ' + error.message), errorPath);
+        userData.logToFile(('Unable to use save demographic info route: ' + error.message), errorPath);
       });
       console.error('unable to use store user demographic route: ', error.message);
     }

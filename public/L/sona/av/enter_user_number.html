@@ -43,7 +43,7 @@
 
   </style>
 </head>
-<body>
+<body onload="initialize()">
   <div id="background"></div>
   <div id="userIdForm">
     <!-- retrieve the user's number-->
@@ -65,9 +65,13 @@
 
   <script>
 
-    sessionStorage.setItem('userType', 'laymen');
-    sessionStorage.setItem('experimentSource', 'sona');
-    sessionStorage.setItem('experimentType', 'av');
+    function initialize() {
+      console.log('initialize');
+      sessionStorage.setItem('userType', 'laymen');
+      sessionStorage.setItem('experimentSource', 'sona');
+      sessionStorage.setItem('experimentType', 'av');
+      console.log(sessionStorage.getItem('userType'));
+    }
 
     // This block of code ensures the user enters a valid user number before continuing
     // -----------------------------------------------------------------------------------
@@ -88,15 +92,16 @@
     // check if user enters valid user number
     async function validateUser() {
       const userId = document.getElementById('userid').value;
-      console.log(userId)
+      //console.log(userId)
       const userType = sessionStorage.getItem('userType');
       const experimentSource = sessionStorage.getItem('experimentSource');
       const experimentType = sessionStorage.getItem('experimentType');
       const errorMessage = document.getElementById('errorMessage');
       checkValidID(userId, userType, experimentSource, experimentType).then(async exists => {
+        console.log('exists');
         if (exists) {
           sessionStorage.setItem('userId', userId); // store user number in session
-          await new Promise(resolve => setTimeout(resolve, 0.1)); // Introduce a delay using Promise
+          await new Promise(resolve => setTimeout(resolve, 5)); // Introduce a delay using Promise
 
           checkConsentFormCompleted().then(consented => {
             console.log(consented);
@@ -117,18 +122,24 @@
     // helper for "validateUser()"
     // makes call to server to check if a valid ID was entered
     async function checkValidID(userId, userType, experimentSource, experimentType){
-      valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-';
+      console.log('check valid ID start');
+      console.log(userId, userType, experimentSource, experimentType);
+      valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
       for (let i = 0; i < String(userId).length; i++) {
         char = String(userId)[i];
         if (!valid_chars.includes(char)) {
+          console.log(char);
           return false;
         }
       }
       const url = `/api/checkExists/${userId}/${userType}/${experimentSource}/${experimentType}`;
       
       try {
-        if (userId == ''){return false;}
+        if (userId == ''){
+          console.log('empty user Id')
+          return false;}
         const response = await fetch(url);
+        console.log('response: ', response);
         const parsedResponse = await response.json();
         const valid = parsedResponse.exists;
         if (!response.ok){
@@ -166,10 +177,6 @@
 
     // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
-
-
-
-
   </script>
 </body>
 </html>

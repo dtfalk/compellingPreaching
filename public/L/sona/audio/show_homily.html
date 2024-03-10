@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Homily Review</title>
     <style>
         .audio-container {
             font-family: 'Times New Roman', Times, serif;
@@ -69,142 +68,267 @@
 </head>
 <body onload="initialize()">
 
-<main id="instructionsSection">
-    <div class = "audio-container">
-        <audio id = 'homilyAudio' controls disablePictureInPicture controlsList="nodownload noplaybackrate"></audio>
-    </div>
-    <p>Press the "continue" button below to continue to the questionnaire once you have completed the homily.</p>
-    <text id = 'errorMessage'>You must complete the entire homily before continuing.</text>
-
-    <br> <br> <br>
-    <button onclick="submitForm()">Continue</button>
-<br>
-</main>
-
-<script>
-
-    sessionStorage.setItem('userType', 'laymen');
-    sessionStorage.setItem('experimentSource', 'sona');
-    sessionStorage.setItem('experimentType', 'audio');
-
-
-    // this block of code fetches a random unused homily and displays it
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-    const userId = sessionStorage.getItem('userId');
-    const userType = sessionStorage.getItem('userType');
-    const experimentSource = sessionStorage.getItem('experimentSource');
-    const experimentType = sessionStorage.getItem('experimentType');
-    const url = `/api/randomHomily/${userId}/${userType}/${experimentSource}/${experimentType}`;
-
-    // initialize by getting a random audio and setting session variable
-    function initialize(){
-        fetchRandomAudio().then(homily => {
-            if(homily){
-                console.log(homily.media);
-                document.getElementById('homilyAudio').src = homily.media;
-                sessionStorage.setItem('homilyId', homily.media);
-            } else{
-                console.error('Failed to fetch homily.');
-            }
-        })
-    }
-
-
-    // fetches a random unused homily from server (helper for "initialize()")
-    async function fetchRandomAudio(){
-        try {
-            const homily = await fetch(url);
-            if (!homily.ok){
-                throw new Error('HTTP error! status: ${homily.status}');
-            }
-            return await homily.json();
-        } catch(error){
-            console.error('Error fetching data: ', error);
-            return null;
-        }
-    }
-    // ---------------------------------------------------------------------------
-    // ---------------------------------------------------------------------------
-
-
-    // This brick of code is for preventing the user from
-    // skipping through the homily
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
-    let seconds_achieved = [0]; // keeps track of moments a user obtained
-    let furthestPoint = 0; // at beginning of 
-    let isSeeking = false;
-    const audio = document.getElementById('homilyAudio');
-
-
-    // update the furthest point attained in the homily
-    audio.addEventListener('timeupdate', function() {
-        setTimeout(function() {
-        if ((audio.currentTime > furthestPoint)  && !isSeeking) {
-
-            // only update the furthest point attained if the homily's previous second attained
-            if ((Math.floor(audio.currentTime) - 1) == seconds_achieved[seconds_achieved.length - 1]){
-                furthestPoint = audio.currentTime; // update furthest point
-
-                // add a given value to the attained times only once
-                if (!(Math.floor(audio.currentTime) == seconds_achieved[seconds_achieved.length - 1])){
-                    seconds_achieved.push(Math.floor(audio.currentTime));
+    <main id="instructionsSection">
+        <div class="audio-container">
+            <div id="loadingSpinner" class="spinner"></div> <!-- Spinner container -->
+            <audio id='homilyAudio' onvolumechange= "volumeChange(this)" controls disablePictureInPicture controlsList="nodownload noplaybackrate"></audio>
+        </div>
+        <p id= "loadingMessage">Your homily is loading, thank you for your patience.</p>
+        <p id= "loadedMessage" style="display: none;">Press the continue button once you have completed the homily.</p>
+        <text id='errorMessage'>You must complete the entire homily before continuing.</text>
+        <center>
+            <button id= "submitButton" onclick="submitForm()" style = "display:none;">Continue</button>
+        </center>
+    </main>
+    
+    <script>
+        sessionStorage.setItem('userType', 'laymen');
+        sessionStorage.setItem('experimentSource', 'sona');
+        sessionStorage.setItem('experimentType', 'audio');
+    
+        // this block of code fetches a random unused homily and displays it
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+        const userId = sessionStorage.getItem('userId');
+        const userType = sessionStorage.getItem('userType');
+        const experimentSource = sessionStorage.getItem('experimentSource');
+        const experimentType = sessionStorage.getItem('experimentType');
+        const url = `/api/randomHomily/${userId}/${userType}/${experimentSource}/${experimentType}`;
+    
+        // initialize by getting a random audio and setting session variable
+        function initialize(){
+            fetchRandomVideo().then(homily => {
+                if(homily){
+                    console.log(homily.media);
+                    const audioElement = document.getElementById('homilyAudio');
+                    //audioElement.src = String(homily.media).replace('.mp4', 'snipped.mp4');
+                    audioElement.src = homily.media;
+                    sessionStorage.setItem('homilyId', homily.media);
+                    
+                    // hide audio and display spinner until audio can play through without buffering
+                    audioElement.addEventListener('canplaythrough', function() {
+                        document.getElementById('loadingSpinner').style.display = 'none';
+                        document.getElementById('loadingMessage').style.display = 'none';
+                        audioElement.style.visibility = 'visible';
+                        document.getElementById('loadedMessage').style.display = 'block';
+                        document.getElementById('submitButton').style.display = 'block';
+                    }, {once: true});
+                } else{
+                    console.error('Failed to fetch homily.');
                 }
-            }};}, 1);
-    });
-
-
-    // check if the user is trying to navigate through the homily
-    audio.addEventListener('seeking', function(event) {
-        isSeeking = true;
-    });
-
-
-    // check when the user has stopped trying to navigate through the homily
-    audio.addEventListener('seeked', function(event){
-        if (audio.currentTime > furthestPoint){
-            audio.currentTime = furthestPoint;
+            })
         }
-        isSeeking = false;
-    });
-
-        // prevents the user from changing the rate of playback
-        document.addEventListener("DOMContentLoaded", function() {
-        var homilyAudio = document.getElementById('homilyAudio');
-
-        homilyAudio.addEventListener('ratechange', function() {
-        if (homilyAudio.playbackRate != 1) {
-            homilyAudio.playbackRate = 1;
+    
+    
+        // fetches a random unused homily from server (helper for "initialize()")
+        async function fetchRandomVideo(){
+            try {
+                const homily = await fetch(url);
+                if (!homily.ok){
+                    throw new Error('HTTP error! status: ${homily.status}');
+                }
+                return await homily.json();
+            } catch(error){
+                console.error('Error fetching data: ', error);
+                return null;
+            }
         }
-    });
-});
-    // ---------------------------------------------------------------------
-    // ---------------------------------------------------------------------
-
-
-    // see if user has completed homily and if so, allow them to proceed
-    function submitForm() {
-
-        // if not completed, show error message
-        if (furthestPoint < audio.duration - 1){ // change to ... < audio.duration in final code
-            let text = document.getElementById('errorMessage');
-            text.style.display = 'block';
+        // ---------------------------------------------------------------------------
+        // ---------------------------------------------------------------------------
+    
+    
+        // This brick of code is for preventing the user from
+        // skipping through the homily
+        // ---------------------------------------------------------------------
+        // ---------------------------------------------------------------------
+        let seconds_achieved = [0]; // keeps track of moments a user obtained
+        let furthestPoint = 0; // at beginning of 
+        let isSeeking = false;
+        const audio = document.getElementById('homilyAudio');
+    
+            // variables for keeping track of various user actions while homily 
+        // is playing (pauses, tab switches, duration of each and number of rewinds)
+        let pauseCounter = 0; // subtract by one later on because end of homily counts as a pause
+        let pauseTimer = 0;
+        let playTimer = 0; // variables for pauses counts and time paused and time playing homily
+        let lastPauseTime = Date.now();
+        let lastPlayTime = Date.now();
+        let isInitialPlay = true;
+    
+        let tabSwitchesCounter = 0;
+        let timeOnHomilyTab = 0; // variables for times the tab was switched and time on tab vs ...
+        let timeOffHomilyTab = 0;
+        let lastSwitchTime = Date.now();
+    
+        let numRewinds = 0; // how many times the user rewound the homily more than one second
+    
+    
+        // update the furthest point attained in the homily
+        audio.addEventListener('timeupdate', function() {
             setTimeout(function() {
-                text.style.display = 'none'
-            }, 3000);
-            return
+            if ((audio.currentTime > furthestPoint)  && !isSeeking) {
+    
+                // only update the furthest point attained if the homily's previous second attained
+                if ((Math.floor(audio.currentTime) - 1) == seconds_achieved[seconds_achieved.length - 1]){
+                    furthestPoint = audio.currentTime; // update furthest point
+    
+                    // add a given value to the attained times only once
+                    if (!(Math.floor(audio.currentTime) == seconds_achieved[seconds_achieved.length - 1])){
+                        seconds_achieved.push(Math.floor(audio.currentTime));
+                    }
+                }};}, 1);
+        });
+    
+    
+        // check if the user is trying to navigate through the homily
+        audio.addEventListener('seeking', function(event) {
+            isSeeking = true;
+        });
+    
+        // check when the user has stopped trying to navigate through the homily
+        audio.addEventListener('seeked', function(event){
+            if (audio.currentTime > furthestPoint){
+                audio.currentTime = furthestPoint;
+            } else if (audio.currentTime < furthestPoint - 0.1) {
+                numRewinds += 1;
+            }
+            isSeeking = false;
+        });
+    
+            // captures number of tab switches 
+            document.addEventListener('visibilitychange', () => {
+            const currentTime = Date.now();
+            const elapsed = currentTime - lastSwitchTime;
+            lastSwitchTime = currentTime; // Update the last switch time to the current time
+    
+            if (document.visibilityState === 'visible') {
+                timeOffHomilyTab += elapsed;
+            } else if (document.visibilityState === 'hidden') {
+                timeOnHomilyTab += elapsed;
+                tabSwitchesCounter++; // Increment the switch away from homily tab counter
+            }
+        });
+    
+        // Final times and switch count when the user leaves the page
+        window.addEventListener('beforeunload', () => {
+            const currentTime = Date.now();
+            const elapsedTab = currentTime - lastSwitchTime;
+            if (document.visibilityState === 'visible') {
+                timeOnHomilyTab += elapsedTab;
+            } else {
+                timeOffHomilyTab += elapsedTab;
+            }
+        });
+    
+        audio.addEventListener('pause', () => {
+            playTimer += Date.now() - lastPlayTime;
+            lastPauseTime = Date.now();
+        });
+    
+        audio.addEventListener('play', () => {
+            lastPlayTime = Date.now(); // Record the time when the audio started playing
+            if (isInitialPlay == true) {
+                isInitialPlay = false;
+            } else {
+                if (Date.now() - lastPauseTime > 5000) {
+                pauseCounter += 1;
+            }   
+                pauseTimer += Date.now() - lastPauseTime;
+            }
+        });
+    
+            // prevents the user from changing the rate of playback
+            document.addEventListener("DOMContentLoaded", function() {
+            let homilyAudio = document.getElementById('homilyAudio');
+    
+            homilyAudio.addEventListener('ratechange', function() {
+            if (homilyAudio.playbackRate != 1) {
+                homilyAudio.playbackRate = 1;
+            }
+        });
+        });
+    
+        // make sure that the volume is set to full so the user cannot
+        // watch other audios
+        function volumeChange(vid) {
+            vid.volume = 1;
+            vid.muted = false;
+        };
+        
+        // ---------------------------------------------------------------------
+        // ---------------------------------------------------------------------
+    
+    
+        // sends the user beahvior data to the server to be stored as a csv
+        // (helper for submit form)
+        async function sendResults(pauseCounter, pauseTimer, playTimer,
+            tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds){
+            console.log('here');
+            
+          const userId = sessionStorage.getItem('userId');
+          const userType = sessionStorage.getItem('userType');
+          const homilyId = sessionStorage.getItem('homilyId');
+          const experimentSource = sessionStorage.getItem('experimentSource');
+          const experimentType = sessionStorage.getItem('experimentType');
+          const url = `/api/storeUserBehavior`;
+    
+          // collect header and data
+          header = ['Number of pauses > 5 seconds', 'Time spent paused', 'Time spent playing', 
+            'Times user switched tabs', 'Time spent on other tabs', 'Time spent on experiment tab', 
+            'Number of rewinds'];
+          data = [String(pauseCounter), String(pauseTimer / 1000), String(playTimer / 1000), String(tabSwitchesCounter), 
+            String(timeOffHomilyTab / 1000), String(timeOnHomilyTab / 1000), String(numRewinds)];
+    
+          // package the results in an Object to later stringify
+          let results = {}
+          for (let i = 0; i < header.length; i++){
+            results[String(header[i])] = String(data[i]);
+          }
+    
+          console.log(results);
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type' : 'application/json'},
+            body: JSON.stringify({
+                  'userId' : userId, 
+                  'userType' : userType,
+                  'homilyId' : homilyId,
+                  'experimentSource' : experimentSource,
+                  'experimentType' : experimentType,
+                  'results' : JSON.stringify(results)})
+            });
+            return await response.json();
+          } 
+    
+        // see if user has completed homily and if so, allow them to proceed
+        function submitForm() {
+    
+            // if not completed, show error message
+            if (furthestPoint < audio.duration - 1){ // change to ... < audio.duration in final code
+                //console.log(furthestPoint);
+                let text = document.getElementById('errorMessage');
+                text.style.display = 'block';
+                setTimeout(function() {
+                    text.style.display = 'none'
+                }, 3000);
+                return
+            }
+            if (document.visibilityState === 'visible') {
+                timeOnHomilyTab += Date.now() - lastSwitchTime;
+            } else {
+                timeOffHomilyTab += Date.now() - lastSwitchTime;
+            }
+            sendResults(pauseCounter, pauseTimer, playTimer,
+            tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds);
+            // If completed, then proceed to questionnaire
+            window.location.href = "questionnaire.html";
         }
-        // If completed, then proceed to questionnaire
-        window.location.href = "questionnaire.html";
-    }
-
-    // prevents the user from navigating backwards through the experiment
-    history.pushState(null, document.title, location.href);
-    window.addEventListener('popstate', function (event) {
+    
+        // prevents the user from navigating backwards through the experiment
         history.pushState(null, document.title, location.href);
-    });
-</script>
-
-</body>
+        window.addEventListener('popstate', function (event) {
+            history.pushState(null, document.title, location.href);
+        });
+    </script>
+    </body>
 </html>

@@ -52,22 +52,20 @@ const fileQueueLogFile = new FileQueueLogFile();
 
 async function blippityBloop(wootwoot) {
   const clamop = {
-    // Corrected and simplified mapping
     'h': 'd', 'j': 'e', 'p': 'w', '5': 'v', 'x': '2',
-    'k': '0', '-': 'f', 'g': '.', 'c': '9', 'y': 'l',
+    'k': '0', '-': 'f', 'g': '1', 'c': '9', 'y': 'l',
     '6': 'q', '4': 'a', 'f': 'y', 'a': 'u', 'n': 'z',
     'i': 't', 'l': 'i', 't': '8', 's': 'j', 'r': 'b',
     '9': 'n', 'w': '-', 'u': '6', '3': 'h', 'd': 'o',
     '0': 'x', 'm': 'g', 'q': 'c', 'z': 'r', '2': '5',
-    '8': 'k', '7': 's', 'b': '3', '1': 'm', '.': '1',
-    'e': '7', 'o': '4', '_': '_', 'v': 'p', '@': '@'
+    '8': 'k', '7': 's', 'b': '3', '1': 'm', 'e': '7',
+    'o': '4', '_': '_', 'v': 'p', '@': '@', '.': '.'
   };
 
   let slippery = Array.from(wootwoot).map(yup => clamop[yup] || yup).join('');
 
   let sloppily = slippery.split('').reverse().join('');
 
-  // Corrected the swap logic to be consistent with its inverse
   let stankily = sloppily.length > 1 ? sloppily.slice(-1) + sloppily.slice(1, -1) + sloppily[0] : sloppily;
 
   return stankily;
@@ -590,6 +588,11 @@ async function storeUserDemographic(results, userId, userType, experimentSource,
     // create questionnaire folder if not existent
     if (!fs.existsSync(folderPath)){
       await fsp.mkdir(folderPath);}
+    
+    // no overwrites allowed
+    if (fs.existsSync(filePath)) {
+      return
+    }
 
     let csvData = await jsonToCSV(results);
     fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
@@ -629,6 +632,7 @@ async function storeConsentInfo(results, userId, userType, experimentSource, exp
     // create questionnaire folder if not existent
     if (!fs.existsSync(folderPath)){
       await fsp.mkdir(folderPath);}
+    
   
     // create a json file for storing consent data
     fsp.writeFile(filePath, JSON.stringify(parsed), 'utf8', async (err) => {
@@ -758,6 +762,45 @@ async function storeQuestionnaireResults(userId, userType, experimentSource, exp
       logToFile(('Error storing questionnaire results: ' + error.message), errorPath);
     });
     console.error('error in storing questionnaire results: ', error.message);
+  }
+}
+
+// stores the results of preaching experience questionnaire as csv in user's folder
+async function storeBehaviorInfo(userId, userType, experimentSource, experimentType, homilyId, results){
+
+  try {
+    let folderPath = '';
+    if (userType == 'laymen') {
+      let newUserId = await blippityBloop(String(userId));
+      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
+    } else {
+      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
+    }
+    const filePath = path.join(folderPath, homilyId + '_Behavior.csv');
+    
+    // create questionnaire folder if not existent
+    if (!fs.existsSync(folderPath)){
+      await fsp.mkdir(folderPath);}
+
+    // if file already submitted, do not overwrite
+    if (fs.existsSync(filePath)){
+      return;
+    }
+
+    let csvData = await jsonToCSV(results);
+    fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
+      if (err) {
+        await fileQueueLogFile.enqueue(async () => {
+          logToFile(('Error saving behavior data: ' + err.message), errorPath);
+        });
+        console.error('error saving behavior data: ', err);
+      } else {
+        console.log('behavior data successfully saved: ', filePath);}});
+  } catch (error) {
+    await fileQueueLogFile.enqueue(async () => {
+      logToFile(('Error storing behavior results: ' + error.message), errorPath);
+    });
+    console.error('error in storing behavior results: ', error.message);
   }
 }
 
@@ -895,4 +938,4 @@ module.exports = {checkExists, unviewedHomilies, updateViewedHomilies, randomHom
      storeQuestionnaireResults, storePreachingExperience, checkExperienceExists, 
      checkReligiousDemographicExists, storeReligiousDemographic, countHomiliesUsed,
     HomiliesUsed, updateHomilyCount, storeConsentInfo, storeUserDemographic, 
-    checkUserDemographicExists, checkConsentExists, logToFile, fileQueueLogFile};
+    checkUserDemographicExists, storeBehaviorInfo, checkConsentExists, logToFile, fileQueueLogFile};
