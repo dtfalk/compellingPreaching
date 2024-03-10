@@ -117,7 +117,7 @@
     // helper for "validateUser()"
     // makes call to server to check if a valid ID was entered
     async function checkValidID(userId, userType, experimentSource, experimentType){
-      valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-';
+      valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
       for (let i = 0; i < String(userId).length; i++) {
         char = String(userId)[i];
         if (!valid_chars.includes(char)) {
