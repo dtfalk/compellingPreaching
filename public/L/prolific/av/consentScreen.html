@@ -170,7 +170,7 @@
 
       if (!isValid) {
         const errorMessage = document.getElementById('errorMessage');
-        errorMessage.textContent = 'Please choose an option and enter a UChicago email address';
+        errorMessage.textContent = 'Please choose an option and enter an email address';
         setTimeout(function() {
           errorMessage.textContent = '';
         }, 3000);
@@ -199,7 +199,7 @@
         let consented = false;
 
         // check that the user has entered something akin to a uchicago email address
-        if (!email.value.includes("@uchicago.edu")){ 
+        if (!email.value.includes("@")){ 
           valid = false;
         }
 
