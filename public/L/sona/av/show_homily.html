@@ -298,7 +298,7 @@
       const homilyId = sessionStorage.getItem('homilyId');
       const experimentSource = sessionStorage.getItem('experimentSource');
       const experimentType = sessionStorage.getItem('experimentType');
-      const url = `/api/storeUserBehavior`;
+      const url2 = `/api/storeUserBehavior`;
 
       // collect header and data
       header = ['Number of pauses > 5 seconds', 'Time spent paused', 'Time spent playing', 
@@ -314,7 +314,7 @@
       }
 
       console.log(results);
-      const response = await fetch(url, {
+      const response = await fetch(url2, {
         method: 'POST',
         headers: {'Content-Type' : 'application/json'},
         body: JSON.stringify({
