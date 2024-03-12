@@ -319,9 +319,12 @@
                 timeOffHomilyTab += Date.now() - lastSwitchTime;
             }
             sendResults(pauseCounter, pauseTimer, playTimer,
-            tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds);
+        tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds).then(response => {
+            console.log('here');
             // If completed, then proceed to questionnaire
             window.location.href = "questionnaire.html";
+        }
+        );
         }
     
         // prevents the user from navigating backwards through the experiment
