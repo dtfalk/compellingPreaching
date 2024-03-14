@@ -19,7 +19,7 @@
           left: 0;
           width: 100%;
           height: 100%;
-          background-color: lightblue;
+          background-color: #800000;
           z-index: -1;
         }
         .prompt-container {
@@ -59,14 +59,29 @@
     // generates the text the user will see
     function generatePromptHTML() {
         return `
-            <p><b>Were you provided a UserId number or did you access this page through Prolific?</b></p>
+            <p><b>Which experimental condition?</b></p>
             <label>
-                <input type = "checkbox" name = "experimentType" value = "1" onclick = "uncheckOthers('experimentType', this)"> I was provided a UserId number.
+                <input type = "checkbox" name = "experimentType" value = "1" onclick = "uncheckOthers('experimentType', this)"> Expert AV
             </label>
             <br>
+            <label>
+                <input type = "checkbox" name = "experimentType" value = "2" onclick = "uncheckOthers('experimentType', this)"> Expert Audio
+            </label>
             <br>
             <label>
-                <input type = "checkbox" name = "experimentType" value = "2" onclick = "uncheckOthers('experimentType', this)"> I accessed this page through Prolific.
+                <input type = "checkbox" name = "experimentType" value = "3" onclick = "uncheckOthers('experimentType', this)"> Prolific AV
+            </label>
+            <br>
+            <label>
+                <input type = "checkbox" name = "experimentType" value = "4" onclick = "uncheckOthers('experimentType', this)"> Prolific Audio
+            </label>
+            <br>
+            <label>
+                <input type = "checkbox" name = "experimentType" value = "5" onclick = "uncheckOthers('experimentType', this)"> SONA AV
+            </label>
+            <br>
+            <label>
+                <input type = "checkbox" name = "experimentType" value = "6" onclick = "uncheckOthers('experimentType', this)"> SONA Audio
             </label>
 
             <!-- Submit button -->
@@ -135,15 +150,26 @@
         }
         else{
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-            let checkbox = checkboxes[0];
+            for (let i = 0; i < checkboxes.length; i++){
+            let checkbox = checkboxes[i];
             if (checkbox.value == 1 && checkbox.checked){
-                sessionStorage.setItem('userType', 'expert');
-                window.location.href = 'expert/av/enter_user_number.html';
+                window.location.href = 'E/av/enter_user_number.html';
             }
-            else{
-                sessionStorage.setItem('userType', 'laymen');
-                window.location.href = 'laymen/sona/av/enter_user_number.html'
+            else if (checkbox.value == 2 && checkbox.checked) {
+                window.location.href = 'E/audio/enter_user_number.html';
             }
+            else if (checkbox.value == 3 && checkbox.checked) {
+                window.location.href = 'L/prolific/av/enter_user_number.html';
+            }
+            else if (checkbox.value == 4 && checkbox.checked) {
+                window.location.href = 'L/prolific/audio/enter_user_number.html';
+            }
+            else if (checkbox.value == 5 && checkbox.checked) {
+                window.location.href = 'L/sona/av/enter_user_number.html';
+            }
+            else if (checkbox.value == 6 && checkbox.checked) {
+                window.location.href = 'L/sona/audio/enter_user_number.html';
+            }}
         }
       }
 
