@@ -93,26 +93,35 @@
         const userType = sessionStorage.getItem('userType');
         const experimentSource = sessionStorage.getItem('experimentSource');
         const experimentType = sessionStorage.getItem('experimentType');
+        let seconds_achieved = [0]; // keeps track of moments a user obtained
+        let furthestPoint = 0; // at beginning of 
+        let lastUpdateTime = 0;
         const url = `/api/randomHomily/${userId}/${userType}/${experimentSource}/${experimentType}`;
     
         // initialize by getting a random audio and setting session variable
         function initialize(){
             fetchRandomVideo().then(homily => {
                 if(homily){
-                    console.log(homily.media);
-                    const audioElement = document.getElementById('homilyAudio');
-                    //audioElement.src = String(homily.media).replace('.mp4', 'snipped.mp4');
-                    audioElement.src = homily.media;
-                    sessionStorage.setItem('homilyId', homily.media);
-                    
-                    // hide audio and display spinner until audio can play through without buffering
-                    audioElement.addEventListener('canplaythrough', function() {
-                        document.getElementById('loadingSpinner').style.display = 'none';
-                        document.getElementById('loadingMessage').style.display = 'none';
-                        audioElement.style.visibility = 'visible';
-                        document.getElementById('loadedMessage').style.display = 'block';
-                        document.getElementById('submitButton').style.display = 'block';
-                    }, {once: true});
+                console.log(homily.media);
+                const audioElement = document.getElementById('homilyAudio');
+                //audioElement.src = String(homily.media).replace('.mp4', 'snipped.mp4');
+                audioElement.src = homily.media;
+                lastUpdateTime = homily.playbackTime;
+                furthestPoint = homily.playbackTime;
+                for (let i = 1; i <= homily.playbackTime; i++) {
+                    seconds_achieved.push(i);
+                }
+                audioElement.currentTime = homily.playbackTime;
+                sessionStorage.setItem('homilyId', homily.media);
+                
+                // hide audio and display spinner until audio can play through without buffering
+                audioElement.addEventListener('canplaythrough', function() {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    document.getElementById('loadingMessage').style.display = 'none';
+                    audioElement.style.visibility = 'visible';
+                    document.getElementById('loadedMessage').style.display = 'block';
+                    document.getElementById('submitButton').style.display = 'block';
+                }, {once: true});
                 } else{
                     console.error('Failed to fetch homily.');
                 }
@@ -141,8 +150,6 @@
         // skipping through the homily
         // ---------------------------------------------------------------------
         // ---------------------------------------------------------------------
-        let seconds_achieved = [0]; // keeps track of moments a user obtained
-        let furthestPoint = 0; // at beginning of 
         let isSeeking = false;
         const audio = document.getElementById('homilyAudio');
     
@@ -164,20 +171,39 @@
     
     
         // update the furthest point attained in the homily
-        audio.addEventListener('timeupdate', function() {
-            setTimeout(function() {
-            if ((audio.currentTime > furthestPoint)  && !isSeeking) {
-    
-                // only update the furthest point attained if the homily's previous second attained
-                if ((Math.floor(audio.currentTime) - 1) == seconds_achieved[seconds_achieved.length - 1]){
-                    furthestPoint = audio.currentTime; // update furthest point
-    
-                    // add a given value to the attained times only once
-                    if (!(Math.floor(audio.currentTime) == seconds_achieved[seconds_achieved.length - 1])){
-                        seconds_achieved.push(Math.floor(audio.currentTime));
-                    }
-                }};}, 1);
-        });
+        // update the furthest point attained in the homily
+    audio.addEventListener('timeupdate', function() {
+        const currentTime = Math.floor(audio.currentTime);
+
+           
+        setTimeout(function() {
+        if ((audio.currentTime > furthestPoint)  && !isSeeking) {
+
+            // only update the furthest point attained if the homily's previous second attained
+            if ((Math.floor(audio.currentTime) - 1) == seconds_achieved[seconds_achieved.length - 1]){
+                furthestPoint = audio.currentTime; // update furthest point
+
+                // add a given value to the attained times only once
+                if (!(Math.floor(audio.currentTime) == seconds_achieved[seconds_achieved.length - 1])){
+                    seconds_achieved.push(Math.floor(audio.currentTime));
+                }
+                if (currentTime - lastUpdateTime >= 30) {
+          
+            // Send an update to the server
+          fetch('/api/updatePlaybackTime', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({'homilyPath': audio.src,
+                                    'playbackTime' : currentTime,
+                                    'userId' : userId, 
+                                    'userType' : userType,
+                                    'experimentSource' : experimentSource,
+                                    'experimentType' : experimentType}),
+          });
+          // Update the last update time
+          lastUpdateTime = currentTime;}
+            }};}, 1);
+    });
     
     
         // check if the user is trying to navigate through the homily

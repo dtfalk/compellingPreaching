@@ -120,6 +120,9 @@
     const userType = sessionStorage.getItem('userType');
     const experimentSource = sessionStorage.getItem('experimentSource');
     const experimentType = sessionStorage.getItem('experimentType');
+    let seconds_achieved = [0]; // keeps track of moments a user obtained
+    let furthestPoint = 0; // at beginning of 
+    let lastUpdateTime = 0;
     const url = `/api/randomHomily/${userId}/${userType}/${experimentSource}/${experimentType}`;
 
     // initialize by getting a random video and setting session variable
@@ -130,6 +133,12 @@
                 const videoElement = document.getElementById('homilyVideo');
                 //videoElement.src = String(homily.media).replace('.mp4', 'snipped.mp4');
                 videoElement.src = homily.media;
+                lastUpdateTime = homily.playbackTime;
+                furthestPoint = homily.playbackTime;
+                for (let i = 1; i <= homily.playbackTime; i++) {
+                    seconds_achieved.push(i);
+                }
+                videoElement.currentTime = homily.playbackTime;
                 sessionStorage.setItem('homilyId', homily.media);
                 
                 // hide video and display spinner until video can play through without buffering
@@ -168,8 +177,6 @@
     // skipping through the homily
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
-    let seconds_achieved = [0]; // keeps track of moments a user obtained
-    let furthestPoint = 0; // at beginning of 
     let isSeeking = false;
     const video = document.getElementById('homilyVideo');
 
@@ -192,6 +199,9 @@
 
     // update the furthest point attained in the homily
     video.addEventListener('timeupdate', function() {
+        const currentTime = Math.floor(video.currentTime);
+
+           
         setTimeout(function() {
         if ((video.currentTime > furthestPoint)  && !isSeeking) {
 
@@ -203,6 +213,21 @@
                 if (!(Math.floor(video.currentTime) == seconds_achieved[seconds_achieved.length - 1])){
                     seconds_achieved.push(Math.floor(video.currentTime));
                 }
+                if (currentTime - lastUpdateTime >= 30) {
+          
+            // Send an update to the server
+          fetch('/api/updatePlaybackTime', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({'homilyPath': video.src,
+                                    'playbackTime' : currentTime,
+                                    'userId' : userId, 
+                                    'userType' : userType,
+                                    'experimentSource' : experimentSource,
+                                    'experimentType' : experimentType}),
+          });
+          // Update the last update time
+          lastUpdateTime = currentTime;}
             }};}, 1);
     });
 
