@@ -74,14 +74,14 @@ async function blippityBloop(wootwoot) {
 
 
 // function to make writing to either the log or error file easier
-function logToFile(message, filePath) {
+async function logToFile(message, filePath) {
   // Create a timestamp for the log entry
   const timestamp = new Date().toISOString();
   // Format the log entry with timestamp
   const logEntry = `${timestamp}: ${message}\n`;
 
   // Append the log entry to the file using the 'a' (append) flag
-  fs.appendFile(filePath, logEntry, 'utf8', (err) => {
+  await fsp.appendFile(filePath, logEntry, 'utf8', (err) => {
     if (err) {
       console.error('Error appending to log file:', err);
     }
@@ -738,6 +738,7 @@ async function storeQuestionnaireResults(userId, userType, experimentSource, exp
       folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
     }
     const filePath = path.join(folderPath, homilyId + '.csv');
+    const homilyProgressPath = path.join(folderPath, homilyId + '_Progress.json');
     
     // create questionnaire folder if not existent
     if (!fs.existsSync(folderPath)){
@@ -748,6 +749,16 @@ async function storeQuestionnaireResults(userId, userType, experimentSource, exp
       return;
     }
 
+    // delete homily progress file after the homily is completed
+    if (fs.existsSync(homilyProgressPath)){
+      await fsp.unlink(homilyProgressPath, (err) => {
+        if (err) {
+          logToFile(('Error deleting homily progress file:', err.message), errorPath);
+        }
+        console.log('File successfully deleted');
+      });
+    }
+    
     let csvData = await jsonToCSV(results);
     fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
       if (err) {
@@ -777,7 +788,7 @@ async function storeBehaviorInfo(userId, userType, experimentSource, experimentT
       folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
     }
     const filePath = path.join(folderPath, homilyId + '_Behavior.csv');
-    
+
     // create questionnaire folder if not existent
     if (!fs.existsSync(folderPath)){
       await fsp.mkdir(folderPath);}
@@ -786,7 +797,7 @@ async function storeBehaviorInfo(userId, userType, experimentSource, experimentT
     if (fs.existsSync(filePath)){
       return;
     }
-
+  
     let csvData = await jsonToCSV(results);
     fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
       if (err) {
@@ -872,6 +883,61 @@ async function updateViewedHomilies(userId, userType, experimentSource, experime
     console.error('Unable to update viewed homilies: ', error.message)}
 }
 
+// updates the user-specific JSON of viewed/not viewed homilies
+async function updatePlaybackTime(userId, userType, experimentSource, experimentType, homilyPath, playbackTime){
+
+  try {
+    let oldFilePath = '';
+    if (userType == 'laymen') {
+      let newUserId = await blippityBloop(String(userId));
+      oldFilePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
+    } else {
+      oldFilePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
+    }
+    if (!fs.existsSync(oldFilePath)) {
+      await fsp.mkdir(oldFilePath);
+    }
+    //console.log(homilyPath);
+    let filePath = '';
+    if (experimentType == 'av'){
+      filePath = path.join(oldFilePath, path.basename(homilyPath, '.mp4') + '_Progress.json');
+    } else {
+      filePath = path.join(oldFilePath, path.basename(homilyPath, '.mp3') + '_Progress.json');
+    }
+    //console.log(filePath);
+    
+    if (!fs.existsSync(filePath)){
+      const jsonObj = JSON.stringify({'homilyPath': homilyPath,
+                                      'playbackTime': playbackTime,
+                                      'lastWriteTime': new Date().toISOString()});
+      await fsp.writeFile(filePath, jsonObj, 'utf8', (err) => {
+        if (err) {
+          console.error('Error writing file:', err);
+        } else {
+          console.log('File written successfully');
+          return;
+        }
+      });
+    } else {
+
+      // read existing data
+      const rawdata = await fsp.readFile(filePath, 'utf8');
+      let jsonData = await JSON.parse(rawdata);
+
+      // update the homily
+      jsonData['playbackTime'] = playbackTime;
+      jsonData['lastWriteTime'] = new Date().toISOString();
+        
+      // overwrite existing file
+      await fsp.writeFile(filePath, JSON.stringify(jsonData, null, 2));
+      console.log("data successfully updated");}
+  } catch (error) {
+    await fileQueueLogFile.enqueue(async () => {
+      logToFile(('Error updating playback time: ' + error.message), errorPath);
+    });
+    console.error('Unable to update playback time: ', error.message)}
+}
+
 // --------------------------------------------------------------------------------------------------
 // --------------------------------  OTHER FUNCTIONS  -----------------------------------------------
 // --------------------------------------------------------------------------------------------------
@@ -880,6 +946,123 @@ async function updateViewedHomilies(userId, userType, experimentSource, experime
 async function randomHomily(userId, userType, experimentSource, experimentType){
 
   try {
+    let directoryPath = '';
+    if (userType == 'laymen') {
+      let newUserId = await blippityBloop(String(userId));
+      directoryPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
+    } else {
+      directoryPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
+    }
+    // create questionnaire folder if not existent
+    if (!fs.existsSync(directoryPath)){
+        await fsp.mkdir(directoryPath);}
+
+    const keyword = '_Progress';
+    const files = await fsp.readdir(directoryPath);
+      
+    // Iterate over the list of file names and check for the keyword
+    const filteredFiles = files.filter(file => file.includes(keyword));
+      
+    if (filteredFiles.length > 0) {
+      console.log('Files containing the keyword:', filteredFiles);
+      // path to the homily progress file
+      const fullPath = path.join(directoryPath, filteredFiles[0]);
+      // Read the JSON file asynchronously
+      const data = await fsp.readFile(fullPath);
+      const jsonObj = JSON.parse(data); // Parse the file content as JSON
+      
+      const lastWriteTime = new Date(jsonObj.lastWriteTime);
+      const currentTime = new Date();
+      const timeDiff = (currentTime - lastWriteTime) / (1000 * 60); // Difference in minutes
+
+      if (timeDiff > 2) {
+        console.log('deleting because file too old....');
+        await fsp.unlink(fullPath);
+        let randomHomilyNum;
+        let randomIndex;
+        let usageData = {};
+
+        // recover the unused homilies
+        let unusedHomilies = await unviewedHomilies(userId, userType, experimentSource, experimentType); 
+
+        // catch if all homilies have been used
+        if (unusedHomilies.length === 0){
+          return null;}
+
+       // randomly select an element from the array if laymen
+        //if (userType == 'laymen') {
+          // path to the homily usage data
+          const homilyUsagePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), 'homilyUsage.json');
+          console.log(homilyUsagePath);
+
+          // read the homily usage data and parse it using a queue to prevent simultaneous accessing
+          try {
+            await fileQueueHomilyUsage.enqueue(async () => {
+              const rawdata = await fsp.readFile(homilyUsagePath, 'utf8');
+              usageData = await JSON.parse(rawdata);
+            })
+          // if there's an error, catch it and don't crash the whole program
+          } catch (error) {
+            await fileQueueLogFile.enqueue(async () => {
+             logToFile(('Error reading usage data file: ' + error.message), errorPath);
+            });
+            console.error('Error reading usage data file:', error);
+            throw error;}
+
+          // once we recover the usage data, collect the used homilies
+          //console.log(usageData);
+          const usedHomilies = await HomiliesUsed(userId, userType, experimentSource, experimentType);
+
+          randomHomilyNum = await randomHomilyNumber(usageData, usedHomilies, unusedHomilies, userType, experimentType); //}
+          //else { // for experts just select any random homily
+          //  randomIndex = Math.floor(Math.random() * unusedHomilies.length());
+          //  randomHomilyNum = unusedHomilies[randomIndex];
+          //}
+
+          // send to correct folder (audioFiles vs videoFiles)
+        if (experimentType === 'av'){
+          let homilyPath = path.join('/stimuli', 'videoFiles', 'servingFiles', randomHomilyNum + '.mp4');
+          let newSavePath = path.join(directoryPath, path.basename(homilyPath, '.mp4') + '_Progress.json')
+          const jsonObj = JSON.stringify({'homilyPath': homilyPath,
+                                          'playbackTime': 0,
+                                          'lastWriteTime': new Date().toISOString()});
+          await fsp.writeFile(newSavePath, jsonObj, 'utf8', (err) => {
+            if (err) {
+              console.error('Error writing file:', err);
+            } else {
+              console.log('File written successfully');
+              return;
+            }
+            });
+          return JSON.stringify({'media' : homilyPath,
+                                'playbackTime': 0});
+        } else {
+          let homilyPath = path.join('/stimuli', 'audioFiles', 'servingFiles', randomHomilyNum + '.mp3');
+          let newSavePath = path.join(directoryPath, path.basename(homilyPath, '.mp3') + '_Progress.json')
+          const jsonObj = JSON.stringify({'homilyPath': homilyPath,
+                                          'playbackTime': 0,
+                                          'lastWriteTime': new Date().toISOString()});
+          await fsp.writeFile(newSavePath, jsonObj, 'utf8', (err) => {
+            if (err) {
+              console.error('Error writing file:', err);
+            } else {
+              console.log('File written successfully');
+              return;
+            }
+          });
+          return JSON.stringify({'media' : homilyPath,
+                                'playbackTime': 0});}
+      } else {
+        console.log('here')
+      // recover the homily ID and the playback time
+      let homilyPath = jsonObj.homilyPath;
+      let playbackTime = jsonObj.playbackTime;
+      return JSON.stringify({'media' : homilyPath,
+                            'playbackTime': playbackTime});
+    }
+  } else {
+    console.log('No files contain the keyword.');
+
     let randomHomilyNum;
     let randomIndex;
     let usageData = {};
@@ -922,10 +1105,38 @@ async function randomHomily(userId, userType, experimentSource, experimentType){
       //}
 
       // send to correct folder (audioFiles vs videoFiles)
-    if (experimentType === 'av'){
-      return path.join('/stimuli', 'videoFiles', 'servingFiles', randomHomilyNum + '.mp4');}
-    else {
-      return path.join('/stimuli', 'audioFiles','servingFiles', randomHomilyNum + '.mp3')};
+      if (experimentType === 'av'){
+        let homilyPath = path.join('/stimuli', 'videoFiles', 'servingFiles', randomHomilyNum + '.mp4');
+        let newSavePath = path.join(directoryPath, path.basename(homilyPath, '.mp4') + '_Progress.json')
+        const jsonObj = JSON.stringify({'homilyPath': homilyPath,
+                                        'playbackTime': 0,
+                                        'lastWriteTime': new Date().toISOString()});
+        await fsp.writeFile(newSavePath, jsonObj, 'utf8', (err) => {
+          if (err) {
+            console.error('Error writing file:', err);
+          } else {
+            console.log('File written successfully');
+            return;
+          }
+          });
+        return JSON.stringify({'media' : homilyPath,
+                              'playbackTime': 0});
+      } else {
+        let homilyPath = path.join('/stimuli', 'audioFiles', 'servingFiles', randomHomilyNum + '.mp3');
+        let newSavePath = path.join(directoryPath, path.basename(homilyPath, '.mp3') + '_Progress.json')
+        const jsonObj = JSON.stringify({'homilyPath': homilyPath,
+                                        'playbackTime': 0,
+                                        'lastWriteTime': new Date().toISOString()});
+        await fsp.writeFile(newSavePath, jsonObj, 'utf8', (err) => {
+          if (err) {
+            console.error('Error writing file:', err);
+          } else {
+            console.log('File written successfully');
+            return;
+          }
+        });
+        return JSON.stringify({'media' : homilyPath,
+                              'playbackTime': 0});}}
   } catch (error) {
     await fileQueueLogFile.enqueue(async () => {
       logToFile(('Error in random homily main function: ' + error.message), errorPath);
@@ -938,4 +1149,5 @@ module.exports = {checkExists, unviewedHomilies, updateViewedHomilies, randomHom
      storeQuestionnaireResults, storePreachingExperience, checkExperienceExists, 
      checkReligiousDemographicExists, storeReligiousDemographic, countHomiliesUsed,
     HomiliesUsed, updateHomilyCount, storeConsentInfo, storeUserDemographic, 
-    checkUserDemographicExists, storeBehaviorInfo, checkConsentExists, logToFile, fileQueueLogFile};
+    checkUserDemographicExists, storeBehaviorInfo, checkConsentExists, updatePlaybackTime, 
+    logToFile, fileQueueLogFile};

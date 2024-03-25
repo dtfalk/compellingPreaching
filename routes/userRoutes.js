@@ -194,8 +194,9 @@ router.get('/randomHomily/:userId/:userType/:experimentSource/:experimentType', 
     }
 
 
-    userData.randomHomily(userId, userType, experimentSource, experimentType).then(randomHomily => {
-      res.json({'media': randomHomily});})
+    userData.randomHomily(userId, userType, experimentSource, experimentType).then(jsonObj => {
+      console.log(jsonObj)
+      res.json(JSON.parse(jsonObj));})
       .catch(error => {
         console.error(error);
         res.status(500).send('An error occurred');})
@@ -414,7 +415,7 @@ router.post(`/storeQuestionnaireResults`, async (req, res) => {
 router.post('/updateHomilyCount', async (req, res) => {
   console.log('here');
   try {
-    const homilyId = req.body.homilyId; // user ID
+    const homilyId = req.body.homilyId; // homily ID
     const userType = req.body.userType; // expert or laymen
     let experimentSource = req.body.experimentSource; // sona or prolific
     const experimentType = req.body.experimentType; // audio or av
@@ -473,8 +474,38 @@ router.post('/updateViewedHomilies', async (req, res) => {
   }
 })
 
+// when served a new homily, this will update the current video and playback time in case of refresh
+router.post('/updatePlaybackTime', async (req, res) => {
+  try {
+    const userId = req.body.userId; // user id
+    const userType = req.body.userType; // expert or laymen
+    let experimentSource = req.body.experimentSource; // sona or prolific
+    const experimentType = req.body.experimentType; // audio or av
+    const homilyPath = req.body.homilyPath; // homily id ("temp" because we will trim in down)
+    const playbackTime = req.body.playbackTime
+    if (experimentSource == 'na'){ // if it is an expert change the value to an empty string (dumb but quick fix)
+      experimentSource = '';
+    }
+
+    userData.updatePlaybackTime(userId, userType, experimentSource, experimentType, homilyPath, playbackTime).then(data => {
+      res.send(JSON.stringify({'success message' : 'playback time updated'}));
+      }).catch(async error => {
+        await userData.fileQueueLogFile.enqueue(async () => {
+          userData.logToFile(('Unable to use update playback time route: ' + error.message), errorPath);
+        });
+        console.error(error);
+        res.status(500).send('Unable to update playback time');});
+    } catch (error) {
+      await userData.fileQueueLogFile.enqueue(async () => {
+      userData.logToFile(('Unable to use update used homilies route: ' + error.message), errorPath);
+    });
+    console.error('unable to use update playback route: ', error.message);
+  }
+    
+})
 // --------------------------------------------------------------------------------------------------
 // --------------------------------  OTHER POST ROUTES  ---------------------------------------------
 // --------------------------------------------------------------------------------------------------
+
 
 module.exports = router;
