@@ -975,7 +975,7 @@ async function randomHomily(userId, userType, experimentSource, experimentType){
       const currentTime = new Date();
       const timeDiff = (currentTime - lastWriteTime) / (1000 * 60); // Difference in minutes
 
-      if (timeDiff > 2) {
+      if (timeDiff > 10) {
         console.log('deleting because file too old....');
         await fsp.unlink(fullPath);
         let randomHomilyNum;
