@@ -130,7 +130,7 @@
         </label>
         <br>
         <br>
-        <label for="email"> Email address: </label>
+        <label for="email"> Prolific email address: </label>
         <input type="text" id="email" name="email"><br>
 
         <!-- Submit button -->
@@ -170,7 +170,7 @@
 
       if (!isValid) {
         const errorMessage = document.getElementById('errorMessage');
-        errorMessage.textContent = 'Please choose an option and enter an email address';
+        errorMessage.textContent = 'Please choose an option and enter a prolific email address';
         setTimeout(function() {
           errorMessage.textContent = '';
         }, 3000);
