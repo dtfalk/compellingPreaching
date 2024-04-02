@@ -350,6 +350,7 @@
     let countryOfOriginTextBox = document.querySelector(`input[type="text"][name="countryOfOrigin"]`).value;
     //console.log(countryOfOriginTextBox);
     if (wordCount(countryOfOriginTextBox) == 0){
+      valid = false;
       unanswered.push('countryOfOrigin');
     } else {
       answered.push('countryOfOrigin');
