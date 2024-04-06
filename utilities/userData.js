@@ -794,9 +794,9 @@ async function storeBehaviorInfo(userId, userType, experimentSource, experimentT
       await fsp.mkdir(folderPath);}
 
     // if file already submitted, do not overwrite
-    if (fs.existsSync(filePath)){
-      return;
-    }
+    //if (fs.existsSync(filePath)){
+    //  return;
+    //}
   
     let csvData = await jsonToCSV(results);
     fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
