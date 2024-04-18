@@ -13,23 +13,9 @@ Before proceeding, ensure you have the following applications installed:
 
 Node.js and npm (Node Package Manager): Download and install Node.js (which includes npm) from the official Node.js website (https://nodejs.org/en/download) or from the command line using the instructions below (hopefully these work I have only tested on Windows but I know that your servers are linux):
 
-For Ubuntu/Debian-based Linux Distributions:
-You can use the NodeSource repository to install Node.js. This allows you to choose between different versions of Node.js. For example, to install Node.js version 14.x, you can use the following commands (v20.10.0 is what I am using):
-===================================================
-curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-sudo apt-get install -y nodejs
-(Note: Replace 14.x with your desired version.[20.10.0 is what I am using])
-======================================================================
+The server admin will needs to install the packages as sudo or root:
 
-
-For CentOS/RHEL-based Linux Distributions:
-Similar to Debian-based distributions, you can use the NodeSource repository. For example, to install Node.js version 14.x, you can run:
-=======================================================================
-curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
-sudo yum install -y nodejs
-(Again, replace 14.x with your desired version. [20.10.0 is what I am using])
-=======================================================================
-
+yum install -y git httpd nodejs npm cronie mod_ssl
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
@@ -37,26 +23,23 @@ Code and Dependency Installation Steps:
 
 1. Clone the Repository
 Clone the CompellingPreaching project repository to your local machine using Git. Open your terminal, navigate to the directory where you want to clone the repository, and run:
-========================================================
-git clone https://github.com/dtfalk/compellingPreaching
-(or potentially: "https://github.com/dtfalk/compellingPreaching.git")
+
+git clone https://github.com/dtfalk/compellingPreaching.git
+(or potentially: "https://github.com/dtfalk/compellingPreaching")
 (try the first one first)
-========================================================
 
 2. Navigate to the Project Directory
 Change into the project directory:
-========================================================
-cd compellingpreaching
-========================================================
+
+cd /var/www/compellingPreaching
 
 
 3. Install Node Dependencies
 Within the project directory, install the necessary Node.js dependencies specified in the package.json file:
-========================================================================
-cd compellingPreaching
+
 npm install
 (This command installs all the required packages to run the CompellingPreaching application according to the package.json file. If I missed a dependency, then you can likely use "npm install missing_dependency_name" to install the missing dependency)
-========================================================================
+
 
 
 -----------------------------------------------------------------------------
@@ -81,28 +64,9 @@ The code on the server is stored in the "server_name/compellingPreaching/public"
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
 
-------------------------------------------------------------------------------------------
-
 Running the Application:
 With all dependencies installed and files in place, you're ready to run the application. Ensure you are in the project's root directory (/compellingPreaching), then start the server:
 
-==========================================================================================
-
-npm install pm2 -g
-
-pm2 start /var/www/compellingPreaching/app.js --name="compellingPreaching"
-
-pm2 startup
-
-systemctl restart httpd
-
-systemctl enable pm2-root
-
-systemctl start pm2-root
-(This command initiates the server by running "app.js")
-==========================================================================================
-
-==========================================================================================
 npm install pm2 -g
 
 cd /var/www/compellingPreaching
@@ -116,7 +80,6 @@ systemctl restart httpd
 systemctl enable pm2-root
 
 systemctl start pm2-root
-==========================================================================================
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
