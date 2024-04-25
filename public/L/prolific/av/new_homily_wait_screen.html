@@ -49,6 +49,18 @@
 
 
 <script> 
+
+    // JavaScript code to check the user number and redirect if it's missing
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve the user number from sessionStorage
+        var userNumber = sessionStorage.getItem('userId');
+
+        // Check if the user number is not found
+        if (!userNumber) {
+            // Redirect to the 'enter_user_number.html' page
+            window.location.href = 'enter_user_number.html';
+        }
+    });
     sessionStorage.setItem('userType', 'laymen');
     sessionStorage.setItem('experimentSource', 'prolific');
     sessionStorage.setItem('experimentType', 'av');
