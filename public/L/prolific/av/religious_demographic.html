@@ -104,11 +104,10 @@
 
         <!-- Present Religion -->
         <label for = "religion">
-        <p>What is your present religion, if any?</p>
+        <p>Which type of Christian do you consider yourself?</p>
         </label>
         <label>
-          <input type="checkbox" name="religion" value="Protestant" onclick="uncheckOthers('religion', this)"> 
-          Protestant (e.g. Baptist, Methodist, Non-denominational, Lutheran, Presbyterian, Pentecostal, Episcopalian, Reformed, Church of Christ, etc.)
+          <input type="checkbox" name="religion" value="Baptist" onclick="uncheckOthers('religion', this)"> Baptist
         </label>
         <br>
         <label>
@@ -116,52 +115,26 @@
         </label>
         <br>
         <label>
-          <input type="checkbox" name="religion" value="Mormon" onclick="uncheckOthers('religion', this)"> Mormon (Church of Jesus Christ of Latter-day Saints or LDS)
+          <input type="checkbox" name="religion" value="Church of England" onclick="uncheckOthers('religion', this)"> Church of England
         </label>
         <br>
         <label>
-          <input type="checkbox" name="religion" value="Orthodox" onclick="uncheckOthers('religion', this)"> Orthodox (such as Greek, Russian, or some other Orthodox church)
+          <input type="checkbox" name="religion" value="Methodist" onclick="uncheckOthers('religion', this)"> Methodist
         </label>
         <br>
         <label>
-          <input type="checkbox" name="religion" value="Jewish" onclick="uncheckOthers('religion', this)"> Jewish
+          <input type="checkbox" name="religion" value="Jehovah Witness" onclick="uncheckOthers('religion', this)"> Jehovah Witness
         </label>
         <br>
         <label>
-          <input type="checkbox" name="religion" value="Muslim" onclick="uncheckOthers('religion', this)"> Muslim
+        <input type="checkbox" name="religion" value="Other" onclick="uncheckOthers('religion', this)"> Other
         </label>
         <br>
-        <label>
-          <input type="checkbox" name="religion" value="Buddhist" onclick="uncheckOthers('religion', this)"> Buddhist
-        </label>
-        <br>
-        <label>
-          <input type="checkbox" name="religion" value="Hindu" onclick="uncheckOthers('religion', this)"> Hindu
-        </label>
-        <br>
-        <label>
-          <input type="checkbox" name="religion" value="Atheist" onclick="uncheckOthers('religion', this)"> Atheist
-        </label>
-        <br>
-        <label>
-          <input type="checkbox" name="religion" value="Agnostic" onclick="uncheckOthers('religion', this)"> Agnostic
-        </label>
-        <br>
-        <label>
-        <input type="checkbox" name="religion" value="Nothing in Particular" onclick="uncheckOthers('religion', this)"> Nothing in Particular
-        </label>
-        <br>
-        <label>
-        <input type="checkbox" name="religion" value="Prefer not to answer" onclick="uncheckOthers('religion', this)"> Prefer not to answer
-        </label>
-        <br>
-        <label for="otherReligion"> <p>Something else, Specify:</p></label>
-        <input type="text" id="otherReligion" name="userid"> 
+        <label for="otherReligion"> <p>Other, please specify:</p></label>
+        <input type="text" id="otherReligion" name="otherReligion"> 
         <br><br><br><br>
         
-
-
-
+        
         <!-- If Something Else or Unspecified-->
         <h2> If you answered either "Something else" or "Prefer not to answer" in the previous question, please answer this question. If not, please select N/A: </h2>
         <label for = "christian">
@@ -383,12 +356,33 @@
         const religionTextbox = document.getElementById('otherReligion').value;
         console.log(religionTextbox === '');
 
-        if (wordCount(religionTextbox) == 0){
-          for (let i = 0; i < religionCheckboxes.length; i++){
-            if (religionCheckboxes[i].checked) {
+
+        for (let i = 0; i < religionCheckboxes.length; i++){
+          if (religionCheckboxes[i].checked && religionCheckboxes[i].value != 'Other') {
+              answered.push('religion');
+              answered.push('otherReligion');
               religionChecked = true;
+            } else {
+              unanswered.push('religion');
+              unanswered.push('otherReligion');
+            }
+          if (religionCheckboxes[i].checked && religionCheckboxes[i].value == 'Other') {
+            if (wordCount(religionTextbox) != 0 ){
+              answered.push('religion');
+              answered.push('otherReligion');
+              religionChecked = true;
+            } else {
+              answered.push('religion');
+              unanswered.push('otherReligion');
             }
           }
+        } 
+        // if (wordCount(religionTextbox) == 0){
+        //   for (let i = 0; i < religionCheckboxes.length; i++){
+        //     if (religionCheckboxes[i].checked && religionCheckboxes[i].value != 'Other') {
+        //       religionChecked = true;
+        //     }
+        //   }
           if (!religionChecked){
             unanswered.push('religion');
             unanswered.push('otherReligion');
@@ -397,7 +391,6 @@
             answered.push('religion');
             answered.push('otherReligion');
           }
-        }
 
         colorAnsweredAndUnanswered(answered, unanswered);
         return valid;
