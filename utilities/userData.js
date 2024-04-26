@@ -407,7 +407,15 @@ async function jsonToCSV(jsonString){
 
     // creates the row
     let values = Object.values(jsonData);
-    let escapedValues = values.map(val => `"${val}"`);
+    let escapedValues = values.map(val => {
+      if (typeof val === 'string') {
+        // Escape double quotes and wrap the value in double quotes
+        return `"${val.replace(/"/g, '""')}"`;
+      } else {
+        // Simply convert non-string values to string
+        return `"${val}"`;
+      }
+    });
     let row = escapedValues.join(',');
     return header + row;
   } catch (error) {
