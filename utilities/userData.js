@@ -580,6 +580,37 @@ async function checkExists(userId, userType, experimentSource, experimentType){
 // --------------------------------  STORING RESULTS FUNCTIONS  -------------------------------------
 // --------------------------------------------------------------------------------------------------
 
+// logs sign in times for a user
+async function logSignIn(userId, userType, experimentSource, experimentType) {
+  try{
+    let folderPath = '';
+    if (userType == 'laymen') {
+      let newUserId = await blippityBloop(String(userId));
+      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
+    } else {
+      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
+    }
+    const filePath = path.join(folderPath, 'signInTimes.csv');
+
+    // create questionnaire folder if not existent
+    if (!fs.existsSync(folderPath)){
+      await fsp.mkdir(folderPath);}
+    
+      let time =  new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' });
+    if (!fs.existsSync(filePath)) {
+      await fsp.appendFile(filePath, 'Date, Time (CST)\n')
+    }
+    await fsp.appendFile(filePath, time + '\n')
+
+  } catch (error) {
+      await fileQueueLogFile.enqueue(async () => {
+        logToFile(('Error storing login timestamp: ' + error.message), errorPath);
+      });
+      console.error('error storing login timestamp: ', error.message);
+  }
+}
+
+
 // stores use demogaphic info (age, etc...)
 async function storeUserDemographic(results, userId, userType, experimentSource, experimentType){
   try {
@@ -823,6 +854,36 @@ async function storeBehaviorInfo(userId, userType, experimentSource, experimentT
   }
 }
 
+// stores order in which user viewed homilies
+// logs sign in times for a user
+async function storeHomilyOrder(userId, userType, experimentSource, experimentType, homilyId) {
+  try{
+    let folderPath = '';
+    if (userType == 'laymen') {
+      let newUserId = await blippityBloop(String(userId));
+      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
+    } else {
+      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
+    }
+    const filePath = path.join(folderPath, 'homilyOrder.csv');
+
+    // create questionnaire folder if not existent
+    if (!fs.existsSync(folderPath)){
+      await fsp.mkdir(folderPath);}
+    
+    let time =  new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' });
+    if (!fs.existsSync(filePath)) {
+      await fsp.appendFile(filePath, 'homilyID, Date, Time (CST)\n')
+    }
+    await fsp.appendFile(filePath, String(homilyId) + ',' + time + '\n')
+
+  } catch (error) {
+      await fileQueueLogFile.enqueue(async () => {
+        logToFile(('Error storing homily order: ' + error.message), errorPath);
+      });
+      console.error('error storing homily order: ', error.message);
+  }
+}
 // --------------------------------------------------------------------------------------------------
 // --------------------------------  UPDATE DATA FUNCTIONS  -----------------------------------------
 // --------------------------------------------------------------------------------------------------
@@ -1158,4 +1219,4 @@ module.exports = {checkExists, unviewedHomilies, updateViewedHomilies, randomHom
      checkReligiousDemographicExists, storeReligiousDemographic, countHomiliesUsed,
     HomiliesUsed, updateHomilyCount, storeConsentInfo, storeUserDemographic, 
     checkUserDemographicExists, storeBehaviorInfo, checkConsentExists, updatePlaybackTime, 
-    logToFile, fileQueueLogFile};
+    logToFile, logSignIn, storeHomilyOrder, fileQueueLogFile};

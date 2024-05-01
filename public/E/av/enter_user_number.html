@@ -54,7 +54,7 @@
       <center>
       <label for ="userid">User ID:</label>
       <input type="text" id="userid" name="userid"><br><br>
-      <input type="submit" value="Submit" onclick="validateUser()">
+      <input type="submit" value="Submit">
       </center>
     <br>
 
@@ -81,6 +81,7 @@
     // checks if the user presses the enter or return key
     document.addEventListener('keydown', event => {
       if (event.key == 'Enter') {
+        event.preventDefault();
         validateUser();
       }
     });
@@ -97,7 +98,7 @@
         if (exists) {
           sessionStorage.setItem('userId', userId); // store user number in session
           await new Promise(resolve => setTimeout(resolve, 5)); // Introduce a delay using Promise
-
+          await LogSignIn(userId, userType, experimentSource, experimentType);
           checkConsentFormCompleted().then(consented => {
             console.log(consented);
             if (consented){
@@ -139,6 +140,23 @@
         console.error('Error:', error);
         return null;
       }}
+
+    // logs the user's sign-in time so we can see how many times they signed in
+    async function LogSignIn(userId, userType, experimentSource, experimentType){
+      const url = `/api/logSignIn`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type' : 'application/json'},
+        body: JSON.stringify({
+          'userId' : userId, 
+          'userType' : userType,
+          'experimentSource' : experimentSource,
+          'experimentType' : experimentType,})
+          });
+        return await response.json();
+      }
+
 
     // checks if the user has completed the consent form
     // (helper for submitForm())

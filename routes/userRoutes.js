@@ -217,10 +217,31 @@ router.get('/randomHomily/:userId/:userType/:experimentSource/:experimentType', 
 // --------------------------------  RESPONSE STORAGE ROUTES  ---------------------------------------
 // --------------------------------------------------------------------------------------------------
 
+// logs the date/time of each user sign in (mostly for experts, but will be with laymen too)
+router.post('/logSignIn', async (req, res) => {
+  try {
+    const userId = req.body.userId; // user id
+    const userType = req.body.userType; // expert or laymen
+    let experimentSource = req.body.experimentSource; // sona or prolific
+    const experimentType = req.body.experimentType; // audio or av
+    if (experimentSource == 'na'){ // if it is an expert change the value to an empty string (dumb but quick fix)
+      experimentSource = '';
+    }
+
+    await userData.logSignIn(userId, userType, experimentSource, experimentType);
+    res.send(JSON.stringify({'success message' : 'Sign in time logged successfully'}));
+
+  } catch (error) {
+    await userData.fileQueueLogFile.enqueue(async () => {
+      userData.logToFile(('Unable to log sign in time: ' + error.message), errorPath);
+    });
+    console.error('unable to use log sign in time route: ', error.message);
+  }
+})
+
 // stores user's behavior while watching homily (rewinds, pauses, tab switchesw)
 router.post('/storeUserBehavior', async (req, res) => {
   try {
-    console.log('here');
     const results = req.body.results;
     const userId = req.body.userId; // user id
     const userType = req.body.userType; // expert or laymen
@@ -390,13 +411,14 @@ router.post(`/storeQuestionnaireResults`, async (req, res) => {
       homilyId = path.basename(tempHomilyId, '.mp3');}
 
     userData.storeQuestionnaireResults(userId, userType, experimentSource, experimentType, homilyId, results).then(data => {
-    res.send(JSON.stringify({'success message' : 'Questionnaire responses saved'}));
+      res.send(JSON.stringify({'success message' : 'Questionnaire responses saved'}));
     }).catch(async error => {
       await userData.fileQueueLogFile.enqueue(async () => {
         userData.logToFile(('Unable to use store questionnaire results route: ' + error.message), errorPath);
       });
       console.error(error);
       res.status(500).send('Unable to save questionnaire responses');});
+      await userData.storeHomilyOrder(userId, userType, experimentSource, experimentType, homilyId)
   } catch (error) {
     await userData.fileQueueLogFile.enqueue(async () => {
       userData.logToFile(('Unable to use store questionnaire results completed route: ' + error.message), errorPath);
