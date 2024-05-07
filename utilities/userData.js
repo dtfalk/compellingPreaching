@@ -766,7 +766,7 @@ async function storePreachingExperience(userId, userType, experimentSource, expe
 }
 
 // stores the results of preaching experience questionnaire as csv in user's folder
-async function storeQuestionnaireResults(userId, userType, experimentSource, experimentType, homilyId, results){
+async function storeQuestionnaireResults(userId, userType, experimentSource, experimentType, homilyId, results, order){
 
   try {
     let folderPath = '';
@@ -778,6 +778,7 @@ async function storeQuestionnaireResults(userId, userType, experimentSource, exp
     }
     const filePath = path.join(folderPath, homilyId + '.csv');
     const homilyProgressPath = path.join(folderPath, homilyId + '_Progress.json');
+    const questionnaireOrderPath = path.join(folderPath, homilyId + '_QuestionOrder.csv');
     
     // create questionnaire folder if not existent
     if (!fs.existsSync(folderPath)){
@@ -785,6 +786,11 @@ async function storeQuestionnaireResults(userId, userType, experimentSource, exp
 
     // if file already submitted, do not overwrite
     if (fs.existsSync(filePath)){
+      return;
+    }
+
+    // if file already submitted, do not overwrite
+    if (fs.existsSync(questionnaireOrderPath)){
       return;
     }
 
@@ -807,6 +813,16 @@ async function storeQuestionnaireResults(userId, userType, experimentSource, exp
         console.error('error saving questionnaire data: ', err);
       } else {
         console.log('questionnaire data successfully saved: ', filePath);}});
+    
+    let orderData = await jsonToCSV(order);
+    fsp.writeFile(questionnaireOrderPath, orderData, 'utf8', async (err) => {
+      if (err) {
+        await fileQueueLogFile.enqueue(async () => {
+          logToFile(('Error saving question order data: ' + err.message), errorPath);
+        });
+        console.error('error saving question order data: ', err);
+      } else {
+        console.log('question order data successfully saved: ', filePath);}});
   } catch (error) {
     await fileQueueLogFile.enqueue(async () => {
       logToFile(('Error storing questionnaire results: ' + error.message), errorPath);

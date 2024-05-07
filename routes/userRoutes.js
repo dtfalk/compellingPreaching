@@ -400,6 +400,7 @@ router.post(`/storeQuestionnaireResults`, async (req, res) => {
     const experimentType = req.body.experimentType; // audio or av
     const tempHomilyId = req.body.homilyId; // homily ID (called "temp..." because we will cut it down)
     const results = req.body.results; // responses to the questionnaire about the homily as a json
+    const order = req.body.order; // order in which the questionnaire questions were given
     if (experimentSource == 'na'){ // if it is an expert change the value to an empty string (dumb but quick fix)
       experimentSource = '';
     }
@@ -410,7 +411,7 @@ router.post(`/storeQuestionnaireResults`, async (req, res) => {
     } else {
       homilyId = path.basename(tempHomilyId, '.mp3');}
 
-    userData.storeQuestionnaireResults(userId, userType, experimentSource, experimentType, homilyId, results).then(data => {
+    userData.storeQuestionnaireResults(userId, userType, experimentSource, experimentType, homilyId, results, order).then(data => {
       res.send(JSON.stringify({'success message' : 'Questionnaire responses saved'}));
     }).catch(async error => {
       await userData.fileQueueLogFile.enqueue(async () => {
