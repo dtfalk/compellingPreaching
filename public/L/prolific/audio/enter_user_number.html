@@ -93,7 +93,7 @@ or properly check for existence of an expert folder -->
     });
 
     // check if user enters valid user number
-    async function validateUser() {
+     function validateUser() {
 
       // gather user info variables
       const userId = document.getElementById('userid').value;
@@ -104,7 +104,7 @@ or properly check for existence of an expert folder -->
       // error message for invalid input
       const errorMessage = document.getElementById('errorMessage');
 
-      const IdIsValid = await checkValidID(userId, userType, experimentSource, experimentType);
+      const IdIsValid =  checkValidID(userId, userType, experimentSource, experimentType);
 
       // if the user entered a valid userId, then...
       if (IdIsValid) {
@@ -113,13 +113,13 @@ or properly check for existence of an expert folder -->
         sessionStorage.setItem('userId', userId);
 
         // create a 5ms delay (fixes a weird bug... idk why it works...)
-        await new Promise(resolve => setTimeout(resolve, 5));
+         new Promise(resolve => setTimeout(resolve, 5));
 
         // log the time (CST) that the user signed in on the server
-        await LogSignIn(userId, userType, experimentSource, experimentType);
+         LogSignIn(userId, userType, experimentSource, experimentType);
 
         // check if the user has already completed the consent form
-        const userHasConsented = await checkConsentFormCompleted(userId, userType, experimentSource, experimentType);
+        const userHasConsented =  checkConsentFormCompleted(userId, userType, experimentSource, experimentType);
 
         // if the user has completed the consent form already, then send them to the introduction screen
         if (userHasConsented) {
@@ -142,7 +142,7 @@ or properly check for existence of an expert folder -->
 
     // helper for "validateUser()"
     // makes call to server to check if a valid ID was entered
-    async function checkValidID(userId, userType, experimentSource, experimentType) {
+     function checkValidID(userId, userType, experimentSource, experimentType) {
 
       // a list of the valid characters a user can enter in their user ID
       const validCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
@@ -168,14 +168,14 @@ or properly check for existence of an expert folder -->
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
 
         try {
-          const response = await fetch(url);
+          const response =  fetch(url);
 
           // if response code is ok (in 200s range), then...
           if (response.ok) {
 
             // return if the folder exists/if it was created successfully
-            const parsedResponse = await response.json();
-            const IdIsValid = await parsedResponse.folderExists;
+            const parsedResponse =  response.json();
+            const IdIsValid =  parsedResponse.folderExists;
             return IdIsValid;
           }
           // if response is not ok, then...
@@ -194,7 +194,7 @@ or properly check for existence of an expert folder -->
 
 
     // logs the user's sign-in time so we can see how many times they signed in and when
-    async function LogSignIn(userId, userType, experimentSource, experimentType) {
+     function LogSignIn(userId, userType, experimentSource, experimentType) {
 
       // url for the route that logs sign in times
       const url = `/api/logSignIn`;
@@ -204,7 +204,7 @@ or properly check for existence of an expert folder -->
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           // AJAX request to the server to log the sign in time (CST)
-          const response = await fetch(url, {
+          const response =  fetch(url, {
             method: 'POST',
             headers: {'Content-Type' : 'application/json'},
             body: JSON.stringify(
@@ -218,7 +218,7 @@ or properly check for existence of an expert folder -->
 
             // If the response was "ok" then return the server's response
             if (response.ok) {
-              return await response.json();
+              return  response.json();
             } 
             // otherwise we log the error (visible under inspect element)
             else {
@@ -236,7 +236,7 @@ or properly check for existence of an expert folder -->
 
     // checks if the user has completed the consent form
     // (helper for submitForm())
-    async function checkConsentFormCompleted(userId, userType, experimentSource, experimentType){
+     function checkConsentFormCompleted(userId, userType, experimentSource, experimentType){
 
       // url for the route on the server that checks if the user has already completed the consent form
       const fileName = 'consentInfo.csv';
@@ -247,12 +247,12 @@ or properly check for existence of an expert folder -->
         
         // try asking the server if the user has completed the consent form
         try {
-          const response = await fetch(url);
+          const response =  fetch(url);
 
           // if response is ok (code in the 200s), then return the server's response
           if (response.ok) {
-            const parsedResponse = await response.json();
-            return await parsedResponse.fileExists;
+            const parsedResponse =  response.json();
+            return  parsedResponse.fileExists;
           }
           // if the response is not ok, then log the issue in the console (visible under inspect element)
           else {

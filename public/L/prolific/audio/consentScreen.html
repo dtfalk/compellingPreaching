@@ -176,10 +176,10 @@
     // --------------------------------------------------------------------------------
     
     // submits the form and send data if complete, otherwise gives error message
-    async function submitForm() {
+    function submitForm() {
 
       // check if the user provided a valid response (valid email address and selected a consent option)
-      const isValidResponse = await checkValidResponse();
+      const isValidResponse = checkValidResponse();
 
       // if the user's responses were invalid, then...
       if (!isValidResponse) {
@@ -212,7 +212,7 @@
         if (consented) {
 
           // send their responses to the server to be stored in their data folder
-          await sendResults(consented, email);
+          sendResults(consented, email);
 
           window.location.href = 'introduction.html';
         }
@@ -225,7 +225,7 @@
     
 
     // ensures that the user has responded to all questions properly
-    async function checkValidResponse() {
+    function checkValidResponse() {
         
         // collects the checkboxes (consent vs not consent) and the email they entered
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -256,7 +256,7 @@
 
     // sends the user response to the server to be stored as a csv
     // (helper for submit form)
-    async function sendResults(consented, email){
+    function sendResults(consented, email){
 
       // user data about type of experiment and user ID etc...
       const userId = sessionStorage.getItem('userId');
@@ -277,7 +277,7 @@
         try {
 
           // AJAX request to the server to store consent info
-          const response = await fetch(url, {
+          const response = fetch(url, {
           method: 'POST',
           headers: {'Content-Type' : 'application/json'},
           body: JSON.stringify({
@@ -291,7 +291,7 @@
 
             // If the response was "ok" then return the server's response
             if (response.ok) {
-              return await response.json();
+              return response.json();
             } 
             // otherwise we log the error (visible under inspect element)
             else {

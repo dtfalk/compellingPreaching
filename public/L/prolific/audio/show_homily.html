@@ -117,10 +117,10 @@
     var lastUpdateTime = 0; // last time in the homily that the user's progress file was updated
 
     // initialize by getting a random audio and setting session variable
-    async function initialize() {
+     function initialize() {
 
       // retrieves a homily from the server to show the user
-      const homily = await fetchRandomVideo();
+      const homily =  fetchRandomVideo();
 
       // get the media element of the html to put our homily into
       const mediaElement = document.getElementById('homilyMedia');
@@ -154,7 +154,7 @@
     
     
     // fetches a random unused homily from server (helper for "initialize()")
-    async function fetchRandomVideo(){
+     function fetchRandomVideo(){
 
       // user information variables
       const userId = sessionStorage.getItem('userId');
@@ -173,13 +173,13 @@
         try {
         
           // get the server's response to our request
-          const response = await fetch(url)
+          const response =  fetch(url)
         
           // if the server's response is OK (200s range), then...
           if (response.ok) {
 
             // parse the response and extract the path to the homily
-            const homily = await response.json();
+            const homily =  response.json();
             return homily;
           }
           // if the server's response is not ok, then log the error to the console
@@ -237,7 +237,7 @@
     // listener for handling events related to the homily progressing (when the time updates)
     // this includes preventing skipping through the homily and updating the user's progress
     // through the homily in case they need to reload the homily
-    mediaElement.addEventListener('timeupdate', async function() {
+    mediaElement.addEventListener('timeupdate',  function() {
         
         // retrieve the current time in the homily
         const currentTime = Math.floor(mediaElement.currentTime);
@@ -311,7 +311,7 @@
             try {
 
               // AJAX request to the server to update the user's progress file for this homily
-              const response = await fetch(url, {
+              const response =  fetch(url, {
               method: 'POST',
               headers: {'Content-Type' : 'application/json'},
               body: JSON.stringify({
@@ -340,7 +340,7 @@
         
 
           // send behavior results every 15 seconds to handle reloads and whatnot
-          await sendResults(pauseCounter, pauseTimer, playTimer, tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds);
+           sendResults(pauseCounter, pauseTimer, playTimer, tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds);
 
           // reset variables
           pauseCounter = 0;
@@ -525,7 +525,7 @@
 
     // If the user presses the 'continue' button then check if they have 
     // completed the homily or show them an error message
-    async function submitForm() {
+     function submitForm() {
 
       // if the user has not completed the homily, then...
       if (furthestPoint < mediaElement.duration - 1) { 
@@ -557,7 +557,7 @@
         timeOnHomilyTab += elapsedTab;
 
         // send the user's behavorial results to the server
-        await sendResults(pauseCounter, pauseTimer, playTimer, tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds);
+         sendResults(pauseCounter, pauseTimer, playTimer, tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds);
 
         // redirect the user to the questionnaire for the homily
         window.location.href = 'questionnaire.html';
@@ -566,7 +566,7 @@
     
 
     // sends the user behavior data to the server to be stored
-    async function sendResults(pauseCounter, pauseTimer, playTimer, tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds) {
+     function sendResults(pauseCounter, pauseTimer, playTimer, tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds) {
         
       // retrieve information about the user
       const userId = sessionStorage.getItem('userId');
@@ -610,7 +610,7 @@
         try {
 
           // AJAX request to the server to store consent info
-          const response = await fetch(url, {
+          const response =  fetch(url, {
           method: 'POST',
           headers: {'Content-Type' : 'application/json'},
           body: JSON.stringify({
@@ -624,7 +624,7 @@
 
           // If the response was "ok" then return the server's response
           if (response.ok) {
-            return await response.json();
+            return  response.json();
           } 
           // otherwise we log the error (visible under inspect element)
           else {
