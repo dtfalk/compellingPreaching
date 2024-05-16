@@ -1,3 +1,6 @@
+<!--Things to test with this document: invalid entries, user can press both 'enter' and 'submit' to provide their userID,
+sign-in times are logged correctly, check if consent form completed and redirect properly, properly create laymen folder 
+or properly check for existence of an expert folder -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,7 +49,7 @@
 <body>
   <div id="background"></div>
   <div id="userIdForm">
-    <!-- retrieve the user's number-->
+    <!-- retrieve the subject's user ID number-->
     <main>
     <form id="userForm">
     <p><b>Enter your Prolific ID and then click submit</b></p>
@@ -64,128 +67,209 @@
   </div>
 
   <script>
-
+    
+    // sets the userType, experimentSource, and experimentType session storage variables
     sessionStorage.setItem('userType', 'laymen');
     sessionStorage.setItem('experimentSource', 'prolific');
     sessionStorage.setItem('experimentType', 'audio');
+
 
     // This block of code ensures the user enters a valid user number before continuing
     // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
 
+    // listens for if the user clicks the "submit" button to submit their user ID
     document.getElementById('userForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault();
     validateUser();
     });
     
-    // checks if the user presses the enter or return key
+    // listens for if the user clicks the "Enter" key to submit their user ID
     document.addEventListener('keydown', event => {
-      if (event.key == 'Enter') {
-        event.preventDefault(); // Prevent the default form submission
+      if (event.key == 'Enter' && document.activeElement === document.getElementById('userid')) {
+        event.preventDefault();
         validateUser();
       }
     });
 
     // check if user enters valid user number
     async function validateUser() {
+
+      // gather user info variables
       const userId = document.getElementById('userid').value;
-      console.log(userId)
       const userType = sessionStorage.getItem('userType');
       const experimentSource = sessionStorage.getItem('experimentSource');
       const experimentType = sessionStorage.getItem('experimentType');
+
+      // error message for invalid input
       const errorMessage = document.getElementById('errorMessage');
-      checkValidID(userId, userType, experimentSource, experimentType).then(async exists => {
-        if (exists) {
-          sessionStorage.setItem('userId', userId); // store user number in session
-          await new Promise(resolve => setTimeout(resolve, 5)); // Introduce a delay using Promise
-          await LogSignIn(userId, userType, experimentSource, experimentType);
-          checkConsentFormCompleted().then(consented => {
-            console.log(consented);
-            if (consented){
-              window.location.href = 'introduction.html';
-            } else {
-              window.location.href = 'consentScreen.html';
-            }
-          });
-        } else {
-          errorMessage.textContent = 'Invalid Prolific identifier. Please try again.';
-          setTimeout(function() {
-            errorMessage.textContent = '';
-          }, 2000);
-        }});
+
+      const IdIsValid = await checkValidID(userId, userType, experimentSource, experimentType);
+
+      // if the user entered a valid userId, then...
+      if (IdIsValid) {
+
+        // store the userId
+        sessionStorage.setItem('userId', userId);
+
+        // create a 5ms delay (fixes a weird bug... idk why it works...)
+        await new Promise(resolve => setTimeout(resolve, 5));
+
+        // log the time (CST) that the user signed in on the server
+        await LogSignIn(userId, userType, experimentSource, experimentType);
+
+        // check if the user has already completed the consent form
+        const userHasConsented = await checkConsentFormCompleted(userId, userType, experimentSource, experimentType);
+
+        // if the user has completed the consent form already, then send them to the introduction screen
+        if (userHasConsented) {
+          window.location.href = 'introduction.html';
+        }
+        // if the user has not already completed the consent form, then send them to the consent form
+        else {
+          window.location.href = 'consentScreen.html';
+        }
+      }
+      // if the user has not entered a valid user ID, then...
+      else {
+
+        // display the "invalid ID entered" error text for 2 seconds
+        errorMessage.textContent = 'Invalid Prolific identifier. Please try again.';
+        setTimeout(function() {errorMessage.textContent = '';}, 2000);
+      }
     }
+
 
     // helper for "validateUser()"
     // makes call to server to check if a valid ID was entered
-    async function checkValidID(userId, userType, experimentSource, experimentType){
-      valid_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
-      for (let i = 0; i < String(userId).length; i++) {
-        char = String(userId)[i];
-        if (!valid_chars.includes(char)) {
+    async function checkValidID(userId, userType, experimentSource, experimentType) {
+
+      // a list of the valid characters a user can enter in their user ID
+      const validCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-';
+
+      // first we check to make sure that user's entry is non-empty
+      if (userId.length === 0) {
+        return false;
+      }
+
+      // then we check to make sure that the user's entry contains only valid characters
+      for (let character of userId) {
+        if (!validCharacters.includes(character)){
           return false;
         }
       }
-      const url = `/api/checkExists/${userId}/${userType}/${experimentSource}/${experimentType}`;
-      
-      try {
-        if (userId == ''){return false;}
-        const response = await fetch(url);
-        const parsedResponse = await response.json();
-        const valid = parsedResponse.exists;
-        if (!response.ok){
-          console.error('An error occurred trying to check if the entered ID is valid');
-        }
-        return valid;
-      } catch (error) {
-        console.error('Error:', error);
-        return null;
-      }}
 
-    // logs the user's sign-in time so we can see how many times they signed in
-    async function LogSignIn(userId, userType, experimentSource, experimentType){
+      // this is the url for the route that checks if a user ID is valid
+      const url = `/api/CheckFileOrFolderExists/${userId}/${userType}/${experimentSource}/${experimentType}/na`;
+      
+      // Try asking the server if the userId is valid (for experts) or create their data folder (for laymen)
+      const maxRetries = 3;
+
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+
+        try {
+          const response = await fetch(url);
+
+          // if response code is ok (in 200s range), then...
+          if (response.ok) {
+
+            // return if the folder exists/if it was created successfully
+            const parsedResponse = await response.json();
+            const IdIsValid = await parsedResponse.folderExists;
+            return IdIsValid;
+          }
+          // if response is not ok, then...
+          else {
+            console.error(`Attempt ${attempt} at creating user data folder: Server responded with status ${response.status}`)
+          }
+        } 
+        // if there is an error, we print it to the console (visible under inspect element)
+        catch (error) {
+          console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+        }
+      }
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to create user data folder after ${maxRetries} attempts`);
+    }
+
+
+    // logs the user's sign-in time so we can see how many times they signed in and when
+    async function LogSignIn(userId, userType, experimentSource, experimentType) {
+
+      // url for the route that logs sign in times
       const url = `/api/logSignIn`;
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type' : 'application/json'},
-        body: JSON.stringify({
-          'userId' : userId, 
-          'userType' : userType,
-          'experimentSource' : experimentSource,
-          'experimentType' : experimentType,})
-          });
-        return await response.json();
+      // try sending sign in data to server, keep trying until we get an "ok" response (response code in the 200s range)
+      const maxRetries = 3;
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          // AJAX request to the server to log the sign in time (CST)
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type' : 'application/json'},
+            body: JSON.stringify(
+              {
+              'userId' : userId, 
+              'userType' : userType,
+              'experimentSource' : experimentSource,
+              'experimentType' : experimentType
+              })
+            });
+
+            // If the response was "ok" then return the server's response
+            if (response.ok) {
+              return await response.json();
+            } 
+            // otherwise we log the error (visible under inspect element)
+            else {
+              console.error(`Attempt ${attempt} at logging user sign in times: Server responded with status ${response.status}`);
+            }
+          }
+          // if the code fails due to some error, then...
+          catch (error) {
+            console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+          }
       }
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to log sign-in after ${maxRetries} attempts`);
+    }
 
     // checks if the user has completed the consent form
     // (helper for submitForm())
-    async function checkConsentFormCompleted(){
-      const userId = sessionStorage.getItem('userId');
-      const userType = sessionStorage.getItem('userType');
-      const experimentSource = sessionStorage.getItem('experimentSource');
-      const experimentType = sessionStorage.getItem('experimentType');
+    async function checkConsentFormCompleted(userId, userType, experimentSource, experimentType){
 
-      const url = `/api/consentFormCompleted/${userId}/${userType}/${experimentSource}/${experimentType}`;
+      // url for the route on the server that checks if the user has already completed the consent form
+      const fileName = 'consentInfo.csv';
+      const url = `/api/CheckFileOrFolderExists/${userId}/${userType}/${experimentSource}/${experimentType}/${fileName}`;
 
-      try{
-        const response = await fetch(url);
-        console.log(response)
-        if (!response.ok){
-              throw new Error('HTTP error! status: ${completed.status}');
+      const maxRetries = 3;
+      for (let attempt = 1; attempt <= maxRetries; attempt ++) {
+        
+        // try asking the server if the user has completed the consent form
+        try {
+          const response = await fetch(url);
+
+          // if response is ok (code in the 200s), then return the server's response
+          if (response.ok) {
+            const parsedResponse = await response.json();
+            return await parsedResponse.fileExists;
           }
-          const completed = await response.json()
-          return await completed.done;
-      } catch (error) {
-          console.error("Unable to fetch completion data");
-          return null;
+          // if the response is not ok, then log the issue in the console (visible under inspect element)
+          else {
+            console.error(`Attempt ${attempt} at logging user sign in times: Server responded with status ${response.status}`);
+          }
         }
+        // if there is an error trying to contact the server, the log it in the console (inspect element)
+        catch (error) {
+          console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+        }
+      }
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to log sign-in after ${maxRetries} attempts`);
     }
 
     // -----------------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------
-
-
-
 
   </script>
 </body>

@@ -52,7 +52,7 @@
       }
   </style>
 </head>
-<body onload="showQuestionnaire()">
+<body onload="initialize()">
   <div id="background"></div>
   <div id="questionnaireContainer" class="questionnaire-container">
   </div>
@@ -70,6 +70,8 @@
             window.location.href = 'enter_user_number.html';
         }
     });
+
+    // set session storage variables with user info
     sessionStorage.setItem('userType', 'expert');
     sessionStorage.setItem('experimentSource', 'na');
     sessionStorage.setItem('experimentType', 'av');
@@ -79,6 +81,55 @@
     // -----------------------------------------------------------------------------
     // -----------------------------------------------------------------------------
 
+    async function initialize() {
+
+      // recover info about user data
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      // checks if the consent form has been completed first
+      const consentCompleted = await checkCompleted(userId, userType, experimentSource, experimentType, 'consentInfo.csv');
+
+      // delay to fix some local testing wackiness
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // if the user has not completed their homilies, then send them to another homily
+      if (!consentCompleted) {
+        window.location.href = 'consentScreen.html';
+      }
+      else {
+        // check if the user has completed all of the homilies/associated questionnaires
+        const homiliesCompleted = await checkHomiliesCompleted(userId, userType, experimentSource, experimentType);
+
+        // delay to fix some local testing wackiness
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        // if the user has not completed their homilies, then send them to another homily
+        if (!homiliesCompleted) {
+          window.location.href = 'new_homily_wait_screen.html';
+        }
+        else {
+
+          // check if the user has completed the preaching experience demographic
+          const preachingExperienceCompleted = await checkCompleted(userId, userType, experimentSource, experimentType, 'preachingExperience.csv');
+
+          // delay to fix some local testing wackiness
+          await new Promise(resolve => setTimeout(resolve, 10));
+
+          // if the user has not completed their homilies, then send them to another homily
+          if (!preachingExperienceCompleted) {
+            window.location.href = 'preaching_experience.html';
+          } 
+          else {
+            // if they are where they are supposed to be, then show them the questionnaire
+            showQuestionnaire();
+          }
+        }
+      }
+    }
+    // display the questionnaire
     function showQuestionnaire() {
       const questionnaireContainer = document.getElementById('questionnaireContainer');
       questionnaireContainer.innerHTML = generateQuestionnaireHTML();
@@ -88,6 +139,7 @@
     }
 
 
+    // generate the HTML for the questionnaire
     function generateQuestionnaireHTML() {
       // You can customize the questionnaire HTML generation based on your requirements
       return `
@@ -251,356 +303,556 @@
     // ---------------------------------------------------------------------
 
     // submits the form and send data if complete, otherwise gives error message
-    function submitForm() {
-      const isValid = validateForm();
-      if (!isValid) { // if response is not valid (missing responses etc...)
+    async function submitForm() {
+
+      // check if the user properly responded to the questionnaire
+      const isValid = await validateForm();
+
+      // if the user did not properly respond to the questionnaire, then...
+      if (!isValid) { 
+
+        // get the HTML element that holds the error message
         const errorMessage = document.getElementById('errorMessage');
+
+        // add an error message to the element
         errorMessage.textContent = 'You must respond to all questions';
+
+        // Remove the error message after 3 seconds
         setTimeout(function() {
           errorMessage.textContent = '';
         }, 3000);
-      }
-      else{ // if responses are valid
 
-          // get header and data and store as csv
-          header = getHeader();
-          data = getData();
-          console.log(sendResults(header, data));
+      }
+      // if the user properly responded to the questionnaire, then...
+      else{ 
+
+          // get header and data
+          const header = await getHeader();
+          const data = await getData();
+
+          // send the data to the server to be stored
+          await sendResults(header, data);
+
+          // send the user to the experiment debrief screen
           window.location.href = 'debrief.html';
           }
       }
 
 
     // returns the word count of a string
-    // (helper for validate form)
     function wordCount(string){
+
+      // split the string into a list. Each element is bookended by spaces
       const words = string.split(" ");
-      wordcount = 0;
-      for (let i = 0; i < words.length; i++){
-        if (!words[i] == ' ') {
+
+      // set the word count equal to 0 to start
+      var wordcount = 0;
+      for (let word of words) {
+
+        // don't count spaces as words of their own
+        if (!word == ' ') {
+
+          // increment the word count by 1
           wordcount += 1;
         }
       }
+
+      // return the word count
       return wordcount;
     }
     
     // validates that the user answered all questions
-    // (helper for submit form)
-    function validateForm() {
+    async function validateForm() {
+
+      // extract all checkboxes, textboxes and numberboxes from the HTML document
       const checkboxes = document.querySelectorAll(`input[type="checkbox"]`);
       const textboxes = document.querySelectorAll(`input[type="text"]`);
       const numberBoxes = document.querySelectorAll(`input[type="number"]`);
       
-      let valid = true;
+      // keeps track of whether the user's submission was valid
+      // initially true, change to false if we find an invalid component of their submission
+      var valid = true;
+
+      // lists to keep track of which questions were answered and which were unanswered
+      // important for highlighting unanswered questions in red
       var answered = [];
       var unanswered = [];
-      let checkbox_name_dict = {};
-      let textbox_name_dict = {};
+
+      // variables to help us group various options/questions by name
+      let checkboxNameDict = {};
+      let textboxNameDict = {};
 
 
+      // group all checkboxes by their question names (e.g. 'ethnicity')
+      for (let checkbox of checkboxes) {
 
-      // collect all names of checkboxes
-      for (let i = 0; i < checkboxes.length; i++){
-        name = checkboxes[i].name;
-        //console.log(name);
+        // extract the name of the checkbox
+        var name = checkbox.name;
+        
+        // try adding the question to the its associated list in the dictionary
         try {
-          checkbox_name_dict[name].push(checkboxes[i]);
-        } catch (error){
-          checkbox_name_dict[name] = [checkboxes[i]];
-        }}
-
-      // collect all names of textboxes
-      for (let i = 0; i < textboxes.length; i++){
-        name = textboxes[i].name;
-        try {
-          textbox_name_dict[name].push(textboxes[i]);
-        } catch (error){
-          textbox_name_dict[name] = [textboxes[i]];
-        }}
+          checkboxNameDict[name].push(checkbox);
+        }
+        // if the list does not exist yet, then create the list and add the checkbox to it 
+        catch (error) {
+          checkboxNameDict[name] = [checkbox];
+        }
+      }
       
-      // check that each checkbox has a response
-      for (const [key, value] of Object.entries(checkbox_name_dict)){
-        //console.log(key);
+      // check that each group of checkboxes has a response
+      for (const [name, questionCheckboxes] of Object.entries(checkboxNameDict)) {
+        
+        // set a variable reflecting if the user has responded to false
+        // (switch to true if we find a checkbox that the user has checked)
         let responded = false;
-        for (let i = 0; i < value.length; i++){
-          if (value[i].checked){
-            responded = true;}}
 
-          if (!responded){
-            if (!unanswered.includes(key)) {
-              //console.log(key);
-              unanswered.push(key);
-            }
-            valid = false;
-          } else {
-            if (!answered.includes(key)){
-              //console.log(key);
-            answered.push(key);
+        // iterate over the checkboxes in the group of checkboxes
+        for (let checkbox of questionCheckboxes) {
+
+          // if the checkbox is checked, then set the responded variable to true
+          if (checkbox.checked) {
+            responded = true;
+
+            // add ethnicity textbox to answered if ethnicity checkbox was checked
+            if (checkbox.name == 'ethnicity' && !(checkbox.value == 'Two or more')) {
+              answered.push('selfDescribeEthnicity');
             }
           }
         }
 
-    // make sure each numberbox has a response
-    for (let i = 0; i < numberBoxes.length; i++){
-      let response = numberBoxes[i].value;
-      console.log(response);
+        // if the user has checked at least one checkbox from this group of questions, then...
+        if (!responded) {
+            
+          // add the group name to the list of unanswered questions
+          unanswered.push(name);
 
-      if (response.length == 0){
-        if (!unanswered.includes(numberBoxes[i].name)) {
-              //console.log(key);
-              unanswered.push(numberBoxes[i].name);
+          // set the valid variable to false to indicate that the user has not properly answererd the questionnaire
+          valid = false;
+
+        } 
+        // if the user has checked at least one checkbox from this group of questions, then..
+        else {
+
+          // add the question to the list of answered questions
+          answered.push(name);
+        }
       }
-      valid = false;
-    } else {
-          if (!answered.includes(numberBoxes[i].name)){
-              //console.log(key);
-            answered.push(numberBoxes[i].name);
-          }
-            }
+
+      // ensure that every number box has a response
+      for (let numberbox of numberBoxes) {
+
+        // extract the user's response to this number box
+        let response = numberbox.value;
+      
+        // if the response is empty, then...
+        if (response.length == 0) {
+
+          // add it to the list of unanswered questions
+          unanswered.push(numberbox.name);
+        
+          // indicate that the user did not properly fill out the questionnaire
+          valid = false;
+
+        }
+        // if the user provided a response in this numberbox, then add it to the list of answered questions
+        else {
+          answered.push(numberbox.name);
+        }
       }
     
-    let countryOfOriginTextBox = document.querySelector(`input[type="text"][name="countryOfOrigin"]`).value;
-    //console.log(countryOfOriginTextBox);
-    if (wordCount(countryOfOriginTextBox) == 0){
-      valid = false;
-      unanswered.push('countryOfOrigin');
-    } else {
-      answered.push('countryOfOrigin');
-    }
+      // handle the country of origin textbox separately?
+      // first we extract the user's response to this textbox
+      let countryOfOriginTextBox = document.getElementById(`countryOfOrigin`).value;
 
-    let ethnicityCheckboxes = document.getElementsByName('ethnicity');
+      // if the user left the textbox blank then...
+      if (wordCount(countryOfOriginTextBox) == 0) {
+
+        // add it to the list of unanswered questions
+        unanswered.push('countryOfOrigin');
+
+        // set the valid variable to false to indicate that the form is not properly filled out
+        valid = false;
+
+      } 
+      // if the user did provide a response to this textbox, then add it to the list of answered questions
+      else {
+        answered.push('countryOfOrigin');
+      }
+
+      // separate logic for the ethnicity checkboxes.
+      // Ensure that if the user selects "Two or more" that they specify what that means in the textbox
+      // previous logic in the code ensures that the user checked at least one of these boxes
+
+      // extract the ethnicity checkboxes
+      let ethnicityCheckboxes = document.getElementsByName('ethnicity');
+      let respondedEthnicity = false;
+
+      // extract the ethnicity self describe textbox's value
+      let ethnicitySelfDescribe = document.getElementById('selfDescribeEthnicity').value;
     
-    // If user answers with two or more, make sure they self describe
-    for (let i = 0; i < ethnicityCheckboxes.length; i++){
-      let response = ethnicityCheckboxes[i].value;
-      if (ethnicityCheckboxes[i].checked && response == 'Two or more'){
-        for (let j = 0; j < textboxes.length; j++) {
-          textResponse = textboxes[j].value;
-          name = textboxes[j].name
-          if (name == 'selfDescribeEthnicity' && wordCount(textResponse) == 0){
-            console.log('here');
-            if (!unanswered.includes('ethnicity')){
-              unanswered.push('ethnicity');
-            }
-            answered = answered.filter(item => item !== 'ethnicity');
-            console.log('new answered: ', answered);
-            //console.log(unanswered);
+      // If user answers with two or more, make sure they self describe
+      // iterate over the ethnicity checkboxes
+      for (let checkbox of ethnicityCheckboxes) {
+
+        // extract the response option for each checkbox (e.g. white, hispanic, etc...)
+        let response = checkbox.value;
+
+        if (checkbox.checked) {
+          respondedEthnicity = true;
+        }
+
+        // if the checkbox is checked and it is the 'Two or more' option, then...
+        if (checkbox.checked && response == 'Two or more') {
+
+          // if the user provided no response in the ethnicity self describe textbox, then...
+          if (wordCount(ethnicitySelfDescribe) == 0) {
+
+            // add the ethnicity checkboxes to the list of unanswered questions
+            unanswered.push('selfDescribeEthnicity');
+
+            // set valid to false to indicate that the user has not properly filled out the form
             valid = false;
+          }
+          // if the user clicked two or more and did provide a response, then...
+          else {
+            answered.push('selfDescribeEthnicity');
           }
         }
       }
-    }
 
-    console.log('unanswered: ', unanswered)
-    console.log('answered: ', answered)
-    console.log('valid: ', valid);
-    colorAnsweredAndUnanswered(answered, unanswered);
-    return valid;
-  }
+      if (!respondedEthnicity) {
+        unanswered.push('selfDescribeEthnicity');
+      }
+
+      // color the unanswered questions red and the answered questions black
+      await colorAnsweredAndUnanswered(answered, unanswered);
+
+      // return whether or not the user properly answered the questionnaire
+      return valid;
+    }
 
     // highlights unanswered questions in red and answered questions in black
-    function colorAnsweredAndUnanswered(answered, unanswered) {
-      //console.log('here');
+    async function colorAnsweredAndUnanswered(answered, unanswered) {
+      
       // color all of the unanswered questions in red
-      for (let i = 0; i < unanswered.length; i++) {
-        //console.log(unanswered[i])
-        // handle country of origin, age and USA residence duration
-        if (unanswered[i] == 'countryOfOrigin' || unanswered[i] == 'age' || unanswered[i] == 'USAResidenceDuration') {
-          let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+      for (let unansweredQuestion of unanswered) {
+      
+        // handle country of origin, age , ethnicity, and USA residence duration logic separately
+        if (unansweredQuestion == 'countryOfOrigin' || unansweredQuestion == 'age' || unansweredQuestion == 'USAResidenceDuration' || unansweredQuestion == 'selfDescribeEthnicity') {
+
+          // extract the text associated with the question
+          let questionText = document.querySelector(`label[for="${unansweredQuestion}"]`).querySelector('p');
+
+          // remove any black coloring and add red highlight
           questionText.classList.remove('blackText');
           questionText.classList.add('redText');
+
+          // continue to next unanswered question
           continue;
-        } 
+        }
 
-        // handle ethnicity questions
-        if (unanswered[i] == 'ethnicity') {
-          // handle ethnicity textbox
-          let questionText = document.querySelector(`label[for="selfDescribeEthnicity"]`).querySelector('p');
-          questionText.classList.remove('blackText');
-          questionText.classList.add('redText');
-        } 
+        // handle gender question differently since prefer to not answer is an option
+        if (unansweredQuestion == 'gender') {
 
-        // handle gender questions
-        if (unanswered[i] == 'gender') {
-          // handle gender textbox
+          // extract the question's text
           let questionText = document.querySelector(`label[for="selfDescribeGender"]`).querySelector('p');
+
+          // remove black coloring and add red highlight
           questionText.classList.remove('blackText');
           questionText.classList.add('redText');
         } 
-        
-        //console.log(unanswered[i])
-        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${unanswered[i]}"]`);
-        let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+      
+        // extract the question text for the unanswered checkboxes
+        let questionText = document.querySelector(`label[for="${unansweredQuestion}"]`).querySelector('p');
+
+        // remove the black coloring and add red highlight
         questionText.classList.remove('blackText');
         questionText.classList.add('redText');
-        for (j = 0; j < checkboxes.length; j++ ) {
-          checkboxes[j].closest('label').classList.remove('blackText');
-          checkboxes[j].closest('label').classList.add('redText');
+
+        // extract the unanswered checkboxes
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${unansweredQuestion}"]`);
+
+        // iterate over all of the unanswered checkboxes and...
+        for (checkbox of checkboxes) {
+
+          // remove black coloring and add red highlight
+          checkbox.closest('label').classList.remove('blackText');
+          checkbox.closest('label').classList.add('redText');
         }
       }
 
       // color all of the answered questions in black
-      //console.log(answered.length)
-      // color all of the unanswered questions in red
-      for (let i = 0; i < answered.length; i++) {
+      for (answeredQuestion of answered) {
 
-        // handle country of origin, age and USA residence duration
-        if (answered[i] == 'countryOfOrigin' || answered[i] == 'age' || answered[i] == 'USAResidenceDuration') {
-          let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+        // handle country of origin, age, ethnicity and USA residence duration logic separately
+        if (answeredQuestion == 'countryOfOrigin' || answeredQuestion == 'age' || answeredQuestion == 'USAResidenceDuration' || answeredQuestion == 'selfDescribeEthnicity') {
+
+          // extract the question text
+          let questionText = document.querySelector(`label[for="${answeredQuestion}"]`).querySelector('p');
+
+          // remove red highlighting and add black coloring
           questionText.classList.remove('redText');
           questionText.classList.add('blackText');
+
+          // skip remainder of the logic
           continue;
         } 
 
-        // handle ethnicity questions
-        if (answered[i] == 'ethnicity') {
-          // handle ethnicity textbox
-          let questionText = document.querySelector(`label[for="selfDescribeEthnicity"]`).querySelector('p');
-          questionText.classList.remove('redText');
-          questionText.classList.add('blackText');
-        } 
+        // handle gender questions separately because prefer not to answer is an option
+        if (answeredQuestion == 'gender') {
 
-        // handle gender questions
-        if (answered[i] == 'gender') {
-          // handle gender textbox
+          // extract prompt for gender textbox
           let questionText = document.querySelector(`label[for="selfDescribeGender"]`).querySelector('p');
+
+          // remove red highlighting and add black coloring
           questionText.classList.remove('redText');
           questionText.classList.add('blackText');
         } 
-        
-        //console.log(answered[i])
-        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${answered[i]}"]`);
-        let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+      
+      
+        // extract the question text for the unanswered set of checkboxes
+        let questionText = document.querySelector(`label[for="${answeredQuestion}"]`).querySelector('p');
+
+        // remove red highlighting and add black coloring
         questionText.classList.remove('redText');
         questionText.classList.add('blackText');
-        for (j = 0; j < checkboxes.length; j++ ) {
-          checkboxes[j].closest('label').classList.remove('redText');
-          checkboxes[j].closest('label').classList.add('blackText');
+
+        // extract answered textboxes for the given question
+        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${answeredQuestion}"]`);
+
+        // iterate over answered checkboxes of this question
+        for (checkbox of checkboxes) {
+
+          // remove red highlighting and add black coloring
+          checkbox.closest('label').classList.remove('redText');
+          checkbox.closest('label').classList.add('blackText');
         }
       }
     }
     
     // sends the user response to the server to be stored as a csv
-    // (helper for submit form)
-    async function sendResults(header, data){
+    async function sendResults(header, data) {
+
+      // collect user info
       const userId = sessionStorage.getItem('userId');
       const userType = sessionStorage.getItem('userType');
-      const homilyId = sessionStorage.getItem('homilyId');
       const experimentSource = sessionStorage.getItem('experimentSource');
       const experimentType = sessionStorage.getItem('experimentType');
-      const url = `/api/storeUserDemographicResults`;
+      const fileName = 'userDemographic.csv';
+
+      // url for route that stores the demographic
+      const url = `/api/storeResponses`;
 
       // package the results in an Object to later stringify
-      let results = {}
+      var results = {}
       for (let i = 0; i < header.length; i++){
         results[String(header[i])] = String(data[i]);
       }
 
-      //console.log('here');
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type' : 'application/json'},
-        body: JSON.stringify({
-              'userId' : userId, 
-              'userType' : userType,
-              'homilyId' : homilyId,
-              'experimentSource' : experimentSource,
-              'experimentType' : experimentType,
-              'results' : JSON.stringify(results)})
-        });
-        return await response.json();
-      } 
 
+      // try sending sign in data to server, keep trying until we get an "ok" response (response code in the 200s range)
+      const maxRetries = 3;
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    
+        try {
+          // AJAX request to the server to store consent info
+          const response = await fetch(url, {
+          method: 'POST',
+          headers: {'Content-Type' : 'application/json'},
+          body: JSON.stringify({
+            'userId' : userId, 
+            'userType' : userType,
+            'experimentSource' : experimentSource,
+            'experimentType' : experimentType,
+            'fileName' : fileName,
+            'results' : JSON.stringify(results)})
+        });
+
+          // If the response was "ok" then return the server's response
+          if (response.ok) {
+            return await response.json();
+          } 
+          // otherwise we log the error (visible under inspect element)
+          else {
+            console.error(`Attempt ${attempt} at saving user demographic data: Server responded with status ${response.status}`);
+          }
+        }
+        // if the code fails due to some error, then...
+        catch (error) {
+          console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+        }
+      }
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to save user demographic data after ${maxRetries} attempts`);
+    }
+
+    // checks if the the user has viewed all of the homilies for proper redirection
+    async function checkHomiliesCompleted(userId, userType, experimentSource, experimentType) {
+      
+      // url for route that checks if all homilies have been completed
+      const url = `/api/allHomiliesViewed/${userId}/${userType}/${experimentSource}/${experimentType}`;
+
+      // maximum number of times we will try to contact the server
+      const maxRetries = 3; 
+      for (let attempt = 1; attempt <= maxRetries; attempt ++) {
+
+        // try contacting the server for info about user completion of homilies
+        try {
+        
+          // get the server's response to our request
+          const response = await fetch(url);
+          
+          // if the server's response is OK (200s range), then...
+          if (response.ok) {
+
+            // parse the response and extract the data regarding homily completion
+            const parsedResponse = await response.json();
+            const homiliesCompleted = await parsedResponse.allHomiliesCompleted;
+
+            // return this information
+            return homiliesCompleted;
+          }
+          // if the server's response is not ok, then log the error to the console
+          else {
+            console.error(`Attempt ${attempt} at checking if user has completed all homilies: Server responded with status ${response.status}`);
+          }
+        }
+        // if the code fails due to some error, then...
+        catch (error) {
+            console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+        }
+      }
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to recover user's homily completion status after ${maxRetries} attempts`);
+    }
+
+    // checks if user demographic or preaching experience demographic have been completed
+    async function checkCompleted(userId, userType, experimentSource, experimentType, fileName) {
+        
+        // url for route that will check for the existence of the given file name
+        const url = `/api/CheckFileOrFolderExists/${userId}/${userType}/${experimentSource}/${experimentType}/${fileName}`;
+
+        // maximum number of times we will try to contact the server
+        const maxRetries = 3; 
+        for (let attempt = 1; attempt <= maxRetries; attempt ++) {
+
+          // try contacting the server for info about user completion of homilies
+          try {
+          
+            // get the server's response to our request
+            const response = await fetch(url);
+            
+            // if the server's response is OK (200s range), then...
+            if (response.ok) {
+
+              // parse the response and extract the data regarding homily completion
+              const parsedResponse = await response.json();
+              const completed = await parsedResponse.fileExists;
+
+              // return this information
+              return completed;
+            }
+            // if the server's response is not ok, then log the error to the console
+            else {
+              console.error(`Attempt ${attempt} at logging user sign in times: Server responded with status ${response.status}`);
+            }
+          }
+          // if the code fails due to some error, then...
+          catch (error) {
+              console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+          }
+        }
+        // final error thrown after we have exhausted the maximum number of retries
+        throw new Error(`Failed to recover user's homily completion status after ${maxRetries} attempts`);
+      }
 
     // gets the header for the soon-to-be csv file on the server
     // (helper for "submitForm())
-    function getHeader(){
+    function getHeader() {
 
-      // variables for storing names of variables and their responses to such variables
+      // variables for storing names of questions
       let checkboxNames = [];
       let textboxNames = [];
       let bigTextboxNames = []
       let numberboxNames = [];
+
+      // variables storing the checkbox/textboxes/bumber boxes
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
       const textboxes = document.querySelectorAll('input[type="text"]');
       const numberboxes = document.querySelectorAll('input[type="number"]');
       const bigTextboxes = document.querySelectorAll('textarea');
 
-      // collect all check box names in order
-      for (let i = 0; i < checkboxes.length; i++){
-        let name = checkboxes[i].name;
-        if (!checkboxNames.includes(name)){
+      // collect all checkbox names in order
+      for (let checkbox of checkboxes){
+        const name = checkbox.name;
+        if (checkbox.checked){
           checkboxNames.push(name);
         }
       }
 
       // collect all textbox names
-      for (let i = 0; i < textboxes.length; i++){
-        let name = textboxes[i].id;
+      for (let textbox of textboxes){
+        const name = textbox.id;
         textboxNames.push(name);
       }
 
       // collect all numberbox names
-      for (let i = 0; i < numberboxes.length; i++){
-        let name = numberboxes[i].id;
+      for (let numberbox of numberboxes){
+        const name = numberbox.id;
         numberboxNames.push(name);
       }
 
-      // collect all big textbox names
-      for (let i = 0; i < bigTextboxes.length; i++){
-        let name = bigTextboxes[i].id;
+      // collect all big textbox names 
+      // (tbh don't know the distinction between this and textboxes, but it works so who cares)
+      for (let bigTextbox of bigTextboxes){
+        const name = bigTextbox.id;
         bigTextboxNames.push(name);
       }
 
+      // return a big list of checkbox names, textbox names, numberbox names, and big textbox names
       return checkboxNames.concat(textboxNames, numberboxNames, bigTextboxNames);
     }
 
     
-    // gets the header for the soon-to-be csv file on the server
-    // (helper for "submitForm())
-    function getData(){
-      // places to store names and data
+    // gets the data for the soon-to-be csv file on the server
+    function getData() {
+
+      // dictionary for storing the various names
       let name_dict = {};
+
+      // variables for storing the user's responses
       let checkboxData = [];
       let textboxData = [];
       let numberboxData = [];
       let bigTextboxData = [];
 
+      // collect all of the HTML elements containing the user's responses
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
       const textboxes = document.querySelectorAll('input[type="text"]');
       const numberboxes = document.querySelectorAll('input[type="number"]');
       const bigTextboxes = document.querySelectorAll('textarea');
 
-      // collect all checkboxes of a given name into a list
-      for (let i = 0; i < checkboxes.length; i++){
-        name = checkboxes[i].name;
-        try {
-          name_dict[name].push(checkboxes[i]);
-          } catch (error){
-            name_dict[name] = [checkboxes[i]];}}
-            
       // iterate over all checkbox questions
-      for (const [key, value] of Object.entries(name_dict)){
-        // iterate over each checkbox in a given question
-        for (let i = 0; i < value.length; i++){
-          let option = value[i];
-          // add all values of checked checkboxes to the list
-          if (option.checked){
-            checkboxData.push(String(option.value));}}}
+      for (let checkbox of checkboxes) {
 
+        // add all checked checkboxes to the checkboxData
+        if (checkbox.checked) {
+          checkboxData.push(checkbox.value);
+        }
+      }
       // iterate over all textbox questions
-        for (let i = 0; i < textboxes.length; i++){
-          let textEntry = textboxes[i].value;
+        for (let textbox of textboxes) {
+          let textEntry = textbox.value;
           textboxData.push(textEntry);}
 
       // iterate over all numberbox questions
-      for (let i = 0; i < numberboxes.length; i++){
-          let textEntry = numberboxes[i].value;
+      for (let numberbox of numberboxes) {
+          let textEntry = numberbox.value;
           numberboxData.push(textEntry);}
 
-      // iterate over all textbox questions
-      for (let i = 0; i < bigTextboxes.length; i++){
-          let textEntry = bigTextboxes[i].value;
+      // iterate over all big textbox questions
+      for (let bigTextbox of bigTextboxes) {
+          let textEntry = bigTextbox.value;
           bigTextboxData.push(textEntry);}
 
       return checkboxData.concat(textboxData, numberboxData, bigTextboxData); 
@@ -610,8 +862,6 @@
     // ---------------------------------------------------------------------
     // ---------------------------------------------------------------------
 
-
-    
     // ensures that the user has at most one checkbox selected at a time
     function uncheckOthers(groupName, currentCheckbox) {
       const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
@@ -620,11 +870,6 @@
           checkbox.checked = false;
         }})};
 
-
-    // prevents the user from navigating backwards through the experiment
-    history.pushState(null, document.title, location.href);
-    window.addEventListener('popstate', function (event) {
-      history.pushState(null, document.title, location.href);});
   </script>
 </body>
 </html>

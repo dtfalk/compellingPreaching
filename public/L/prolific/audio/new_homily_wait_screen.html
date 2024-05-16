@@ -1,3 +1,4 @@
+<!-- Things to test in this file: user is redirected to a homily -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,17 +62,12 @@
             window.location.href = 'enter_user_number.html';
         }
     });
+
+    // setting session variables
     sessionStorage.setItem('userType', 'laymen');
     sessionStorage.setItem('experimentSource', 'prolific');
     sessionStorage.setItem('experimentType', 'audio');
     
-    // prevents the user from navigating backwards through the experiment
-    history.pushState(null, document.title, location.href);
-    window.addEventListener('popstate', function (event) {
-        history.pushState(null, document.title, location.href);
-    });
-    
-
     // navigates the user to the homily
     function submitForm() {
         window.location.href = 'show_homily.html';

@@ -1,3 +1,4 @@
+<!-- THings to test in this file: after user presses continue button they are sent to the exit screen -->
 <!DOCTYPE html>
 <html lang="en">
 <head onload="initialSetup()">
@@ -39,7 +40,7 @@
         text-align: center;
       }
         h2 {
-        font-family: 'Times New Roman', Times, serif;
+            font-family: 'Times New Roman', Times, serif;
         text-decoration: underline;
         text-align: center;
       }
@@ -53,7 +54,7 @@
         }
     </style>
 </head>
-<body id = "mainBody" onload="initialSetup()">
+<body id = "mainBody">
 
 <main id="instructionsSection">
     <center>
@@ -76,58 +77,25 @@
     <p>If you have questions or concerns about the study, you can contact the researchers at Jean Matelski Boulware at (312) 860-9260 or at matelskiboulware@uchicago.edu.</p>
     <p>If you have any questions about your rights as a participant in this research, or to discuss other study-related concerns with someone who is not part of the research team, 
         you can contact the University of Chicago Social & Behavioral Sciences Institutional Review Board (IRB) Office by phone at (773) 702-2915, or by email at sbs-irb@uchicago.edu.</p>
-    
 
     <!-- Submit button -->
     <br> <br>
-    <center>
-        <text id = 'errorMessage'> </text>
-    </center>
     <br>
     <center>
-        <button onclick="submitForm()">Submit</button>
+        <button onclick="submitForm()">Continue</button>
     </center>
     <br>
 </main>
 
 
 <script>
-
-    // JavaScript code to check the user number and redirect if it's missing
-    document.addEventListener('DOMContentLoaded', function() {
-        // Retrieve the user number from sessionStorage
-        var userNumber = sessionStorage.getItem('userId');
-
-        // Check if the user number is not found
-        if (!userNumber) {
-            // Redirect to the 'enter_user_number.html' page
-            window.location.href = 'enter_user_number.html';
-        }
-    });
-    
     sessionStorage.setItem('userType', 'laymen');
     sessionStorage.setItem('experimentSource', 'prolific');
     sessionStorage.setItem('experimentType', 'av');
     
-    // script to be called on runtime
-    function initialSetup() {
-        document.getElementById("mainBody").focus();
-        preventBackNavigation();
-    }
-
-
-    // prevent the user from navigating backwards through the experiment
-    function preventBackNavigation() {
-    history.pushState(null, document.title, location.href);
-    window.onpopstate = function (event) {
-        console.log("Back navigation attempted");
-        history.pushState(null, document.title, location.href);
-        };
-    }
-
     // hides the screen to suggest to the user that they ought to quit out of the window
     function submitForm() {
-      window.location.href = 'exit_screen.html';
+        window.location.href = 'exit_screen.html';
     }
 
 </script>

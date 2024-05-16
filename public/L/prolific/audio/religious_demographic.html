@@ -53,7 +53,7 @@
     
   </style>
 </head>
-<body onload="showQuestionnaire()">
+<body onload="initialize()">
   <div id="background"></div>
   <div id="questionnaireContainer" class="questionnaire-container">
   </div>
@@ -72,6 +72,7 @@
         }
     });
 
+    // set session storage variables with user info
     sessionStorage.setItem('userType', 'laymen');
     sessionStorage.setItem('experimentSource', 'prolific');
     sessionStorage.setItem('experimentType', 'audio');  
@@ -80,6 +81,42 @@
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
+
+    async function initialize() {
+
+      // recover info about user data
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      // checks if the consent form has been completed first
+      const consentCompleted = await checkCompleted(userId, userType, experimentSource, experimentType, 'consentInfo.csv');
+
+      // delay to fix some local testing wackiness
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      // if the user has not completed their homilies, then send them to another homily
+      if (!consentCompleted) {
+        window.location.href = 'consentScreen.html';
+      } 
+      else {
+
+        // check if the user has completed all of the homilies/associated questionnaires
+        const homiliesCompleted = await checkHomiliesCompleted(userId, userType, experimentSource, experimentType);
+      
+        // delay to fix some local testing wackiness
+        await new Promise(resolve => setTimeout(resolve, 10));
+
+        // if the user has not completed their homilies, then send them to another homily
+        if (!homiliesCompleted) {
+          window.location.href = 'new_homily_wait_screen.html';
+        } 
+        else {
+          showQuestionnaire();
+        }
+      }
+    }
 
     // shows the questionnaire
     function showQuestionnaire() {
@@ -282,271 +319,482 @@
     // --------------------------------------------------------------------------------
     
     // submits the form and send data if complete, otherwise gives error message
-    function submitForm() {
-      const isValid = validateForm();
+    async function submitForm() {
+
+      // check if the user answered all questions properly
+      const isValid = await validateForm();
+
+      // if the user did not answer all questions properly, then...
       if (!isValid) {
+
+        // retrieve the HTML element for the error message and add an error message
         const errorMessage = document.getElementById('errorMessage');
         errorMessage.textContent = 'You must respond to all questions and meet all minimum required word counts';
+
+        // display the error message for 3 seconds before deleting the error message
         setTimeout(function() {
           errorMessage.textContent = '';
         }, 3000);
+
       }
-      else{         
-          // get header and data and store as csv
-          header = getHeader();
-          data = getData();
-          sendResults(header, data);
+      // if the user did answer all of the questions properly, then...
+      else {         
+
+          // get the header and the data
+          const header = await getHeader();
+          const data = await getData();
+
+          // send the data to the server to be stored
+          await sendResults(header, data);
+
+          // redirect the user to the user demographic questionnaire
           window.location.href = 'userDemographics.html';
         }
       }
     
 
     // ensures that the user has responded to all questions and met all required minimum wordcounts
-    function validateForm() {
+    async function validateForm() {
+
+        // collect all of the checkboxes in the form
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        let valid = true;
-        name_dict = {};
-        let religionCheckboxes = [];
-        let answered = [];
-        let unanswered = [];
+
+        // create a JS object to store the names of questions
+        var name_dict = {};
+
+        // variable to store the religion checkboxes because they have additional logic that 
+        // needs to be handled that other checkboxes do not (selecting 'other' requires the user
+        // to specify what 'other' means
+        var religionCheckboxes = [];
+
+        // lists to store which questions are answered and which are unanswered.
+        // These are important for the ability to highlight/unhighlight unanswered questions
+        var answered = [];
+        var unanswered = [];
+
+        // variable to keep track of if the user has answered all of the questions
+        var valid = true;
 
         // collect all checkboxes of a given name into a list
-        for (let i = 0; i < checkboxes.length; i++){
-            name = checkboxes[i].name;
-            if (name === 'religion'){
-              religionCheckboxes.push(checkboxes[i]);
-              continue;
-            }
-            try {
-                name_dict[name].push(checkboxes[i]);
-            } catch (error){
-                name_dict[name] = [checkboxes[i]];
-            }}
-        
-            for (const [key, value] of Object.entries(name_dict)){
-        let responded = false;
-        for (let i = 0; i < value.length; i++){
-          if (value[i].checked){
-            responded = true;}}
+        for (let checkbox of checkboxes) {
 
-          if (!responded){
-            if (!unanswered.includes(key)) {
-              //console.log(key);
-              unanswered.push(key);
+          // store the name/group of a given checkbox (e.g. religion or bornAgain)
+          const name = checkbox.name;
+
+          // if this is a 'religion' checkbox, then...
+          if (name === 'religion') {
+
+            // add this checkbox to the religionCheckboxes list so we can handle these independently later
+            religionCheckboxes.push(checkbox);
+
+            // skip the rest of the logic for now because we want to handle these separately
+            continue;
+          }
+
+          // add all of the other checkboxes to the name dict so we can group the checkboxes by name
+
+          // If a list already exists for a checkbox in the name_dict, then add it to its associated list
+          try {
+            name_dict[name].push(checkbox);
+          } 
+          // If a list does not exist for this checkbox's name, create it
+          catch (error){
+            name_dict[name] = [checkbox];
+          }
+        }
+        
+        // iterate over the lists of checkboxes in the name_dict (all names except for 'religion')
+        // to make sure that every group of checkboxes has at least one checkbox that the user checked
+        // (i.e. the user responded to all checkbox questions)
+        for (const [name, questionCheckboxes] of Object.entries(name_dict)) {
+
+          // variable to keep track of if this group of checkboxes has a response
+          var responded = false;
+
+          // iterate over the checkboxes in the group
+          for (let checkbox of questionCheckboxes) {
+
+            // if the checkbox has been checked, then set the responded variable to true
+            // to indicate that this question has a response
+            if (checkbox.checked) {
+              responded = true;
+
+              // also push the name of this question to the list of answered questions
+              answered.push(name);
             }
-            valid = false;
-            //break;
-          } else {
-            if (!answered.includes(key)){
-              //console.log(key);
-              answered.push(key);
-            }
+          }
+
+          // if the user has not provided a response to this question, then...
+          if (!responded) {
+              unanswered.push(name);
+              valid = false;
           }
         }
 
-        let religionChecked = false;
+        // now we handle the "religion" checkboxes separately...
+
+        // variable to keep track of if the religion checkboxes have been answered properly
+        var religionChecked = false;
+
+        // retrieve the HTML element that stores the TEXT box for specifying another religion
+        // than the options we provided the user
         const religionTextbox = document.getElementById('otherReligion').value;
-        console.log(religionTextbox === '');
+        
+        // iterate over all of the 'religion' checkboxes.
+        // we need to ensure that if the user selected 'Other', than they specified in 
+        // the textbox. Otherwise, any selection is valud
+        for (let religionCheckbox of religionCheckboxes) {
 
+          // if the user checked a box, then...
+          if (religionCheckbox.checked) {
 
-        for (let i = 0; i < religionCheckboxes.length; i++){
-          if (religionCheckboxes[i].checked && religionCheckboxes[i].value != 'Other') {
+            // if the box they checked WASN'T the 'Other' checkbox, then...
+            if (religionCheckbox.value != 'Other') {
+
+              // add the checkboxes and the textbox to the list of answered questions
               answered.push('religion');
               answered.push('otherReligion');
-              religionChecked = true;
-            } else {
-              unanswered.push('religion');
-              unanswered.push('otherReligion');
-            }
-          if (religionCheckboxes[i].checked && religionCheckboxes[i].value == 'Other') {
-            if (wordCount(religionTextbox) != 0 ){
-              answered.push('religion');
-              answered.push('otherReligion');
-              religionChecked = true;
-            } else {
-              answered.push('religion');
-              unanswered.push('otherReligion');
-            }
-          }
-        } 
-        // if (wordCount(religionTextbox) == 0){
-        //   for (let i = 0; i < religionCheckboxes.length; i++){
-        //     if (religionCheckboxes[i].checked && religionCheckboxes[i].value != 'Other') {
-        //       religionChecked = true;
-        //     }
-        //   }
-          if (!religionChecked){
-            unanswered.push('religion');
-            unanswered.push('otherReligion');
-            valid = false;
-          } else {
-            answered.push('religion');
-            answered.push('otherReligion');
-          }
 
-        colorAnsweredAndUnanswered(answered, unanswered);
+              // change the religionChecked variable to true to reflect that the user
+              // properly responded to this question
+              religionChecked = true;
+            } 
+            // if the box they checked WAS the 'Other' checkbox, then...
+            else {
+
+              // if the user provided some sort of response in the TEXTBOX, then...
+              if (wordCount(religionTextbox) != 0) {
+
+                // add both the textbox and the checkbox to the list of answered questions
+                answered.push('religion');
+                answered.push('otherReligion');
+
+                // change the religionChecked variable to true to reflect that the user
+                // properly responded to this question
+                religionChecked = true;
+              } 
+              // if the user did not provide a response in the TEXTBOX, then...
+              else {
+                
+                // add the checkboxes to the list of answered questions (because they clicked 'Other')
+                answered.push('religion');
+
+                // add the textbox to the list of unanswered questions so they know to fill it in
+                unanswered.push('otherReligion');
+
+                // set valid to false because the user needs to provide an answer in the textbox
+                valid = false;
+              }
+            }
+          } 
+        }
+
+        // if no religion checkboxes were selected, then push to unanswered and set valid to false.
+        if (!religionChecked) {
+          unanswered.push('religion');
+          unanswered.push('otherReligion');
+          valid = false;
+        }
+
+        // set the color of the unanswered questions to red and the answered questions to black
+        await colorAnsweredAndUnanswered(answered, unanswered);
+
+        // return whether or not the user properly answered all of the questions in the questionnaire
         return valid;
       }
 
     // highlights unanswered questions in red and answered questions in black
-    function colorAnsweredAndUnanswered(answered, unanswered) {
+    async function colorAnsweredAndUnanswered(answered, unanswered) {
       
       // color all of the unanswered questions in red
-      for (let i = 0; i < unanswered.length; i++) {
-        if (unanswered[i] == 'otherReligion') {
-          console.log('here');
-          let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+      for (let unansweredQuestion of unanswered) {
+
+        // handle the textbox separately...
+        if (unansweredQuestion == 'otherReligion') {
+          
+          // recover the HTML element with the textbox text
+          const questionText = document.querySelector(`label[for="${unansweredQuestion}"]`).querySelector('p');
+
+          // remove its black coloring and add a red color to the text
           questionText.classList.remove('blackText');
           questionText.classList.add('redText');
+
+          // move on to the next unanswered question
           continue;
         } 
-        console.log(unanswered[i])
-        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${unanswered[i]}"]`);
-        let questionText = document.querySelector(`label[for="${unanswered[i]}"]`).querySelector('p');
+        
+        // this part is a bit inefficient... it colors each question red multiple times, but it gets the job
+        // done so I do not particularly care
+
+        // collect all of the question text associated with the unanswered checkboxes
+        const questionText = document.querySelector(`label[for="${unansweredQuestion}"]`).querySelector('p');
+
+        // remove the black coloring and add a red highlighting to the question text
         questionText.classList.remove('blackText');
         questionText.classList.add('redText');
-        for (j = 0; j < checkboxes.length; j++ ) {
-          checkboxes[j].closest('label').classList.remove('blackText');
-          checkboxes[j].closest('label').classList.add('redText');
+
+        // collect all of the unanswered checkboxes
+        const checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${unansweredQuestion}"]`);
+
+        // remove the black coloring and add a red highlighting to all of the checkboxes
+        for (let checkbox of checkboxes) {
+          checkbox.closest('label').classList.remove('blackText');
+          checkbox.closest('label').classList.add('redText');
         }
       }
 
       // color all of the answered questions in black
-      console.log(answered.length)
-      for (let i = 0; i < answered.length; i++) {
-        if (answered[i] == 'otherReligion') {
-          console.log('here');
-          let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+      for (let answeredQuestion of answered) {
+
+        // logic to handle the text box separately
+        if (answeredQuestion == 'otherReligion') {
+          
+          // get the HTML element with the textbox's text
+          var questionText = document.querySelector(`label[for="${answeredQuestion}"]`).querySelector('p');
+
+          // remove the red highlighting and add a black coloring to the question text
           questionText.classList.remove('redText');
           questionText.classList.add('blackText');
+
+          // skip the rest of the funciton
           continue;
         } 
-        let checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${answered[i]}"]`);
-        let questionText = document.querySelector(`label[for="${answered[i]}"]`).querySelector('p');
+        
+        // this part is a bit inefficient... it colors each question red multiple times, but it gets the job
+        // done so I do not particularly care
+
+        // collect all of the question text associated with the answered checkboxes
+        var questionText = document.querySelector(`label[for="${answeredQuestion}"]`).querySelector('p');
+
+        // remove the red highlighting and add a red coloring to the question text
         questionText.classList.remove('redText');
         questionText.classList.add('blackText');
-        for (j = 0; j < checkboxes.length; j++ ) {
-          checkboxes[j].closest('label').classList.remove('redText');
-          checkboxes[j].closest('label').classList.add('blackText');
+
+        // collect all of the answered checkboxes
+        var checkboxes = document.querySelectorAll(`input[type="checkbox"][name="${answeredQuestion}"]`);
+
+        // remove the red highlighting and add a red coloring to all of the checkboxes
+        for (let checkbox of checkboxes) {
+          checkbox.closest('label').classList.remove('redText');
+          checkbox.closest('label').classList.add('blackText');
         }
       }
     }
 
     // returns the word count of a string
-    // (helper for validate form)
-    function wordCount(string){
+    function wordCount(string) {
+
+      // split the text entry into a list, new entry in the list each time we encounter a space
       const words = string.split(" ");
-      wordcount = 0;
-      for (let i = 0; i < words.length; i++){
-        if (!words[i] == ' ') {
+
+      // start the word count at 0
+      var wordcount = 0;
+      for (let word of words) {
+
+        // don't count spaces as words
+        if (!word == ' ') {
+
+          // if the word is not just a space, then increment the word count by 1
           wordcount += 1;
         }
       }
+
+      // return the word count
       return wordcount;
     }
 
     // sends the user response to the server to be stored as a csv
-    // (helper for submit form)
-    async function sendResults(header, data){
+    async function sendResults(header, data) {
+
+      // collect user info
       const userId = sessionStorage.getItem('userId');
       const userType = sessionStorage.getItem('userType');
       const experimentSource = sessionStorage.getItem('experimentSource');
       const experimentType = sessionStorage.getItem('experimentType');
+      const fileName = 'religiousDemographic.csv';
 
-      const url = `/api/storeReligiousDemographic`;
+      // url for route that stores the religious demographic
+      const url = `/api/storeResponses`;
 
       // package the results in an Object to later stringify
-      let results = {}
+      var results = {}
       for (let i = 0; i < header.length; i++){
         results[String(header[i])] = String(data[i]);
       }
 
-      console.log(results);
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type' : 'application/json'},
-        body: JSON.stringify({
-              'userId' : userId, 
-              'userType' : userType,
-              'experimentSource' : experimentSource,
-              'experimentType' : experimentType,
-              'results' : JSON.stringify(results)})
-        });
-        return await response.json();
-      } 
+      
+      // try sending sign in data to server, keep trying until we get an "ok" response (response code in the 200s range)
+      const maxRetries = 3;
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        
+        try {
+          // AJAX request to the server to store consent info
+          const response = await fetch(url, {
+          method: 'POST',
+          headers: {'Content-Type' : 'application/json'},
+          body: JSON.stringify({
+                'userId' : userId, 
+                'userType' : userType,
+                'experimentSource' : experimentSource,
+                'experimentType' : experimentType,
+                'fileName' : fileName,
+                'results' : JSON.stringify(results)})
+          });
 
+          // If the response was "ok" then return the server's response
+          if (response.ok) {
+            return await response.json();
+          } 
+          // otherwise we log the error (visible under inspect element)
+          else {
+            console.error(`Attempt ${attempt} at saving religious demographic data: Server responded with status ${response.status}`);
+          }
+         }
+         // if the code fails due to some error, then...
+         catch (error) {
+           console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+         }
+      }
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to save religious demographic data after ${maxRetries} attempts`);
+    } 
+
+    // checks if user demographic or religious demographic have been completed
+    async function checkCompleted(userId, userType, experimentSource, experimentType, fileName) {
+        
+        // url for route that will check for the existence of the given file name
+        const url = `/api/CheckFileOrFolderExists/${userId}/${userType}/${experimentSource}/${experimentType}/${fileName}`;
+
+        // maximum number of times we will try to contact the server
+        const maxRetries = 3; 
+        for (let attempt = 1; attempt <= maxRetries; attempt ++) {
+
+          // try contacting the server for info about user completion of homilies
+          try {
+          
+            // get the server's response to our request
+            const response = await fetch(url);
+            
+            // if the server's response is OK (200s range), then...
+            if (response.ok) {
+
+              // parse the response and extract the data regarding homily completion
+              const parsedResponse = await response.json();
+              const completed = await parsedResponse.fileExists;
+
+              // return this information
+              return completed;
+            }
+            // if the server's response is not ok, then log the error to the console
+            else {
+              console.error(`Attempt ${attempt} at logging user sign in times: Server responded with status ${response.status}`);
+            }
+          }
+          // if the code fails due to some error, then...
+          catch (error) {
+              console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+          }
+        }
+        // final error thrown after we have exhausted the maximum number of retries
+        throw new Error(`Failed to recover user's homily completion status after ${maxRetries} attempts`);
+      }
+
+    // checks if the the user has viewed all of the homilies for proper redirection
+    async function checkHomiliesCompleted(userId, userType, experimentSource, experimentType) {
+      
+      // url for route that checks if all homilies have been completed
+      const url = `/api/allHomiliesViewed/${userId}/${userType}/${experimentSource}/${experimentType}`;
+
+      // maximum number of times we will try to contact the server
+      const maxRetries = 3; 
+      for (let attempt = 1; attempt <= maxRetries; attempt ++) {
+
+        // try contacting the server for info about user completion of homilies
+        try {
+        
+          // get the server's response to our request
+          const response = await fetch(url);
+          
+          // if the server's response is OK (200s range), then...
+          if (response.ok) {
+
+            // parse the response and extract the data regarding homily completion
+            const parsedResponse = await response.json();
+            const homiliesCompleted = await parsedResponse.allHomiliesCompleted;
+
+            // return this information
+            return homiliesCompleted;
+          }
+          // if the server's response is not ok, then log the error to the console
+          else {
+            console.error(`Attempt ${attempt} at checking if user has completed all homilies: Server responded with status ${response.status}`);
+          }
+        }
+        // if the code fails due to some error, then...
+        catch (error) {
+            console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+        }
+      }
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to recover user's homily completion status after ${maxRetries} attempts`);
+    }
 
     // gets the header for the soon-to-be csv file on the server
-    // (helper for "submitForm())
-    function getHeader(){
-      let homilyName = sessionStorage.getItem('homilyId');
-      let checkboxNames = [];
-      let textboxNames = [];
+    async function getHeader() {
+
+      // lists to store checkbox responses and textbox responses
+      var checkboxNames = [];
+      var textboxNames = [];
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
       const textboxes = document.querySelectorAll('textarea');
 
-      // collect all check box names in order
-      for (let i = 0; i < checkboxes.length; i++){
-        name = checkboxes[i].name;
-        if (checkboxNames.includes(name)){
-          continue;
+      // collect all checkbox names in order
+      for (let checkbox of checkboxes){
+        const name = checkbox.name;
+        if (checkbox.checked){
+          checkboxNames.push(name);
         }
-        checkboxNames.push(name);
       }
 
       // collect all textbox names
-      for (let i = 0; i < textboxes.length; i++){
-        name = textboxes[i].id;
+      for (let textbox of textboxes){
+        const name = textbox.id;
         textboxNames.push(name);
       }
-      console.log(textboxNames)
+      
+      // combine the checkbox names and textbox names into one long list and return
       return checkboxNames.concat('otherReligion', textboxNames);
     }
 
 
     // gets the header for the soon-to-be csv file on the server
-    // (helper for "submitForm())
-    function getData(){
-      let name_dict = {};
-      let checkboxData = [];
-      let textboxData = [];
-      let religionChecked = false;
-      let otherReligion = document.getElementById('otherReligion').value;
+    async function getData() {
+
+      // variables to store the data
+      var name_dict = {};
+      var checkboxData = [];
+      var textboxData = [];
+      
+      // directly collect the 'otherReligion' textbox data
+      var otherReligion = document.getElementById('otherReligion').value;
+
+      // collect all checkbox and textbox HTML objects in the form
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
       const textboxes = document.querySelectorAll('textarea');
-
-      // collect all checkboxes of a given name into a list
-      for (let i = 0; i < checkboxes.length; i++){
-        name = checkboxes[i].name;
-        try {
-          name_dict[name].push(checkboxes[i]);
-          } catch (error){
-            name_dict[name] = [checkboxes[i]];}}
             
-        // iterate over all checkbox questions
-        for (const [key, value] of Object.entries(name_dict)){
-          // iterate over each checkbox in a given question
-          for (let i = 0; i < value.length; i++){
-            let option = value[i];
+      // iterate over all checkbox questions
+      for (let checkbox of checkboxes) {
 
-            if (key === 'religion'){
-              if (option.checked){
-                religionChecked = true;
-              }
-            }
-            // add all values of checked checkboxes to the list
-            if (option.checked){
-              checkboxData.push(String(option.value));}}
+        // add all checked checkboxes to the checkboxData
+        if (checkbox.checked) {
+          checkboxData.push(checkbox.value);
+        }
+      }
 
-          if (key === 'religion' && !religionChecked){
-            checkboxData.push('0');
-          }
-            }
-
-          // iterate over all textbox questions
-          for (let i = 0; i < textboxes.length; i++){
-            let textEntry = textboxes[i].value;
-            textboxData.push(textEntry);}
+      // iterate over all textbox questions
+      for (let textbox of textboxes) {
+        let textEntry = textbox.value;
+        textboxData.push(textEntry);}
 
       return checkboxData.concat(otherReligion, textboxData); 
     }
@@ -558,20 +806,18 @@
 
     // ensures that only one checkbox is selected at a time for a given question
     function uncheckOthers(groupName, currentCheckbox) {
+
+      // collect all checkboxes with the same name
       const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
-      checkboxes.forEach(checkbox => {
+
+      // uncheck all checkboxes except for the one that was just checked
+      for (let checkbox of checkboxes) {
         if (checkbox !== currentCheckbox) {
            checkbox.checked = false;
-          }
-        });
-    };
+        }
+      }
+    }
 
-    // prevents back navigation through experiment to best of my ability
-    history.pushState(null, document.title, location.href);
-    window.onpopstate = function (event) {
-        console.log("Back navigation attempted");
-        history.pushState(null, document.title, location.href);
-        };
   </script>
 </body>
 </html>

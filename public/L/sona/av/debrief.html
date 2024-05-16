@@ -1,3 +1,4 @@
+<!-- THings to test in this file: after user presses continue button they are sent to the exit screen -->
 <!DOCTYPE html>
 <html lang="en">
 <head onload="initialSetup()">
@@ -39,7 +40,7 @@
         text-align: center;
       }
         h2 {
-        font-family: 'Times New Roman', Times, serif;
+            font-family: 'Times New Roman', Times, serif;
         text-decoration: underline;
         text-align: center;
       }
@@ -53,7 +54,7 @@
         }
     </style>
 </head>
-<body id = "mainBody" onload="initialSetup()">
+<body id = "mainBody">
 
 <main id="instructionsSection">
     <center>
@@ -79,12 +80,9 @@
 
     <!-- Submit button -->
     <br> <br>
-    <center>
-        <text id = 'errorMessage'> </text>
-    </center>
     <br>
     <center>
-        <button onclick="submitForm()">Submit</button>
+        <button onclick="submitForm()">Continue</button>
     </center>
     <br>
 </main>
@@ -95,25 +93,9 @@
     sessionStorage.setItem('experimentSource', 'sona');
     sessionStorage.setItem('experimentType', 'av');
     
-    // script to be called on runtime
-    function initialSetup() {
-        document.getElementById("mainBody").focus();
-        preventBackNavigation();
-    }
-
-
-    // prevent the user from navigating backwards through the experiment
-    function preventBackNavigation() {
-    history.pushState(null, document.title, location.href);
-    window.onpopstate = function (event) {
-        console.log("Back navigation attempted");
-        history.pushState(null, document.title, location.href);
-        };
-    }
-
     // hides the screen to suggest to the user that they ought to quit out of the window
     function submitForm() {
-    window.location.href = 'exit_screen.html';
+        window.location.href = 'exit_screen.html';
     }
 
 </script>

@@ -1,3 +1,4 @@
+<!-- Things to check in this file: proper redirection (to a new homily vs to religious quesetionnaire vs to user demographic vs to debrief screen) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,27 +62,23 @@
 
 <script> 
 
-    // JavaScript code to check the user number and redirect if it's missing
+    // JavaScript code to check the user ID and redirect if it's missing
     document.addEventListener('DOMContentLoaded', function() {
         // Retrieve the user number from sessionStorage
         var userNumber = sessionStorage.getItem('userId');
 
         // Check if the user number is not found
         if (!userNumber) {
+
             // Redirect to the 'enter_user_number.html' page
             window.location.href = 'enter_user_number.html';
         }
     });
-    
+
+    // set session storage variables with user info
     sessionStorage.setItem('userType', 'laymen');
     sessionStorage.setItem('experimentSource', 'sona');
     sessionStorage.setItem('experimentType', 'audio');
-
-    // prevents the user from navigating backwards through the experiment
-    history.pushState(null, document.title, location.href);
-    window.addEventListener('popstate', function (event) {
-        history.pushState(null, document.title, location.href);
-    });
     
 
 
@@ -92,96 +89,146 @@
     // --------------------------------------------------------------
 
     // redirects user according to progress
-    function submitForm() {
-      checkHomiliesCompleted().then(completed => {
-      if (!completed){
-        window.location.href = 'new_homily_wait_screen.html';
-      } else{ // if homilies are completed
-        checkReligiousSurveyCompleted().then(submitted => {
-          if (!submitted) { 
-            window.location.href = 'religious_demographic.html';
-          } else { // if religious demographic completed
-            checkUserDemographicCompleted().then(done => {
-              if (!done) {
-                window.location.href = 'userDemographics.html';
-              } else { // if user demographic completed
-                window.location.href = 'exit_screen.html';
-              }});
-            }
-          });
-        }});
-    }
+    async function submitForm() {
 
-
-    // checks if the expert has viewed all of the homilies for proper redirection
-    // (helper for submitForm())
-    async function checkHomiliesCompleted(){
+      // recover info about user data
       const userId = sessionStorage.getItem('userId');
       const userType = sessionStorage.getItem('userType');
       const experimentSource = sessionStorage.getItem('experimentSource');
       const experimentType = sessionStorage.getItem('experimentType');
+
+      // checks if the consent form has been completed first
+      const consentCompleted = await checkCompleted(userId, userType, experimentSource, experimentType, 'consentInfo.csv');
+
+      // delay to fix some local testing wackiness
+      await new Promise(resolve => setTimeout(resolve, 2));
+
+      // if the user has not completed their homilies, then send them to another homily
+      if (!consentCompleted) {
+        window.location.href = 'consentScreen.html';
+      } 
+      else {
+
+        // check if the user has completed all of the homilies/associated questionnaires
+        const homiliesCompleted = await checkHomiliesCompleted(userId, userType, experimentSource, experimentType);
       
+
+        // if the user has not completed their homilies, then send them to another homily
+        if (!homiliesCompleted) {
+          window.location.href = 'new_homily_wait_screen.html';
+        }
+        else {
+
+          // check if the user has completed the religious questionnaire
+          const religiousBackgroundCompleted = await checkCompleted(userId, userType, experimentSource, experimentType, 'religiousDemographic.csv');
+
+          // delay to fix some local testing wackiness
+          await new Promise(resolve => setTimeout(resolve, 10));
+      
+          // if the user has not completed the user demographic, then send them to the user demographic
+          if (!religiousBackgroundCompleted) {
+            window.location.href = 'religious_demographic.html';
+          } 
+          else {
+
+            // check if the user has completed the religious questionnaire
+            const userDemographicCompleted = await checkCompleted(userId, userType, experimentSource, experimentType, 'userDemographic.csv');
+
+            // 2 ms delay to fix some local testing wackiness
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            // if the user has not completed the user demographic, then send them to the user demographic
+            if (!userDemographicCompleted) {
+              window.location.href = 'userDemographics.html';
+            }
+            else { 
+              window.location.href = 'debrief.html';
+            }
+          }
+        }
+      }
+    }
+
+
+    // checks if the the user has viewed all of the homilies for proper redirection
+    async function checkHomiliesCompleted(userId, userType, experimentSource, experimentType) {
+      
+      // url for route that checks if all homilies have been completed
       const url = `/api/allHomiliesViewed/${userId}/${userType}/${experimentSource}/${experimentType}`;
 
-      try{
-        const response = await fetch(url);
-        if (!response.ok){
-              throw new Error('HTTP error! status: ${completed.status}');
+      // maximum number of times we will try to contact the server
+      const maxRetries = 3; 
+      for (let attempt = 1; attempt <= maxRetries; attempt ++) {
+
+        // try contacting the server for info about user completion of homilies
+        try {
+        
+          // get the server's response to our request
+          const response = await fetch(url);
+          
+          // if the server's response is OK (200s range), then...
+          if (response.ok) {
+
+            // parse the response and extract the data regarding homily completion
+            const parsedResponse = await response.json();
+            const homiliesCompleted = await parsedResponse.allHomiliesCompleted;
+
+            // return this information
+            return homiliesCompleted;
           }
-          const completed = await response.json()
-          return await completed.done;
-      } catch (error) {
-          console.error("Unable to fetch completion data");
-          return null;
+          // if the server's response is not ok, then log the error to the console
+          else {
+            console.error(`Attempt ${attempt} at checking if user has completed all homilies: Server responded with status ${response.status}`);
+          }
         }
+        // if the code fails due to some error, then...
+        catch (error) {
+            console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+        }
+      }
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to recover user's homily completion status after ${maxRetries} attempts`);
     }
 
+    // checks if user demographic or religious demographic have been completed
+    async function checkCompleted(userId, userType, experimentSource, experimentType, fileName) {
+        
+        // url for route that will check for the existence of the given file name
+        const url = `/api/CheckFileOrFolderExists/${userId}/${userType}/${experimentSource}/${experimentType}/${fileName}`;
 
-    // checks if the laymen has completed the religious demographic survey
-    // (helper for submitForm())
-    async function checkReligiousSurveyCompleted(){
-      const userId = sessionStorage.getItem('userId');
-      const userType = sessionStorage.getItem('userType');
-      const experimentSource = sessionStorage.getItem('experimentSource');
-      const experimentType = sessionStorage.getItem('experimentType');
+        // maximum number of times we will try to contact the server
+        const maxRetries = 3; 
+        for (let attempt = 1; attempt <= maxRetries; attempt ++) {
 
-      const url = `/api/religiousDemographicCompleted/${userId}/${userType}/${experimentSource}/${experimentType}`;
+          // try contacting the server for info about user completion of homilies
+          try {
+          
+            // get the server's response to our request
+            const response = await fetch(url);
+            
+            // if the server's response is OK (200s range), then...
+            if (response.ok) {
 
-      try{
-        const response = await fetch(url);
-        if (!response.ok){
-              throw new Error('HTTP error! status: ${completed.status}');
+              // parse the response and extract the data regarding homily completion
+              const parsedResponse = await response.json();
+              const completed = await parsedResponse.fileExists;
+
+              // return this information
+              return completed;
+            }
+            // if the server's response is not ok, then log the error to the console
+            else {
+              console.error(`Attempt ${attempt} at logging user sign in times: Server responded with status ${response.status}`);
+            }
           }
-          const completed = await response.json()
-          return await completed.done;
-      } catch (error) {
-          console.error("Unable to fetch completion data");
-          return null;
-        }
-    }
-
-    // checks if the laymen has completed the user demographic survey
-    // (helper for submitForm())
-    async function checkUserDemographicCompleted(){
-      const userId = sessionStorage.getItem('userId');
-      const userType = sessionStorage.getItem('userType');
-      const experimentSource = sessionStorage.getItem('experimentSource');
-      const experimentType = sessionStorage.getItem('experimentType');
-
-      const url = `/api/userDemographicCompleted/${userId}/${userType}/${experimentSource}/${experimentType}`;
-
-      try{
-        const response = await fetch(url);
-        if (!response.ok){
-              throw new Error('HTTP error! status: ${completed.status}');
+          // if the code fails due to some error, then...
+          catch (error) {
+              console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
           }
-          const completed = await response.json()
-          return await completed.done;
-      } catch (error) {
-          console.error("Unable to fetch completion data");
-          return null;
         }
-    }
+        // final error thrown after we have exhausted the maximum number of retries
+        throw new Error(`Failed to recover user's homily completion status after ${maxRetries} attempts`);
+      }
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------

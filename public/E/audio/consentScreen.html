@@ -1,290 +1,319 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Homily Review</title>
-  <style>
-    body {
-      font-family: 'Times New Roman', Times, serif;
-      margin: 0;
-      overflow: auto;
-    }
-    #background {
-      font-family: 'Times New Roman', Times, serif;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #800000;
-      z-index: -1;
-    }
-    .questionnaire-container {
-      font-family: 'Times New Roman', Times, serif;
-      display: none;
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 20px;
-      background-color: white;
-      z-index: 1;
-      }
-      h1 {
-        font-family: 'Times New Roman', Times, serif;
-        text-align: center;
-      }
-      h2 {
-        font-family: 'Times New Roman', Times, serif;
-        text-decoration: underline;
-        text-align: center;
-      }
-      text{
-        font-family: 'Times New Roman', Times, serif;
-        color: red;
-      }
-    
-  </style>
-</head>
-<body onload="showQuestionnaire()">
-  <div id="background"></div>
-  <div id="questionnaireContainer" class="questionnaire-container">
-  </div>
-
-  <script>
-    // JavaScript code to check the user number and redirect if it's missing
-    document.addEventListener('DOMContentLoaded', function() {
-        // Retrieve the user number from sessionStorage
-        var userNumber = sessionStorage.getItem('userId');
-
-        // Check if the user number is not found
-        if (!userNumber) {
-            // Redirect to the 'enter_user_number.html' page
-            window.location.href = 'enter_user_number.html';
-        }
-    });
-
-    sessionStorage.setItem('userType', 'expert');
-    sessionStorage.setItem('experimentSource', 'na');
-    sessionStorage.setItem('experimentType', 'audio');  
-
-    // this block of code creates and displays the questionnaire to the subject
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-
-    // shows the questionnaire
-    function showQuestionnaire() {
-      const questionnaireContainer = document.getElementById('questionnaireContainer');
-      questionnaireContainer.innerHTML = generateQuestionnaireHTML();
-
-      // Display the questionnaire
-      questionnaireContainer.style.display = 'block';
-    }
-
-    // generates the HTML for the questionnaire
-    function generateQuestionnaireHTML() {
-      // You can customize the questionnaire HTML generation based on your requirements
-      return `
-      <center>
-        <img src="uchicagoInsignia.png" width = 150>
-      </center>
-        <h1>University of Chicago Online Consent Form for Research Participation </h1>
-        <h2><b>Study Number: </b> IRB24-0068</h2>
-        <h2><b>Study Title: </b> Understanding Preaching</h2>
-        <h2><b>Researcher(s): </b> Howard Nusbaum</h2>
-        <h2><b>Sponsor: </b> Catholic Theological Union</h2><br>
-
-        <h2><b>Description </b> </h2>
-        <p> We are researchers at the University of Chicago working with the Catholic Theological Union in Chicago 
-          carrying out a study to understand preaching as communication. There is a collection of homilies taken from 
-          different sources and we would appreciate it greatly if you would review the recordings of these homilies and 
-          rate them using a questionnaire. We will also ask for your demographic information and information about your
-          preaching experiences and expertise in instruction. </p>
-        <p> You have been asked to review these homilies as an expert of homiletics. Your review is completely
-           voluntary and we would greatly appreciate your participation. </p>
-        <p> Reviews should take less than 30 minutes per homily. There is a total of four homilies.
-            We would appreciate it if you can complete the reviews within two weeks.
-            The rate at which you go through the content is under your control. You may log in and out of the survey and take as many breaks as needed.</p>
-
-        <h2><b>Incentives </b></h2>
-        <p> We appreciate your expertise and offer compensation of one hundred dollars provided by our research grant that is joint with Catholic Theological Union for
-           your review of the complete set of homilies. In addition, we will provide you with any reports arising from this research based on the data of all the expert homiletic reviewers.</p>
-
-        <h2><b>Risks and Benefits </b> </h2>
-        <p> Your participation in this study does not involve any risk to you beyond that of everyday life.
-           Risks for this task are minimal and include boredom, minor fatigue, and the possibility of a breach of confidentiality.
-           Taking part in this research study may not benefit you personally beyond learning about psychological research, 
-           but we may learn new things that could help others and contribute to the field of psychology.</p>
-
-        <h2><b>Confidentiality </b> </h2>
-        <p>Any identifiable data or information collected by this study will never be shared outside the research team. De-identified 
-          information from this study may be used for future research studies or shared with other researchers for future research 
-          without your additional informed consent. We may also upload your data (in both aggregate and individual form) to public data repositories. 
-          Your study data will be handled as confidentially as possible. If results of this study are published or presented, 
-          your individual name will not be used. If you decide to withdraw from this study, any data already collected will be destroyed.</p>
-        
-        <h2><b>Contacts and Questions </b></h2>
-        <p>If you have questions or concerns about the study, you can contact Jean Matelski Boulware at (312) 860-9260 or at matelskiboulware@uchicago.edu. </p>
-        <p>If you have any questions about your rights as a participant in this research, feel you have been harmed, 
-          or wish to discuss other study-related concerns with someone who is not part of the research team, 
-          you can contact the University of Chicago Social & Behavioral Sciences Institutional Review Board (IRB) Office by phone at (773) 702-2915, 
-          or by email at sbs-irb@uchicago.edu. </p>
-        
-        <h2><b>Consent </b></h2>
-        <p>Participation is voluntary. Refusal to participate or withdrawing from the research will involve no penalty or loss of benefits to which you might otherwise be entitled.</p>
-        <p>By selecting “I agree” below, you confirm that you have read the consent form, are at least 18 years old, and agree to participate in the research. Please print or save a copy of this page for your records.</p>  
-        <p>By selecting “I do NOT agree” you will be taken to a screen that exits you from the survey.</p>
-        
-        
-        <label>
-          <input type = "checkbox" name = "consent" value = "agree" onclick = "uncheckOthers('consent', this)"> I agree to participate in the research
-        </label>
-        <br>
-        <label>
-          <input type = "checkbox" name = "consent" value = "disagree" onclick = "uncheckOthers('consent', this)"> I do NOT agree to participate in the research
-        </label>
-
-        <!-- Submit button -->
-        <br>
-        <br>
-        <center>
-          <text id = 'errorMessage'> </text>
-        </center>
-        <br>
-        <center>
-          <button onclick="submitForm()">Submit</button>
-        </center>
-        <br>
-      `;
-    }
-    
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-
-
-
-    // this block of code checks if the user has completed the form and redirects 
-    // the user appropriately (e.g. error message or form submitted to server)
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    
-    // submits the form and send data if complete, otherwise gives error message
-    function submitForm() {
-
-      // results relating to the user's input (is it valid and what data did they provide)
-      const resultsArray = validateForm();
-      const isValid = resultsArray[0]; // get info about if the submission was valid
-      const consented = resultsArray[1] // true = consented, false = did not consent
-      //const email = resultsArray[2] // the email address that the user entered
-
-      if (!isValid) {
-        const errorMessage = document.getElementById('errorMessage');
-        errorMessage.textContent = 'Please choose an option';
-        setTimeout(function() {
-          errorMessage.textContent = '';
-        }, 3000);
-      }
-      else{     
-        // if the user has consented to the terms of the homily review
-        if (consented){
-          sendResults(consented);//, email);
-          window.location.href = 'introduction.html';
-        } 
-        // if the user has not consented to the terms of the homily review
-        else{
-          sendResults(consented)//, email);
-          window.location.href = 'nonConsent.html';
+<!-- Things to test in this file: The user's test response includes an "@" symbol, invalid response triggered if
+      they don't provide a consent repsonse OR they do not provide a valid email, user is redirected to non consent 
+      screen if they choose the non consent option, user is redirected to the introduction/instructions if they do 
+      consent, the user's consent info gets stored on the server -->
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Homily Review</title>
+        <style>
+          body {
+            font-family: 'Times New Roman', Times, serif;
+            margin: 0;
+            overflow: auto;
           }
+          #background {
+            font-family: 'Times New Roman', Times, serif;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color:#800000;
+            z-index: -1;
+          }
+          .questionnaire-container {
+            font-family: 'Times New Roman', Times, serif;
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 20px;
+            background-color: white;
+            z-index: 1;
+            }
+            h1 {
+              font-family: 'Times New Roman', Times, serif;
+              text-align: center;
+            }
+            h2 {
+              font-family: 'Times New Roman', Times, serif;
+              text-decoration: underline;
+              text-align: center;
+            }
+            text{
+              font-family: 'Times New Roman', Times, serif;
+              color: red;
+            }
+          
+        </style>
+      </head>
+      <body onload="showQuestionnaire()">
+        <div id="background"></div>
+        <div id="questionnaireContainer" class="questionnaire-container">
+        </div>
+      
+<script>
+      
+          sessionStorage.setItem('userType', 'expert');
+          sessionStorage.setItem('experimentSource', 'na');
+          sessionStorage.setItem('experimentType', 'audio'); 
+      
+          // If we lose the user ID, force the user to re-enter their user number
+          document.addEventListener('DOMContentLoaded', function() {
+              // Retrieve the user number from sessionStorage
+              var userNumber = sessionStorage.getItem('userId');
+      
+              // Check if the user number is not found
+              if (!userNumber) {
+                  // Redirect to the 'enter_user_number.html' page
+                  window.location.href = 'enter_user_number.html';
+              }
+          }); 
+      
+          // this block of code creates and displays the questionnaire to the subject
+          // --------------------------------------------------------------------------------
+          // --------------------------------------------------------------------------------
+          // --------------------------------------------------------------------------------
+      
+          // shows the questionnaire
+          function showQuestionnaire() {
+            const questionnaireContainer = document.getElementById('questionnaireContainer');
+            questionnaireContainer.innerHTML = generateQuestionnaireHTML();
+      
+            // Display the questionnaire
+            questionnaireContainer.style.display = 'block';
+          }
+      
+        // generates the HTML for the questionnaire
+        function generateQuestionnaireHTML() {
+          // You can customize the questionnaire HTML generation based on your requirements
+          return `
+          <center>
+            <img src="uchicagoInsignia.png" width = 150>
+          </center>
+            <h1>University of Chicago Online Consent Form for Research Participation </h1>
+            <h2><b>Study Number: </b> IRB24-0068</h2>
+            <h2><b>Study Title: </b> Understanding Preaching</h2>
+            <h2><b>Researcher(s): </b> Howard Nusbaum</h2>
+            <h2><b>Sponsor: </b> Catholic Theological Union</h2><br>
+
+            <h2><b>Description </b> </h2>
+            <p> We are researchers at the University of Chicago working with the Catholic Theological Union in Chicago 
+              carrying out a study to understand preaching as communication. There is a collection of homilies taken from 
+              different sources and we would appreciate it greatly if you would review the recordings of these homilies and 
+              rate them using a questionnaire. We will also ask for your demographic information and information about your
+              preaching experiences and expertise in instruction. </p>
+            <p> You have been asked to review these homilies as an expert of homiletics. Your review is completely
+              voluntary and we would greatly appreciate your participation. </p>
+            <p> Reviews should take less than 30 minutes per homily. There is a total of four homilies.
+                We would appreciate it if you can complete the reviews within two weeks.
+                The rate at which you go through the content is under your control. You may log in and out of the survey and take as many breaks as needed.</p>
+
+            <h2><b>Incentives </b></h2>
+            <p> We appreciate your expertise and offer compensation of one hundred dollars provided by our research grant that is joint with Catholic Theological Union for
+              your review of the complete set of homilies. In addition, we will provide you with any reports arising from this research based on the data of all the expert homiletic reviewers.</p>
+
+            <h2><b>Risks and Benefits </b> </h2>
+            <p> Your participation in this study does not involve any risk to you beyond that of everyday life.
+              Risks for this task are minimal and include boredom, minor fatigue, and the possibility of a breach of confidentiality.
+              Taking part in this research study may not benefit you personally beyond learning about psychological research, 
+              but we may learn new things that could help others and contribute to the field of psychology.</p>
+
+            <h2><b>Confidentiality </b> </h2>
+            <p>Any identifiable data or information collected by this study will never be shared outside the research team. De-identified 
+              information from this study may be used for future research studies or shared with other researchers for future research 
+              without your additional informed consent. We may also upload your data (in both aggregate and individual form) to public data repositories. 
+              Your study data will be handled as confidentially as possible. If results of this study are published or presented, 
+              your individual name will not be used. If you decide to withdraw from this study, any data already collected will be destroyed.</p>
+            
+            <h2><b>Contacts and Questions </b></h2>
+            <p>If you have questions or concerns about the study, you can contact Jean Matelski Boulware at (312) 860-9260 or at matelskiboulware@uchicago.edu. </p>
+            <p>If you have any questions about your rights as a participant in this research, feel you have been harmed, 
+              or wish to discuss other study-related concerns with someone who is not part of the research team, 
+              you can contact the University of Chicago Social & Behavioral Sciences Institutional Review Board (IRB) Office by phone at (773) 702-2915, 
+              or by email at sbs-irb@uchicago.edu. </p>
+            
+            <h2><b>Consent </b></h2>
+            <p>Participation is voluntary. Refusal to participate or withdrawing from the research will involve no penalty or loss of benefits to which you might otherwise be entitled.</p>
+            <p>By selecting “I agree” below, you confirm that you have read the consent form, are at least 18 years old, and agree to participate in the research. Please print or save a copy of this page for your records.</p>  
+            <p>By selecting “I do NOT agree” you will be taken to a screen that exits you from the survey.</p>
+            
+            
+            <label>
+              <input type = "checkbox" name = "consent" value = "agree" onclick = "uncheckOthers('consent', this)"> I agree to participate in the research
+            </label>
+            <br>
+            <label>
+              <input type = "checkbox" name = "consent" value = "disagree" onclick = "uncheckOthers('consent', this)"> I do NOT agree to participate in the research
+            </label>
+
+            <!-- Submit button -->
+            <br>
+            <br>
+            <center>
+              <text id = 'errorMessage'> </text>
+            </center>
+            <br>
+            <center>
+              <button onclick="submitForm()">Submit</button>
+            </center>
+            <br>
+          `;
         }
-      }
-    
-
-    // ensures that the user has responded to all questions properly
-    function validateForm() {
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        //const email = document.getElementById("email");
-        let valid = true; // assume valid entry. Check conditions and switch to false if a condition is not met.
-        let resultsArray = [];
-        let consented = false;
-
-        // checks that the user checked one of the boxes (i agree vs i do not agree)
-        let checked = false;
-        for (let i = 0; i < checkboxes.length; i++) {
-          if (checkboxes[i].checked) {
-            checked = true;
-
-            // if the checked response is "I agree", then update the variable reflecting that the user consented
-            if (checkboxes[i].value == 'agree'){
-              consented = true;
+          
+          // --------------------------------------------------------------------------------
+          // --------------------------------------------------------------------------------
+          // --------------------------------------------------------------------------------
+      
+      
+      
+          // this block of code checks if the user has completed the form and redirects 
+          // the user appropriately (e.g. error message or form submitted to server)
+          // --------------------------------------------------------------------------------
+          // --------------------------------------------------------------------------------
+          // --------------------------------------------------------------------------------
+          
+          // submits the form and send data if complete, otherwise gives error message
+          async function submitForm() {
+      
+            // check if the user provided a valid response (selected a consent option)
+            const isValidResponse = await checkValidResponse();
+      
+            // if the user's responses were invalid, then...
+            if (!isValidResponse) {
+      
+              // display error message for 3 seconds
+              const errorMessage = document.getElementById('errorMessage');
+              errorMessage.textContent = 'Please choose an option';
+              setTimeout(function() {errorMessage.textContent = '';}, 3000);
+            }
+            // if the user's responses were valid, then...
+            else {     
+      
+              // see if they consented or not
+              const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+              var consented = false;
+      
+              // iterate over the consent checkbox options
+              for (checkbox of checkboxes) {
+      
+                // if the 'I consent' checkbox is checked then set the consented variable to true
+                if (checkbox.value === 'agree' && checkbox.checked){
+                  consented = true;
+                }
+              }
+      
+              // if the user consented, then save their data and redirect to experiment start
+              if (consented) {
+      
+                // send their responses to the server to be stored in their data folder
+                await sendResults(consented);
+      
+                window.location.href = 'introduction.html';
+              }
+              // if they did not consent, then send user to non consent screen
+              else {
+                window.location.href = 'nonConsent.html';
+              }
             }
           }
-        }
+          
+      
+          // ensures that the user has responded to all questions properly
+          async function checkValidResponse() {
+              
+              // collects the checkboxes (consent vs not consent)
+              const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      
+              // checks that the user checked one of the boxes (i agree vs i do not agree)
+              let checked = false;
+              for (checkbox of checkboxes) {
+                if (checkbox.checked) {
+                  checked = true;
+                }
+              }
+      
+              // if none of the checkboxes were checked then return false (invalid entry)
+              if (!checked) {
+                return false;
+              }
+      
+              // if a checkbox is checked, then it was a valid response and we return true
+              return true;
+            }
         
-        // sets valid to false if no checkboxes have been checked
-        if (!checked){
-          valid = false;
-        }
-        resultsArray.push(valid, consented);//, email.value);
-
-        return resultsArray;
-      }
-  
-
-    // sends the user response to the server to be stored as a csv
-    // (helper for submit form)
-    async function sendResults(consented){//, email){
-
-      // user data about type of experiment and user ID
-      const userId = sessionStorage.getItem('userId');
-      const userType = sessionStorage.getItem('userType');
-      const experimentSource =  sessionStorage.getItem('experimentSource');
-      const experimentType = sessionStorage.getItem('experimentType');
-
-      const url = `/api/storeConsentInfo`;
-
-      // package the results in an Object to later stringify
-      let results = {'consented' : consented}//, 'email' : email};
-
-      console.log(results);
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type' : 'application/json'},
-        body: JSON.stringify({
-              'userId' : userId, 
-              'userType' : userType,
-              'experimentSource' : experimentSource,
-              'experimentType' : experimentType,
-              'results' : JSON.stringify(results)})
-        });
-        return await response.json();
-      } 
-
-
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-    // --------------------------------------------------------------------------------
-  
-
-    // ensures that only one checkbox is selected at a time for a given question
-    function uncheckOthers(groupName, currentCheckbox) {
-      const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
-      checkboxes.forEach(checkbox => {
-        if (checkbox !== currentCheckbox) {
-           checkbox.checked = false;
+      
+          // sends the user response to the server to be stored as a csv
+          // (helper for submit form)
+          async function sendResults(consented){
+      
+            // user data about type of experiment and user ID etc...
+            const userId = sessionStorage.getItem('userId');
+            const userType = sessionStorage.getItem('userType');
+            const experimentSource =  sessionStorage.getItem('experimentSource');
+            const experimentType = sessionStorage.getItem('experimentType');
+            const fileName = 'consentInfo.csv';
+      
+            // url for the route that stores their consent status
+            const url = `/api/storeResponses`;
+      
+            // package the results in an Object to later stringify
+            let results = {'consented' : consented};
+      
+            // try sending sign in data to server, keep trying until we get an "ok" response (response code in the 200s range)
+            const maxRetries = 3;
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+              try {
+      
+                // AJAX request to the server to store consent info
+                const response = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type' : 'application/json'},
+                body: JSON.stringify({
+                      'userId' : userId, 
+                      'userType' : userType,
+                      'experimentSource' : experimentSource,
+                      'experimentType' : experimentType,
+                      'fileName' : fileName,
+                      'results' : JSON.stringify(results)})
+                });
+      
+                  // If the response was "ok" then return the server's response
+                  if (response.ok) {
+                    return await response.json();
+                  } 
+                  // otherwise we log the error (visible under inspect element)
+                  else {
+                    console.error(`Attempt ${attempt} at logging user sign in times: Server responded with status ${response.status}`);
+                  }
+               }
+               // if the code fails due to some error, then...
+               catch (error) {
+                console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+               }
+            }
+            // final error thrown after we have exhausted the maximum number of retries
+            throw new Error(`Failed to log sign-in after ${maxRetries} attempts`);
           }
-        });
-    };
-
-    // prevents back navigation through experiment to best of my ability
-    history.pushState(null, document.title, location.href);
-    window.onpopstate = function (event) {
-        console.log("Back navigation attempted");
-        history.pushState(null, document.title, location.href);
-        };
-  </script>
-</body>
-</html>
+      
+          // --------------------------------------------------------------------------------
+          // --------------------------------------------------------------------------------
+          // --------------------------------------------------------------------------------
+        
+      
+          // ensures that only one checkbox is selected at a time for a given question
+          function uncheckOthers(groupName, currentCheckbox) {
+            const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
+            for (checkbox of checkboxes) {
+              if (checkbox !== currentCheckbox) {
+                 checkbox.checked = false;
+                }
+            };
+          };
+        </script>
+      </body>
+  </html>

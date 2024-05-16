@@ -1,3 +1,8 @@
+<!-- Things to check in this file: User behavior statistics appear correct, user gets served a homily properly, 
+      the homily that they are served is of the right type, the user is redirected to another homily if they 
+      are not done with homilies and redirected to the first of the questionnaires if they are done, 
+      the user can reload the homily by refreshing the page, the user can rewind the homily but cannot
+      fast forward through it (fast forward past the furthest point they have already achieved)-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,10 +11,10 @@
     <style>
         .audio-container {
             font-family: 'Times New Roman', Times, serif;
-            width: 80%; /* or any width you prefer */
-            border: 1px solid #000; /* optional: for styling */
+            width: 80%;
+            border: 1px solid #000; 
             margin: auto;
-            position: relative; /* for positioning the audio element */
+            position: relative; 
             padding: 20px;
         }
         audio{
@@ -67,11 +72,10 @@
     </style>
 </head>
 <body onload="initialize()">
-
     <main id="instructionsSection">
         <div class="audio-container">
             <div id="loadingSpinner" class="spinner"></div> <!-- Spinner container -->
-            <audio id='homilyAudio' onvolumechange= "volumeChange(this)" controls disablePictureInPicture controlsList="nodownload noplaybackrate"></audio>
+            <audio id='homilyMedia' onvolumechange= "volumeChange(this)" controls disablePictureInPicture controlsList="nodownload noplaybackrate"></audio>
         </div>
         <p id= "loadingMessage">Your homily is loading, thank you for your patience.</p>
         <p id= "loadedMessage" style="display: none;">Press the continue button once you have completed the homily.</p>
@@ -81,7 +85,7 @@
         </center>
     </main>
     
-    <script>
+<script>
 
     // JavaScript code to check the user number and redirect if it's missing
     document.addEventListener('DOMContentLoaded', function() {
@@ -94,282 +98,548 @@
             window.location.href = 'enter_user_number.html';
         }
     });
-        sessionStorage.setItem('userType', 'laymen');
-        sessionStorage.setItem('experimentSource', 'prolific');
-        sessionStorage.setItem('experimentType', 'audio');
+
+    const extension = '.mp3'; 
+
+    // set session storage variables
+    sessionStorage.setItem('userType', 'laymen');
+    sessionStorage.setItem('experimentSource', 'prolific');
+    sessionStorage.setItem('experimentType', 'audio');
+
+    // this block of code fetches a random unused homily and displays it
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+
+    // some global variables for keeping track of user's progress and preventing them
+    // from skipping through the homily
+    var seconds_achieved = [0]; // keeps track of moments a user obtained
+    var furthestPoint = 0; // keeps track of the furthest point a user has achieved in the homily
+    var lastUpdateTime = 0; // last time in the homily that the user's progress file was updated
+
+    // initialize by getting a random audio and setting session variable
+    async function initialize() {
+
+      // retrieves a homily from the server to show the user
+      const homily = await fetchRandomVideo();
+
+      // get the media element of the html to put our homily into
+      const mediaElement = document.getElementById('homilyMedia');
+
+      // place the homily into the media element
+      mediaElement.src = homily.media;
+
+      // update our variables that prevent the user from skipping forwards
+      // and clock how often the user's progress file gets updated
+      lastUpdateTime = homily.playbackTime;
+      furthestPoint = homily.playbackTime;
+      for (let i = 1; i <= homily.playbackTime; i++) {
+        seconds_achieved.push(i);
+      }
+
+      // place the user at the proper point in the homily
+      mediaElement.currentTime = homily.playbackTime;
+
+      // store the homilyID in the session storage for their questionnaire
+      sessionStorage.setItem('homilyId', homily.media);
+
+      // hide audio and display spinner until audio can play through without buffering
+      mediaElement.addEventListener('canplaythrough', function() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('loadingMessage').style.display = 'none';
+            mediaElement.style.visibility = 'visible';
+            document.getElementById('loadedMessage').style.display = 'block';
+            document.getElementById('submitButton').style.display = 'block';
+            }, {once: true});
+    }
     
-        // this block of code fetches a random unused homily and displays it
-        // ---------------------------------------------------------------------------
-        // ---------------------------------------------------------------------------
+    
+    // fetches a random unused homily from server (helper for "initialize()")
+    async function fetchRandomVideo(){
+
+      // user information variables
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource =  sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+
+      // url for the route that serves the user a homily
+      const url = `/api/randomHomily/${userId}/${userType}/${experimentSource}/${experimentType}`;
+
+      // maximum number of times we will try to contact the server
+      const maxRetries = 3; 
+      for (let attempt = 1; attempt <= maxRetries; attempt ++) {
+
+        // try getting a homily from the server
+        try {
+        
+          // get the server's response to our request
+          const response = await fetch(url)
+        
+          // if the server's response is OK (200s range), then...
+          if (response.ok) {
+
+            // parse the response and extract the path to the homily
+            const homily = await response.json();
+            return homily;
+          }
+          // if the server's response is not ok, then log the error to the console
+          else {
+            console.error(`Attempt ${attempt} at retrieving a homily: Server responded with status ${response.status}`);
+          }
+        }
+        // if the code fails due to some error, then...
+        catch (error) {
+            console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+        }
+      }
+
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to retrieve a homily after ${maxRetries} attempts`);
+    }
+
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+
+
+    // This brick of code is for preventing the user from
+    // skipping through the homily and keeping track of their behavior while watching
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+    let isSeeking = false;
+    const mediaElement = document.getElementById('homilyMedia');
+
+    // variables for keeping track of various user actions while homily 
+    // is playing (pauses, tab switches, duration of each and number of rewinds)
+
+    // counts number of pauses (subtract by one later on because end of homily counts as a pause)
+    let pauseCounter = 0; 
+
+    // timers for amount of time spent paused and spent playing the homily
+    let pauseTimer = 0;
+    let playTimer = 0; 
+
+    // keeps track of the last time the user paused and the last time they pressed play
+    let lastPauseTime = Date.now();
+    let lastPlayTime = Date.now();
+    let isInitialPlay = true;
+
+    // keeps track of how many times/for how long the user spent time on other tabs
+    let tabSwitchesCounter = 0;
+    let timeOnHomilyTab = 0; 
+    let timeOffHomilyTab = 0;
+    let lastSwitchTime = Date.now();
+    let visibilityEverChanged = false;
+
+    // how many times the user rewound the homily 
+    let numRewinds = 0; 
+
+
+    // listener for handling events related to the homily progressing (when the time updates)
+    // this includes preventing skipping through the homily and updating the user's progress
+    // through the homily in case they need to reload the homily
+    mediaElement.addEventListener('timeupdate', async function() {
+        
+        // retrieve the current time in the homily
+        const currentTime = Math.floor(mediaElement.currentTime);
+
+        // we limit how often this function fires because it will be getting called constantly.
+        // We want to make sure that successive calls to this function happen successively.
+        // For example we don't want the second call to happen before the first call or something like that.
+        // Furthermore, there are other event listeners in this file and we want to make sure that this doesn't 
+        // fire twice before the first call to this function is completed. I am kind of talking out of my ass right now
+        // but this is my intuitive understanding of what is going on. Basically, this thing gets called so often that
+        // it screws with the order in which you might think everything else would happen.
+        // We remedy this by introducing a limit on how often this gets called so that everything else happens in a more
+        // predictable, intuitive way. That's JavaScript for you. However, I might be entirely incorrect about this, but the 
+        // one thing I know is that if you fuck with this, then the thing you want to have happen won't happen, or it will 
+        // happen with less consistently. There is probably a better way to do this, but if you are looking at this then
+        // you are likely a student of the social sciences and are not experienced in JavaScript. Unless you really know your shit,
+        // don't change it. I imagine this makes me sound like a bit of an asshole. That is true. I am a bit of a dick too. 
+        // FYI: "setTimeout" basically says 'run this function after a specified amount of time'. We specify this time at the very end.
+        setTimeout(function() {
+          
+          // if the homily is past the furthest point attained thus far, and they are not using the scroll bar to do so
+          // i.e. if the user is just watching the video as opposed to trying to skip through it
+          if ((currentTime > furthestPoint)  && !isSeeking) {
+
+            // only update the furthest point attained if the homily's previous second attained.
+            // For example, we don't want the user moving to the 120-second mark if they haven't 
+            // watched second 119. We only update the time if they have watched everything that came before.
+            // This is a check to prevent them from skipping through the homily. Javascript is janky. So sometimes
+            // you have to add 1000 bandaids to get the functionality you're looking for even if some simpler
+            // logic makes sense to you. Preventing the user from skipping through the homily is one such case.
+            if (Math.floor(currentTime) - 1 == seconds_achieved[seconds_achieved.length - 1]) {
+
+              // update the "furthestPoint" that the user has obtained
+              furthestPoint = currentTime;
+
+              // Only add the current timestamp to the seconds_achieved list if it hasn't already been added.
+              // Since this listener fires constantly, we don't want to add too many values to the seconds_achieved list.
+              // This if-statement ensures that we only add a value once. The list will look like [1,2,3,4,...] instead of
+              // [1,1,1,1,1,1,2,2,2,2,2,3,3,3,3,3,3,....] which would happen if we did not do this check since this listener
+              // is constantly firing.
+              if (!seconds_achieved.includes(furthestPoint)) {
+                seconds_achieved.push(Math.floor(currentTime));
+              }
+            }
+          }
+        },        1); 
+             // ^^^^^
+             // sets a 1ms delay on things. I honestly don't know why this works but it does. Getting rid of it or changing the value causes problems.
+        
+
+        // this part of the listener updates the user's progress file on the server.
+
+        // url for the route that updates the user's progress on the homily
+        const url = `/api/updatePlaybackTime`;
+
+        // information about the user
         const userId = sessionStorage.getItem('userId');
         const userType = sessionStorage.getItem('userType');
-        const experimentSource = sessionStorage.getItem('experimentSource');
+        const experimentSource =  sessionStorage.getItem('experimentSource');
         const experimentType = sessionStorage.getItem('experimentType');
-        let seconds_achieved = [0]; // keeps track of moments a user obtained
-        let furthestPoint = 0; // at beginning of 
-        let lastUpdateTime = 0;
-        const url = `/api/randomHomily/${userId}/${userType}/${experimentSource}/${experimentType}`;
-    
-        // initialize by getting a random audio and setting session variable
-        function initialize(){
-            fetchRandomVideo().then(homily => {
-                if(homily){
-                console.log(homily.media);
-                const audioElement = document.getElementById('homilyAudio');
-                //audioElement.src = String(homily.media).replace('.mp4', 'snipped.mp4');
-                audioElement.src = homily.media;
-                lastUpdateTime = homily.playbackTime;
-                furthestPoint = homily.playbackTime;
-                for (let i = 1; i <= homily.playbackTime; i++) {
-                    seconds_achieved.push(i);
-                }
-                audioElement.currentTime = homily.playbackTime;
-                sessionStorage.setItem('homilyId', homily.media);
-                
-                // hide audio and display spinner until audio can play through without buffering
-                audioElement.addEventListener('canplaythrough', function() {
-                    document.getElementById('loadingSpinner').style.display = 'none';
-                    document.getElementById('loadingMessage').style.display = 'none';
-                    audioElement.style.visibility = 'visible';
-                    document.getElementById('loadedMessage').style.display = 'block';
-                    document.getElementById('submitButton').style.display = 'block';
-                }, {once: true});
-                } else{
-                    console.error('Failed to fetch homily.');
-                }
-            })
-        }
-    
-    
-        // fetches a random unused homily from server (helper for "initialize()")
-        async function fetchRandomVideo(){
-            try {
-                const homily = await fetch(url);
-                if (!homily.ok){
-                    throw new Error('HTTP error! status: ${homily.status}');
-                }
-                return await homily.json();
-            } catch(error){
-                console.error('Error fetching data: ', error);
-                return null;
-            }
-        }
-        // ---------------------------------------------------------------------------
-        // ---------------------------------------------------------------------------
-    
-    
-        // This brick of code is for preventing the user from
-        // skipping through the homily
-        // ---------------------------------------------------------------------
-        // ---------------------------------------------------------------------
-        let isSeeking = false;
-        const audio = document.getElementById('homilyAudio');
-    
-            // variables for keeping track of various user actions while homily 
-        // is playing (pauses, tab switches, duration of each and number of rewinds)
-        let pauseCounter = 0; // subtract by one later on because end of homily counts as a pause
-        let pauseTimer = 0;
-        let playTimer = 0; // variables for pauses counts and time paused and time playing homily
-        let lastPauseTime = Date.now();
-        let lastPlayTime = Date.now();
-        let isInitialPlay = true;
-    
-        let tabSwitchesCounter = 0;
-        let timeOnHomilyTab = 0; // variables for times the tab was switched and time on tab vs ...
-        let timeOffHomilyTab = 0;
-        let lastSwitchTime = Date.now();
-    
-        let numRewinds = 0; // how many times the user rewound the homily more than one second
-    
-    
-        // update the furthest point attained in the homily
-        // update the furthest point attained in the homily
-    audio.addEventListener('timeupdate', function() {
-        const currentTime = Math.floor(audio.currentTime);
+        const homilyId = sessionStorage.getItem('homilyId');
 
-           
-        setTimeout(function() {
-        if ((audio.currentTime > furthestPoint)  && !isSeeking) {
-
-            // only update the furthest point attained if the homily's previous second attained
-            if ((Math.floor(audio.currentTime) - 1) == seconds_achieved[seconds_achieved.length - 1]){
-                furthestPoint = audio.currentTime; // update furthest point
-
-                // add a given value to the attained times only once
-                if (!(Math.floor(audio.currentTime) == seconds_achieved[seconds_achieved.length - 1])){
-                    seconds_achieved.push(Math.floor(audio.currentTime));
-                }
-                if (currentTime - lastUpdateTime >= 30) {
-          
-            // Send an update to the server
-          fetch('/api/updatePlaybackTime', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({'homilyPath': audio.src,
-                                    'playbackTime' : currentTime,
-                                    'userId' : userId, 
-                                    'userType' : userType,
-                                    'experimentSource' : experimentSource,
-                                    'experimentType' : experimentType}),
-          });
-          // Update the last update time
-          lastUpdateTime = currentTime;}
-            }};}, 1);
-    });
-    
-    
-        // check if the user is trying to navigate through the homily
-        audio.addEventListener('seeking', function(event) {
-            isSeeking = true;
-        });
-    
-        // check when the user has stopped trying to navigate through the homily
-        audio.addEventListener('seeked', function(event){
-            if (audio.currentTime > furthestPoint){
-                audio.currentTime = furthestPoint;
-            } else if (audio.currentTime < furthestPoint - 0.1) {
-                numRewinds += 1;
-            }
-            isSeeking = false;
-        });
-    
-            // captures number of tab switches 
-            document.addEventListener('visibilitychange', () => {
-            const currentTime = Date.now();
-            const elapsed = currentTime - lastSwitchTime;
-            lastSwitchTime = currentTime; // Update the last switch time to the current time
-    
-            if (document.visibilityState === 'visible') {
-                timeOffHomilyTab += elapsed;
-            } else if (document.visibilityState === 'hidden') {
-                timeOnHomilyTab += elapsed;
-                tabSwitchesCounter++; // Increment the switch away from homily tab counter
-            }
-        });
-    
-        // Final times and switch count when the user leaves the page
-        window.addEventListener('beforeunload', () => {
-            const currentTime = Date.now();
-            const elapsedTab = currentTime - lastSwitchTime;
-            if (document.visibilityState === 'visible') {
-                timeOnHomilyTab += elapsedTab;
-            } else {
-                timeOffHomilyTab += elapsedTab;
-            }
-        });
-    
-        audio.addEventListener('pause', () => {
-            playTimer += Date.now() - lastPlayTime;
-            lastPauseTime = Date.now();
-        });
-    
-        audio.addEventListener('play', () => {
-            lastPlayTime = Date.now(); // Record the time when the audio started playing
-            if (isInitialPlay == true) {
-                isInitialPlay = false;
-            } else {
-                if (Date.now() - lastPauseTime > 5000) {
-                pauseCounter += 1;
-            }   
-                pauseTimer += Date.now() - lastPauseTime;
-            }
-        });
-    
-            // prevents the user from changing the rate of playback
-            document.addEventListener("DOMContentLoaded", function() {
-            let homilyAudio = document.getElementById('homilyAudio');
-    
-            homilyAudio.addEventListener('ratechange', function() {
-            if (homilyAudio.playbackRate != 1) {
-                homilyAudio.playbackRate = 1;
-            }
-        });
-        });
-    
-        // make sure that the volume is set to full so the user cannot
-        // watch other audios
-        function volumeChange(vid) {
-            vid.volume = 1;
-            vid.muted = false;
-        };
+        // if it has been more than x seconds since the last time we updated the user's progress file, then...
+        if (seconds_achieved[seconds_achieved.length - 1] - lastUpdateTime >= 15) {
         
-        // ---------------------------------------------------------------------
-        // ---------------------------------------------------------------------
-    
-    
-        // sends the user beahvior data to the server to be stored as a csv
-        // (helper for submit form)
-        async function sendResults(pauseCounter, pauseTimer, playTimer,
-            tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds){
-            console.log('here');
-            
-          const userId = sessionStorage.getItem('userId');
-          const userType = sessionStorage.getItem('userType');
-          const homilyId = sessionStorage.getItem('homilyId');
-          const experimentSource = sessionStorage.getItem('experimentSource');
-          const experimentType = sessionStorage.getItem('experimentType');
-          const url2 = `/api/storeUserBehavior`;
-    
-          // collect header and data
-          header = ['Number of pauses > 5 seconds', 'Time spent paused', 'Time spent playing', 
-            'Times user switched tabs', 'Time spent on other tabs', 'Time spent on experiment tab', 
-            'Number of rewinds'];
-          data = [String(pauseCounter), String(pauseTimer / 1000), String(playTimer / 1000), String(tabSwitchesCounter), 
-            String(timeOffHomilyTab / 1000), String(timeOnHomilyTab / 1000), String(numRewinds)];
-    
-          // package the results in an Object to later stringify
-          let results = {}
-          for (let i = 0; i < header.length; i++){
-            results[String(header[i])] = String(data[i]);
+          // maximum number of times we request the server updates the user's progress
+          const maxRetries = 3;
+          for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
+
+            // try updating the user's progress file for this homily on the server
+            try {
+
+              // AJAX request to the server to update the user's progress file for this homily
+              const response = await fetch(url, {
+              method: 'POST',
+              headers: {'Content-Type' : 'application/json'},
+              body: JSON.stringify({
+                'userId' : userId, 
+                'userType' : userType,
+                'experimentSource' : experimentSource,
+                'experimentType' : experimentType,
+                'homilyPath' : homilyId,
+                'playbackTime' : currentTime})
+              });
+
+              // If the response was "ok" then return the server's response and update the last time we updated the progress
+              if (response.ok) {
+                lastUpdateTime = currentTime;
+              } 
+              // otherwise we log the error (visible under inspect element)
+              else {
+                console.error(`Attempt ${attempt} at logging user sign in times: Server responded with status ${response.status}`);
+              }
+            }
+            // if the code fails due to some error, then...
+            catch (error) {
+              console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+            }
           }
+        
+
+          // send behavior results every 15 seconds to handle reloads and whatnot
+          await sendResults(pauseCounter, pauseTimer, playTimer, tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds);
+
+          // reset variables
+          pauseCounter = 0;
+          pauseTimer = 0;
+          playTimer = 0;
+          tabSwitchesCounter = 0;
+          timeOffHomilyTab = 0; 
+          timeOnHomilyTab = 0;
+          numRewinds = 0;
+        }
+    });
+
+
+    // listener to check if the user is trying to navigate through the homily using the scroll bar
+    // i.e. the user is 'unfaithfully' trying to navigate through the homily
+    mediaElement.addEventListener('seeking', function(event) {
+        isSeeking = true;
+    });
+
+
+    // listener to check when the user has stopped trying to navigate through the homily
+    mediaElement.addEventListener('seeked', function(event) {
+
+        // if the time that the user selected is further than the furthest time that they
+        // have 'faithfully' achieved, then reset them to the last time that they 'faithfully' achieved.
+        // Basically, it allows them to navigate backwards through the homily, but skip their way
+        // forwards through the homily
+        if (mediaElement.currentTime > furthestPoint){
+            mediaElement.currentTime = furthestPoint;
+        }
+        // if they do navigate backwards, then increase the number of rewinds by 1 
+        else if (mediaElement.currentTime < furthestPoint - 0.1) {
+            numRewinds += 1;
+            console.log('number of rewinds: ' + String(numRewinds));
+        }
+        // set the 'isSeeking' variable to false to reflect that the user is no longer trying
+        // to 'seek' their way through the homily. 
+        isSeeking = false;
+    });
+
+
+    // listener to keep track of when the user switches tabs away from the homily/switches tabs back to the homily
+    document.addEventListener('visibilitychange', () => {
+
+      // current time (not current time in the homily, current time according to the user's computer)
+      const currentTime = Date.now();
+
+      // how much time has elapsed since the last time they switched tabs
+      // (The time elapsed since they last switched TO the homily tab or switched AWAY from the homily tab)
+      const elapsed = currentTime - lastSwitchTime;
+
+      // Update the last time they switched tabs time to the current time
+      lastSwitchTime = currentTime; 
+
+      // if the user switches TO the homily, add the elapsed time to the variable that keeps track of how
+      // much time they spent AWAY from the homily tab
+      if (document.visibilityState === 'visible') {
+        timeOffHomilyTab += elapsed;
+        console.log('time off of homily tab: ' + String(timeOffHomilyTab));
+      }
+
+      // If the user switches AWAY from the homily, add the elapsed time to the variable that keeps track
+      // of how much time they spent ON the homily tab 
+      else {
+        timeOnHomilyTab += elapsed;
+        console.log('time on of homily tab: ' + String(timeOnHomilyTab));
+
+        // mark that the user has switched away from the homily tab at least once
+        visibilityEverChanged = true;
+
+        // also add to the counter keeping track of how many times the user switched AWAY from the homily
+        tabSwitchesCounter++; 
+        console.log('tab switches: ' + String(tabSwitchesCounter));
+      }
+    });
+
+
+    // Add a listener to handle what we do when the homily ends and the user presses "continue"
+    // If the user never switched, then our above logic would never add to the amount of time the
+    // user spent on the homily. So this is one final check to keep track of that
+    window.addEventListener('beforeunload', () => {
+
+      // current time according to the user's computer
+      const currentTime = Date.now();
+
+      // elapsed time (should be roughly the length of the homily)
+      const elapsedTab = currentTime - lastSwitchTime;
+
+      // add to the proper variable (not sure if this if-else statement is necessary)
+      if (document.visibilityState === 'visible') {
+        timeOnHomilyTab += elapsedTab;
+      } 
+      else {
+        timeOffHomilyTab += elapsedTab;
+      }
+    });
+
+
+    // listener to keep track of the number of times that the user pauses the homily
+    mediaElement.addEventListener('pause', () => {
+
+      // Since the user just paused, we add the amount of time they just spent playing the homily
+      playTimer += Date.now() - lastPlayTime;
+      console.log('play timer: ' + String(playTimer));
+
+      // Since the user just paused, set the variable that keeps track of the last time that the 
+      // user paused the homily to the current time
+      lastPauseTime = Date.now();
+    });
+
+
+    // listener to handle when the user presses the play button on the homily
+    mediaElement.addEventListener('play', () => {
+
+        // update the last time (accd. to the user's computer) that the user pressed play
+        lastPlayTime = Date.now(); 
+
+        // since starting the homily counts as playing the homily, we don't want time that the user
+        // spent BEFORE starting the homily to count as time spent paused. We are only interested in the 
+        // time they spent paused AFTER starting the homily. No one becomes disengaged BEFORE they start 
+        // the homily. They become disengaged and distracted AFTER starting the homily. Why penalize someone
+        // if they needed a couple of minutes to center themselves before watching a homily? That is very
+        // different than taking a break mid-homily. Those are two very different scenarios and we should
+        // treat them as such. The former are heroes worthy of our admiration. They are 
+        // dedicated to buying-in to the experiment and participating faithfully, giving us the data that
+        // we desire. The latter are bad people. Not good human beings. They are barely worthy of the emotional energy
+        // it would take to hold them in contempt.
+        // Any who, if this is the first time the pressed the play button (started the homily), then... 
+        if (isInitialPlay == true) {
+            
+          // update the variable indicating whether or not this is the first time they pressed play (started the homily)
+          lastPlayTime = Date.now();
+          isInitialPlay = false;
+        }
+        // if this is not the initial play, then they have just unpaused the homily. Therefore...
+        else {
+          
+          // if their pause has lasted for more than 5 seconds, then...
+          // (we set it to 5 seconds because rewinds/fastforwards count as pauses. These are momentary so we )
+          if (Date.now() - lastPauseTime > 5000) {
+
+            // increment the number of pauses by 1
+            pauseCounter += 1;
+            console.log('pause counter: ' + String(pauseCounter));
+
+            // since the user just unpaused the homily, add the amount of time they spent paused to 
+            // the amount of time the user has had the homily paused for
+            pauseTimer += Date.now() - lastPauseTime;
+            console.log('pause timer: ' + String(pauseTimer));
+          }
+        }
+    });
+
+    // listener that prevents the user from changing the rate of playback
+    // (First we need to make sure that the page has fully loaded. IDK why but causes issues
+    // if we don't wait for this on some browsers)
+    document.addEventListener("DOMContentLoaded", function() {
     
-          console.log(results);
-          const response = await fetch(url2, {
-            method: 'POST',
-            headers: {'Content-Type' : 'application/json'},
-            body: JSON.stringify({
-                  'userId' : userId, 
-                  'userType' : userType,
-                  'homilyId' : homilyId,
-                  'experimentSource' : experimentSource,
-                  'experimentType' : experimentType,
-                  'results' : JSON.stringify(results)})
-            });
+      // then we listen for if the user tries to change the rate of playbacl
+      mediaElement.addEventListener('ratechange', function() {
+
+        // if the user tries to change the rate of playback from anything other than normal speed, then...
+        if (mediaElement.playbackRate != 1) {
+          
+          // set the rate of playback to normal speed
+          mediaElement.playbackRate = 1;
+        }
+      });
+    });
+
+    // Little function that gets called if the user tries to change the audio level.
+    // It ensures that the only way to mute the homily or reduce its audio level is to
+    // mute your computer (or mute the tab)
+    function volumeChange(vid) {
+        vid.volume = 1;
+        vid.muted = false;
+    };
+    
+    // ---------------------------------------------------------------------
+    // ---------------------------------------------------------------------
+
+
+    // If the user presses the 'continue' button then check if they have 
+    // completed the homily or show them an error message
+    async function submitForm() {
+
+      // if the user has not completed the homily, then...
+      if (furthestPoint < mediaElement.duration - 1) { 
+        
+        // recover the errorMessage element of the HTML
+        let errorMessage = document.getElementById('errorMessage');
+
+        // display the error message (set it to visible)
+        errorMessage.style.display = 'block';
+
+        // remove the error message after displaying it for 3 seconds
+        setTimeout(function() {
+            errorMessage.style.display = 'none'
+        }, 3000);
+
+        // exit this function
+        return
+      }
+      // If the user has completed the homily, then...
+      else {
+
+        // current time according to the user's computer
+        const currentTime = Date.now();
+
+        // elapsed time (should be roughly the length of the homily)
+        const elapsedTab = currentTime - lastSwitchTime;
+
+        // add final value to time on homily tab
+        timeOnHomilyTab += elapsedTab;
+
+        // send the user's behavorial results to the server
+        await sendResults(pauseCounter, pauseTimer, playTimer, tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds);
+
+        // redirect the user to the questionnaire for the homily
+        window.location.href = 'questionnaire.html';
+      }
+    }
+    
+
+    // sends the user behavior data to the server to be stored
+    async function sendResults(pauseCounter, pauseTimer, playTimer, tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds) {
+        
+      // retrieve information about the user
+      const userId = sessionStorage.getItem('userId');
+      const userType = sessionStorage.getItem('userType');
+      const experimentSource = sessionStorage.getItem('experimentSource');
+      const experimentType = sessionStorage.getItem('experimentType');
+      const filePath = sessionStorage.getItem('homilyId');
+
+      // extract the homily number so we can create the file name of the behavior file we store on the server
+      // Split the string on the backslash
+      var parts = filePath.split("\\");
+
+      // Get the last element from the array
+      var homilyName = parts[parts.length - 1];
+
+      // Remove the extension part and get the number
+      var homilyNumber = homilyName.replace(extension, "");
+
+      // construct the filename for our behavior file
+      const fileName = homilyNumber + '_Behavior.json';
+      
+      // url for the route that stores the behavior data
+      const url = `/api/storeResponses`;
+
+      // collect header and data
+      const header = ['Number of pauses > 5 seconds', 'Time spent paused', 'Time spent playing', 
+        'Times user switched tabs', 'Time spent on other tabs', 'Time spent on experiment tab', 
+        'Number of rewinds'];
+      const data = [String(pauseCounter), String(pauseTimer / 1000), String(playTimer / 1000), String(tabSwitchesCounter), 
+        String(timeOffHomilyTab / 1000), String(timeOnHomilyTab / 1000), String(numRewinds)];
+
+      // package the results in an Object to later stringify
+      var results = {}
+      for (let i = 0; i < header.length; i++){
+        results[String(header[i])] = String(data[i]);
+      }
+
+      // try sending sign in data to server, keep trying until we get an "ok" response (response code in the 200s range)
+      const maxRetries = 3;
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+
+          // AJAX request to the server to store consent info
+          const response = await fetch(url, {
+          method: 'POST',
+          headers: {'Content-Type' : 'application/json'},
+          body: JSON.stringify({
+                'userId' : userId, 
+                'userType' : userType,
+                'experimentSource' : experimentSource,
+                'experimentType' : experimentType,
+                'fileName' : fileName,
+                'results' : JSON.stringify(results)})
+          });
+
+          // If the response was "ok" then return the server's response
+          if (response.ok) {
             return await response.json();
           } 
-    
-        // see if user has completed homily and if so, allow them to proceed
-        function submitForm() {
-    
-            // if not completed, show error message
-            if (furthestPoint < audio.duration - 1){ // change to ... < audio.duration in final code
-                //console.log(furthestPoint);
-                let text = document.getElementById('errorMessage');
-                text.style.display = 'block';
-                setTimeout(function() {
-                    text.style.display = 'none'
-                }, 3000);
-                return
-            }
-            if (document.visibilityState === 'visible') {
-                timeOnHomilyTab += Date.now() - lastSwitchTime;
-            } else {
-                timeOffHomilyTab += Date.now() - lastSwitchTime;
-            }
-            sendResults(pauseCounter, pauseTimer, playTimer,
-        tabSwitchesCounter, timeOffHomilyTab, timeOnHomilyTab, numRewinds).then(response => {
-            console.log('here');
-            // If completed, then proceed to questionnaire
-            window.location.href = "questionnaire.html";
+          // otherwise we log the error (visible under inspect element)
+          else {
+            console.error(`Attempt ${attempt} at saving behavioral data: Server responded with status ${response.status}`);
+          }
         }
-        );
+        // if the code fails due to some error, then...
+        catch (error) {
+          console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
         }
+     }
+     // final error thrown after we have exhausted the maximum number of retries
+     throw new Error(`Failed to save behavioral data after ${maxRetries} attempts`);
+    }
     
-        // prevents the user from navigating backwards through the experiment
-        history.pushState(null, document.title, location.href);
-        window.addEventListener('popstate', function (event) {
-            history.pushState(null, document.title, location.href);
-        });
     </script>
     </body>
 </html>

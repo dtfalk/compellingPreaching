@@ -1,3 +1,7 @@
+<!-- Things to test in this file: The user's test response includes an "@" symbol, invalid response triggered if
+      they don't provide a consent repsonse OR they do not provide a valid email, user is redirected to non consent 
+      screen if they choose the non consent option, user is redirected to the introduction/instructions if they do 
+      consent, the user's consent info gets stored on the server -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,7 +58,11 @@
 
   <script>
 
-    // JavaScript code to check the user number and redirect if it's missing
+    sessionStorage.setItem('userType', 'laymen');
+    sessionStorage.setItem('experimentSource', 'prolific');
+    sessionStorage.setItem('experimentType', 'audio'); 
+
+    // If we lose the user ID, force the user to re-enter their user number
     document.addEventListener('DOMContentLoaded', function() {
         // Retrieve the user number from sessionStorage
         var userNumber = sessionStorage.getItem('userId');
@@ -64,11 +72,7 @@
             // Redirect to the 'enter_user_number.html' page
             window.location.href = 'enter_user_number.html';
         }
-    });
-
-    sessionStorage.setItem('userType', 'laymen');
-    sessionStorage.setItem('experimentSource', 'prolific');
-    sessionStorage.setItem('experimentType', 'audio');  
+    }); 
 
     // this block of code creates and displays the questionnaire to the subject
     // --------------------------------------------------------------------------------
@@ -172,69 +176,81 @@
     // --------------------------------------------------------------------------------
     
     // submits the form and send data if complete, otherwise gives error message
-    function submitForm() {
+    async function submitForm() {
 
-      // results relating to the user's input (is it valid and what data did they provide)
-      const resultsArray = validateForm();
-      const isValid = resultsArray[0]; // get info about if the submission was valid
-      const consented = resultsArray[1] // true = consented, false = did not consent
-      const email = resultsArray[2] // the email address that the user entered
+      // check if the user provided a valid response (valid email address and selected a consent option)
+      const isValidResponse = await checkValidResponse();
 
-      if (!isValid) {
+      // if the user's responses were invalid, then...
+      if (!isValidResponse) {
+
+        // display error message for 3 seconds
         const errorMessage = document.getElementById('errorMessage');
         errorMessage.textContent = 'Please choose an option and enter a prolific email address';
-        setTimeout(function() {
-          errorMessage.textContent = '';
-        }, 3000);
+        setTimeout(function() {errorMessage.textContent = '';}, 3000);
       }
-      else{     
-        // if the user has consented to the terms of the homily review
-        if (consented){
-          sendResults(consented, email);
-          window.location.href = 'introduction.html';
-        } 
-        // if the user has not consented to the terms of the homily review
-        else{
-          sendResults(consented, email);
-          window.location.href = 'nonConsent.html';
+      // if the user's responses were valid, then...
+      else {     
+        
+        // extract their email address
+        const email = document.getElementById('email').value;
+
+        // see if they consented or not
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        var consented = false;
+
+        // iterate over the consent checkbox options
+        for (checkbox of checkboxes) {
+
+          // if the 'I consent' checkbox is checked then set the consented variable to true
+          if (checkbox.value === 'agree' && checkbox.checked){
+            consented = true;
           }
         }
+
+        // if the user consented, then save their data and redirect to experiment start
+        if (consented) {
+
+          // send their responses to the server to be stored in their data folder
+          await sendResults(consented, email);
+
+          window.location.href = 'introduction.html';
+        }
+        // if they did not consent, then send user to non consent screen
+        else {
+          window.location.href = 'nonConsent.html';
+        }
       }
+    }
     
 
     // ensures that the user has responded to all questions properly
-    function validateForm() {
+    async function checkValidResponse() {
+        
+        // collects the checkboxes (consent vs not consent) and the email they entered
         const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        const email = document.getElementById("email");
-        let valid = true; // assume valid entry. Check conditions and switch to false if a condition is not met.
-        let resultsArray = [];
-        let consented = false;
-
-        // check that the user has entered something akin to a uchicago email address
-        if (!email.value.includes("@")){ 
-          valid = false;
+        const email = document.getElementById("email").value;
+        
+        // check that the user has entered a valid email address 
+        if (!email.includes("@email.prolific.com")) { 
+          return false;
         }
 
         // checks that the user checked one of the boxes (i agree vs i do not agree)
         let checked = false;
-        for (let i = 0; i < checkboxes.length; i++) {
-          if (checkboxes[i].checked) {
+        for (checkbox of checkboxes) {
+          if (checkbox.checked) {
             checked = true;
-
-            // if the checked response is "I agree", then update the variable reflecting that the user consented
-            if (checkboxes[i].value == 'agree'){
-              consented = true;
-            }
           }
         }
-        
-        // sets valid to false if no checkboxes have been checked
-        if (!checked){
-          valid = false;
-        }
-        resultsArray.push(valid, consented, email.value);
 
-        return resultsArray;
+        // if none of the checkboxes were checked then return false (invalid entry)
+        if (!checked) {
+          return false;
+        }
+
+        // if a checkbox is checked and an email was provided, then it was a valid response and we return true
+        return true;
       }
   
 
@@ -242,31 +258,54 @@
     // (helper for submit form)
     async function sendResults(consented, email){
 
-      // user data about type of experiment and user ID
+      // user data about type of experiment and user ID etc...
       const userId = sessionStorage.getItem('userId');
       const userType = sessionStorage.getItem('userType');
       const experimentSource =  sessionStorage.getItem('experimentSource');
       const experimentType = sessionStorage.getItem('experimentType');
+      const fileName = 'consentInfo.csv';
 
-      const url = `/api/storeConsentInfo`;
+      // url for the route that stores their consent status and their email address
+      const url = `/api/storeResponses`;
 
       // package the results in an Object to later stringify
       let results = {'consented' : consented, 'email' : email};
 
-      console.log(results);
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {'Content-Type' : 'application/json'},
-        body: JSON.stringify({
-              'userId' : userId, 
-              'userType' : userType,
-              'experimentSource' : experimentSource,
-              'experimentType' : experimentType,
-              'results' : JSON.stringify(results)})
-        });
-        return await response.json();
-      } 
+      // try sending sign in data to server, keep trying until we get an "ok" response (response code in the 200s range)
+      const maxRetries = 3;
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
 
+          // AJAX request to the server to store consent info
+          const response = await fetch(url, {
+          method: 'POST',
+          headers: {'Content-Type' : 'application/json'},
+          body: JSON.stringify({
+                'userId' : userId, 
+                'userType' : userType,
+                'experimentSource' : experimentSource,
+                'experimentType' : experimentType,
+                'fileName' : fileName,
+                'results' : JSON.stringify(results)})
+          });
+
+            // If the response was "ok" then return the server's response
+            if (response.ok) {
+              return await response.json();
+            } 
+            // otherwise we log the error (visible under inspect element)
+            else {
+              console.error(`Attempt ${attempt} at logging user sign in times: Server responded with status ${response.status}`);
+            }
+         }
+         // if the code fails due to some error, then...
+         catch (error) {
+          console.error(`Attempt ${attempt}: Failed to fetch from ${url} with error ${error}`);
+         }
+      }
+      // final error thrown after we have exhausted the maximum number of retries
+      throw new Error(`Failed to log sign-in after ${maxRetries} attempts`);
+    }
 
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
@@ -276,19 +315,12 @@
     // ensures that only one checkbox is selected at a time for a given question
     function uncheckOthers(groupName, currentCheckbox) {
       const checkboxes = document.querySelectorAll(`input[name="${groupName}"]`);
-      checkboxes.forEach(checkbox => {
+      for (checkbox of checkboxes) {
         if (checkbox !== currentCheckbox) {
            checkbox.checked = false;
           }
-        });
+      };
     };
-
-    // prevents back navigation through experiment to best of my ability
-    history.pushState(null, document.title, location.href);
-    window.onpopstate = function (event) {
-        console.log("Back navigation attempted");
-        history.pushState(null, document.title, location.href);
-        };
   </script>
 </body>
 </html>

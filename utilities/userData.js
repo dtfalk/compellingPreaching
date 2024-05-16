@@ -4,9 +4,16 @@ const path = require('path');
 const logPath = path.join(__dirname, '..', '..', 'data', 'consoleResponses', 'log.txt');
 const errorPath = path.join(__dirname, '..', '..', 'data', 'consoleResponses', 'error.txt');
 
+// list of current homily numbers
+// update this if you add a homily
+const strongHomilyNumbers = ['1', '2'];
+const weakHomilyNumbers = ['3', '4'];
+const homilyNumbers = strongHomilyNumbers.concat(weakHomilyNumbers);
+
 // ========================================================================================================================================================================
 // ==================================== CLASSES ===========================================================================================================================
 // ========================================================================================================================================================================
+
 
 // ensures that only one person at a time can either read or write to the homilyUsage file
 class FileQueueHomilyUsage {
@@ -26,6 +33,7 @@ class FileQueueHomilyUsage {
 
 // initialize an instance of the homily usage queue
 const fileQueueHomilyUsage = new FileQueueHomilyUsage();
+
 
 // ensures that only one person at a time can access the log file
 class FileQueueLogFile {
@@ -50,28 +58,35 @@ const fileQueueLogFile = new FileQueueLogFile();
 // ================== HELPER FUNCTIONS ====================================================================================================================================
 // ========================================================================================================================================================================
 
-async function blippityBloop(wootwoot) {
-  const clamop = {
-    'h': 'd', 'j': 'e', 'p': 'w', '5': 'v', 'x': '2',
-    'k': '0', '-': 'f', 'g': '1', 'c': '9', 'y': 'l',
-    '6': 'q', '4': 'a', 'f': 'y', 'a': 'u', 'n': 'z',
-    'i': 't', 'l': 'i', 't': '8', 's': 'j', 'r': 'b',
-    '9': 'n', 'w': '-', 'u': '6', '3': 'h', 'd': 'o',
-    '0': 'x', 'm': 'g', 'q': 'c', 'z': 'r', '2': '5',
-    '8': 'k', '7': 's', 'b': '3', '1': 'm', 'e': '7',
-    'o': '4', '_': '_', 'v': 'p', '@': '@', '.': '.'
-  };
+// encodes user IDs
+async function blippityBloop(userId, userType) {
 
-  let slippery = Array.from(wootwoot).map(yup => clamop[yup] || yup).join('');
+  // if user type is expert, then return the user ID without modifying it
+  if (userType === 'expert') {
+    return userId;
+  }
+  // if user type is laymen, then encode their user ID
+  else {
+    const clamop = {
+      'h': 'd', 'j': 'e', 'p': 'w', '5': 'v', 'x': '2',
+      'k': '0', '-': 'f', 'g': '1', 'c': '9', 'y': 'l',
+      '6': 'q', '4': 'a', 'f': 'y', 'a': 'u', 'n': 'z',
+      'i': 't', 'l': 'i', 't': '8', 's': 'j', 'r': 'b',
+      '9': 'n', 'w': '-', 'u': '6', '3': 'h', 'd': 'o',
+      '0': 'x', 'm': 'g', 'q': 'c', 'z': 'r', '2': '5',
+      '8': 'k', '7': 's', 'b': '3', '1': 'm', 'e': '7',
+      'o': '4', '_': '_', 'v': 'p', '@': '@', '.': '.'
+    };
 
-  let sloppily = slippery.split('').reverse().join('');
+    let slippery = Array.from(userId).map(yup => clamop[yup] || yup).join('');
 
-  let stankily = sloppily.length > 1 ? sloppily.slice(-1) + sloppily.slice(1, -1) + sloppily[0] : sloppily;
+    let sloppily = slippery.split('').reverse().join('');
 
-  return stankily;
+    let stankily = sloppily.length > 1 ? sloppily.slice(-1) + sloppily.slice(1, -1) + sloppily[0] : sloppily;
+
+    return stankily;
+  }
 }
-
-
 
 // function to make writing to either the log or error file easier
 async function logToFile(message, filePath) {
@@ -88,111 +103,80 @@ async function logToFile(message, filePath) {
   });
 }
 
-// counts the number of homilies that have been used
-async function countHomiliesUsed(userId, userType, experimentSource, experimentType){
-  try {
-    let filePath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'usedHomilies.json');
-    } else {
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'usedHomilies.json');
-    }
-    try {
-      const rawdata = await fsp.readFile(filePath, 'utf8');
-      const data = JSON.parse(rawdata);
-      let result = 0;
-      for (let vidNum in data) {
-        if (data[vidNum] == true) {
-          result += 1;}}
-      return result;
 
-    } catch (error) {
-      await fileQueueLogFile.enqueue(async () => {
-        logToFile(('Error reading file: ' + error.message), errorPath);
-      });
-      console.error('Error reading file:', error);
-      throw error;}
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error counting the number of used homilies: ' + error.message), errorPath);
-    });
-    console.error('Error counting the number of used homilies: ', error.message);
+// returns a list of which homilies have been used (homily viewed + associated questionnaire completed)
+async function viewedHomilies(userId, userType, experimentSource, experimentType) {
+
+  // try to return a list of the homilies a viewer has used and completed the questionnaire for
+  try {
+
+    // set experiment source variable equal to '' if expert (it will come in as 'na' if it is an expert)
+    const source = await experimentSource === 'na' ? '' : experimentSource;
+
+    // get the path of the questionnaires folder so we can recover which homilies have been used
+    var folderPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires');
+
+    // collect a list of "target files" (i.e. 1.csv, 2.csv, ...) which are the questionnaire files
+    var targetFiles = [];
+    for (let homilyNumber of homilyNumbers) {
+      targetFiles.push(homilyNumber + '.csv');
+    }
+
+    // get a list of all files in the user's questionnaires folder
+    var fileList = await fsp.readdir(folderPath);
+
+    // iterate over all of the files and extract the ones that match our target files
+    var usedHomilies = [];
+    for (let file of fileList) {
+      for (let targetFile of targetFiles) {
+        if (file === targetFile) {
+          // remove the '.csv' from the end of the files we add to a list
+          usedHomilies.push(targetFile.replace('.csv', ''));
+        }
+      }
+    }
+
+    // return the list of homilies that the user has used and completed the associated questionnaire for
+    return usedHomilies;
   }
-}
-
-
-// returns a list of which homilies have been used
-async function HomiliesUsed(userId, userType, experimentSource, experimentType){
-  try {
-    let filePath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'usedHomilies.json');
-    } else {
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'usedHomilies.json');
-    }
-    try {
-      const rawdata = await fsp.readFile(filePath, 'utf8');
-      const data = JSON.parse(rawdata);
-      let result = [];
-      for (let vidNum in data) {
-        if (data[vidNum] == true) {
-          result.push(vidNum);}}
-      return result;
-
-    } catch (error) {
-      await fileQueueLogFile.enqueue(async () => {
-        logToFile(('Error reading file: ' + error.message), errorPath);
-      });
-      console.error('Error reading file:', error);
-      throw error;}
-    } catch (error) {
-      await fileQueueLogFile.enqueue(async () => {
-        logToFile(('Error recovering used homilies: ' + error.message), errorPath);
-      });
-      console.error('Error recovering used homilies: ', error.message);
+  // if we encounter an error, write the error to the error.txt file in the data/consoleResponses folder
+    catch (error) {
+    await fileQueueLogFile.enqueue(async () => {
+      logToFile((`Error recovering used homilies for user ${userId}: ` + error.message), errorPath);
+    });
+    console.error('Error recovering used homilies: ', error.message);
     }
 }
 
-
-// returns a JSON with all of the user's unviewed homilies
+// returns a list of which homilies have not been used (not homily viewed + associated questionnaire completed)
 async function unviewedHomilies(userId, userType, experimentSource, experimentType) {
-  try {
-    let filePath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'usedHomilies.json');
-    } else {
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'usedHomilies.json');
-    }
-    try {
-      const rawdata = await fsp.readFile(filePath, 'utf8');
-      const data = JSON.parse(rawdata);
-      let result = [];
-      for (let vidNum in data) {
-        if (data[vidNum] == false) {
-          result.push(vidNum);}}
 
-      return result;
-    } catch (error) {
-      await fileQueueLogFile.enqueue(async () => {
-        logToFile(('Error reading file: ' + error.message), errorPath);
-      });
-      console.error('Error reading file:', error);
-      throw error;}
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error retrieving unused homilies: ' + error.message), errorPath);
-    });
-    console.error('error retrieving unused homilies: ', error.message);
+  // try to return a list of the homilies a user has not viewed/completed the associated questionnaire for
+  try {
+    var usedHomilies = await viewedHomilies(userId, userType, experimentSource, experimentType);
+    
+    // add everything missing from used homilies to the unused homilies list
+    var unusedHomilies = [];
+    for (let homilyNumber of homilyNumbers) {
+      if (!usedHomilies.includes(homilyNumber)) {
+        unusedHomilies.push(homilyNumber);
+      }
+    }
+    return unusedHomilies;
   }
+  // if we encounter an error, write the error to the error.txt file in the data/consoleResponses folder
+  catch (error) {
+    await fileQueueLogFile.enqueue(async () => {
+      logToFile((`Error recovering unused homilies for user ${userId}: ` + error.message), errorPath);
+    });
+    console.error('Error recovering unused homilies: ', error.message);
+    }
 }
 
 // returns a random homily number according to the types and number of homilies shown
 // with the probability of being selected related to the inverse of the existing usages
 // of each homily
-async function randomHomilyNumber(usageData, usedHomilies, unusedHomilies, userType, experimentType){
+async function randomHomilyNumber(usageData, usedHomilies, unusedHomilies, userType){
 
 try {
   // variables for later use
@@ -201,28 +185,14 @@ try {
   let sum = 0; // initial sum of usages
   let newSum = 0; // sum of reciprocals of proportions of usages
   let newProbs = {}; // updated probabilites where least used becomes most likely
-  let randomHomilyNum; // final homily number we give to user
-  let strongHomilyNums; // numbers associated with strong homilies
-  let weakHomilyNums; // numbers associated with weak homilies
-
-  // the numbers associated with the strong and weak homilies (can be edited later)
-  if (experimentType == 'av') { // av condition (check "other/video_name_conversions" for more details)
-    strongHomilyNums = ['1', '2'];
-    weakHomilyNums = ['3', '4'];
-  } else { // audio only condition (check "other/audio_name_conversions" for more details)
-    strongHomilyNums = ['1', '2'];
-    weakHomilyNums = ['3', '4'];
-  }
 
   // the number of strong and weak homilies the laymen user will be shown (can be edited later)
-  let numStrongToShow;
-  let numWeakToShow;
   if (userType == 'laymen'){
-    numStrongToShow = 1;
-    numWeakToShow = 1;
+    var numStrongToShow = 1;
+    var numWeakToShow = 1;
   } else {
-    numStrongToShow = 2;
-    numWeakToShow = 2;
+    var numStrongToShow = 2;
+    var numWeakToShow = 2;
   }
 
   // calculates the number of strong and weak homilies shown 
@@ -233,7 +203,7 @@ try {
     homilyId = usedHomilies[i];
 
     // increment strong homilies shown if it is a strong homily
-    if (strongHomilyNums.includes(homilyId)){
+    if (strongHomilyNumbers.includes(homilyId)){
       strongHomiliesShown += 1;
     
     // otherwise it is a weak homily so increment the weak homilies shown
@@ -253,8 +223,8 @@ try {
   if (weakHomiliesShown === numWeakToShow){
     
     // usage data of strong homilies 
-    for (let i = 0; i < strongHomilyNums.length; i++) {
-      let homilyId = strongHomilyNums[i]; 
+    for (let i = 0; i < strongHomilyNumbers.length; i++) {
+      let homilyId = strongHomilyNumbers[i]; 
 
       // if this homily has been used, then do not include in probability calculation
       if (usedHomilies.includes(homilyId)){
@@ -297,8 +267,8 @@ try {
   // if we have shown the required number of strong homilies, then pick a weak one
   } else if (strongHomiliesShown === numStrongToShow){
     // usage data of weak homilies 
-    for (let i = 0; i < weakHomilyNums.length; i++) {
-      let homilyId = weakHomilyNums[i]; 
+    for (let i = 0; i < weakHomilyNumbers.length; i++) {
+      let homilyId = weakHomilyNumbers[i]; 
 
       // if this homily has been used, then do not include in probability calculation
       if (usedHomilies.includes(homilyId)){
@@ -336,10 +306,10 @@ try {
       }
       lastValue += newProbs[key];
     }
-
+  }
   // otherwise pick a random unseen homily
-  } else{
-    console.log(unusedHomilies);
+  else{
+    
     // usage data of strong homilies 
     for (let i = 0; i < unusedHomilies.length; i++) {
       let homilyId = unusedHomilies[i]; 
@@ -365,14 +335,12 @@ try {
     for (let key in oldProbs){
       newProbs[key] = oldProbs[key] / newSum;
     }
-    console.log(newProbs);
     
     // randomly select new homily number
     let randomNum = Math.random();
     lastValue = 0;
     for (let key in newProbs){
       if (randomNum <= newProbs[key] + lastValue) {
-        console.log(key);
         return key;
       }
       lastValue += newProbs[key];
@@ -388,12 +356,22 @@ try {
 
 // converts a json file to a csv format
 // JSON must be of the form {'header_1': data_1, ... , 'header_n': data_n}
-async function jsonToCSV(jsonString){
+async function jsonToCSV(jsonString, consentInfo){
   try {
     let jsonData;
     try {
       jsonData = JSON.parse(jsonString);
-      } catch (error) {
+
+      if (consentInfo) {
+        try {
+          jsonData.email = await blippityBloop(jsonData.email, 'laymen');
+        }
+        catch {
+          console.log('expert spotted!');
+        }
+      }
+      } 
+      catch (error) {
         await fileQueueLogFile.enqueue(async () => {
           logToFile(('Invalid JSON string ' + error.message), errorPath);
         });
@@ -435,142 +413,63 @@ async function jsonToCSV(jsonString){
 // --------------------------------  EXISTENCE CHECK FUNCTIONS  -------------------------------------
 // --------------------------------------------------------------------------------------------------
 
-// checks if user has completed their consent form and responded that they consent
-async function checkConsentExists(userId, userType, experimentSource, experimentType) {
-  try{
-    let filePath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires', 'consentInfo.json');
-    } else {
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires', 'consentInfo.json');
-    }
+// checks if a given file or folder exists
+// If laymen, it will create this folder
+// If expert, it just checks if it exists
+// overall, this checks for the existence of a file and the folder and returns the existence status of each
+// If laymen, then create this folder
+async function checkFileOrFolderExists(userId, userType, experimentSource, experimentType, fileName){
   
-    // check if the consent form exists and return false if it does not
-    if (!fs.existsSync(filePath)) {
-      return false;
-    }
-
-   // if it does exist, then see if the user consented (return true) or not (return false)
-    try {
-      // read existing data
-      const rawdata = await fsp.readFile(filePath, 'utf8');
-      let jsonData = await JSON.parse(rawdata);
-
-      // check if user has consented
-      if (jsonData['consented']) {
-        return true;
-      }
-      return false;
-    } catch (error) {
-      await fileQueueLogFile.enqueue(async () => {
-        logToFile(('Error loading the user consent data: ' + error.message), errorPath);
-      });
-      console.error('Error loading the user consent data: ', error.message);
-      return false;
-    }
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error checking if consent form file exists: ' + error.message), errorPath);
-    });
-    console.error('error checking if consent form file exists: ', error.message);
-  }
-}
-
-// checks if expert has completed their preaching experience questionnaire
-async function checkExperienceExists(userId, userType, experimentSource, experimentType) {
-    try {
-      let filePath = '';
-      if (userType == 'laymen') {
-        let newUserId = await blippityBloop(String(userId));
-        filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires', 'preachingExperience.csv');
-      } else {
-        filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires', 'preachingExperience.csv');
-      }
-      return fs.existsSync(filePath);
-    } catch (error) {
-      await fileQueueLogFile.enqueue(async () => {
-        logToFile(('Error checking if preaching experience file exists: ' + error.message), errorPath);
-      });
-      console.error('error checking if preaching experience file exists: ', error.message);
-    }
-}
-
-// checks if laymen has completed their religious demographic questionnaire
-async function checkReligiousDemographicExists(userId, userType, experimentSource, experimentType) {
+  // try to check existence of a file for a user
   try {
-    let filePath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires', 'religiousDemographic.csv');
-    } else {
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires', 'religiousDemographic.csv');
+
+    // set experiment source variable equal to '' if expert (it will come in as 'na' if it is an expert)
+    const source = await experimentSource === 'na' ? '' : experimentSource;
+
+    // get the path of the file we are trying to check the existence of
+    var filePath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', fileName);
+
+    // get the path of the user data folder containing the file that we are checking the existence of (alt. use this if we are checking for a folder's existence)
+    var folderPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType));
+    console.log(folderPath);
+
+    // If the user's data folder exists, then...
+    if (fs.existsSync(folderPath)){
+
+      // set the folderExists variable equal to true
+      var folderExists = true;
+
+      // if no questionnaires subfolder has been created, then we create it
+      if (!fs.existsSync(path.join(folderPath, 'questionnaires'))) {
+        await fsp.mkdir(path.join(folderPath, 'questionnaires'));
+      }
     }
-    return fs.existsSync(filePath);
-  } catch (error) {
+    // if the user's data data folder does not exist, then ...
+    else {
+
+      // set the folderExists variable to false
+      var folderExists = false;
+
+      // if the user is a laymen, then we create their data folder and the questionnaires subfolder
+      if (userType === 'laymen') {
+        await fsp.mkdir(path.join(folderPath, 'questionnaires'), {recursive: true});
+        var folderExists = true;
+      }
+    }
+
+    // if the specified file exists, then set the fileExists variable equal to true
+    var fileExists = false;
+    if (fs.existsSync(filePath)) {
+      fileExists = true;
+    }
+    
+    // return info about the existence of the file and the folder
+    return {'fileExists': fileExists, 'folderExists': folderExists};
+  } 
+  // if we run into an error, then add this error to the error.txt file in data/consoleResponses
+  catch (error) {
     await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error checking if religious demographic file exists: ' + error.message), errorPath);
-    });
-    console.error('error checking if religious demographic file exists', error.message);
-  }
-}
-
-// checks if user demographic has been completed
-async function checkUserDemographicExists(userId, userType, experimentSource, experimentType) {
-  try {
-    let filePath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires', 'userDemographic.csv');
-    } else {
-      filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires', 'userDemographic.csv');
-    }
-    return fs.existsSync(filePath);
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error checking if user demographic exists: ' + error.message), errorPath);
-    });
-    console.error('error checking if user demographic exists: ', error.message);
-  }
-}
-
-// if the folder exists then we load and proceed
-// if not we return false and will throw an error message on the client side
-// if laymen, either create the folder or load it
-async function checkExists(userId, userType, experimentSource, experimentType){
-  try{
-    let folderPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId));
-    } else {
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId));
-    }
-
-    const templatePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), 'templates', 'usedHomilies.json');
-    // creates a folder for laymen if necessary
-    if (userType === 'laymen'){
-      if (!fs.existsSync(folderPath)) {
-
-        // make directory if non-existent
-        await fsp.mkdir(folderPath);
-
-        // copy the usedHomilies template into the new folder
-        try{
-          await fsp.copyFile(templatePath, path.join(folderPath, 'usedHomilies.json'));
-          console.log('template successfully copied');
-        } catch (err) {
-          await fileQueueLogFile.enqueue(async () => {
-            logToFile(('Unable to copy the template: ' + err.message), errorPath);
-          });
-          console.error('unable to copy the template: ', err);
-        }
-      }      
-    }
-    return fs.existsSync(folderPath);
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error checking if a user folder exists/creating said folder: ' + error.message), errorPath);
+      logToFile((`Error checking if a file or folder exists for user ${await blippityBloop(userId, userType)}: ` + error.message), errorPath);
     });
     console.error('error checking if a user folder exists/creating said folder: ', error.message);
   }
@@ -580,443 +479,257 @@ async function checkExists(userId, userType, experimentSource, experimentType){
 // --------------------------------  STORING RESULTS FUNCTIONS  -------------------------------------
 // --------------------------------------------------------------------------------------------------
 
+// stores the responses to various questionnaires (all except sign-in times )
+async function storeResponses(userId, userType, experimentSource, experimentType, fileName, results){
+
+  // try storing the data
+  try {
+
+    // set experiment source variable equal to '' if expert (it will come in as 'na' if it is an expert)
+    const source = await experimentSource === 'na' ? '' : experimentSource;
+
+    // get the path of the file we are trying to save to
+    var filePath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', fileName);
+
+
+    // delete progress files when we save a questionnaire to a homily
+    // also stores the order in which users saw the homilies
+
+    // iterate over all of the homily numbers
+    for (let homilyNumber of homilyNumbers) {
+
+      // If the filepath for the function is a homily questionnaire filepath, then...
+      if (filePath.includes(homilyNumber + '.csv')) {
+
+        // construct the path of the potentially still extant progress file
+        const progressPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', homilyNumber + '_Progress.json');
+
+        // delete the existing progress file
+        if (fs.existsSync(progressPath)) {
+          await fsp.unlink(progressPath);
+        }
+
+        // construct the path of the behavior file for the homily
+        const behaviorPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', homilyNumber + '_Behavior.json');
+
+        // read the data from the behavior JSON
+        const behaviorData = await fsp.readFile(behaviorPath, {encoding: 'utf8'});
+
+        // convert JSON data to CSV
+        const csvData = await jsonToCSV(behaviorData, false);
+
+        // write the behavior CSV file to the user's data folder
+        await fsp.writeFile(behaviorPath.replace('json', 'csv'), csvData, 'utf8');
+
+        // delete the existing behavior JSON
+        await fsp.unlink(behaviorPath);
+
+
+        // store the homily + timestamp of questionnaire completion
+        await storeHomilyOrder(userId, userType, source, experimentType, homilyNumber);
+      }
+    }
+    
+    // get the files that are ok to overwrite (currently just the behavior files)
+    var filesOkToOverwrite = [];
+    var behaviorFilenames = [];
+    for (let homilyNumber of homilyNumbers) {
+      filesOkToOverwrite.push(homilyNumber + '_Behavior.json');
+      behaviorFilenames.push(homilyNumber + '_Behavior.json');
+    }
+
+    // if file exists and is not a behavior file, then do not overwrite it
+    if (fs.existsSync(filePath) && !filesOkToOverwrite.includes(fileName)) {
+        return
+      }
+
+
+    // convert the data to a csv-friendly format 
+    // if this is consent info, then we need to encode the email address
+    if (userType == 'laymen' && fileName == 'consentInfo.csv') {
+      var csvData = await jsonToCSV(results, true);
+    }
+    // handle updating the beahvior file
+    else if (behaviorFilenames.includes(fileName)){
+
+      // convert JSON string with behavior data to a JSON object
+      const newBehaviorData = JSON.parse(results);
+      var finalData = {};
+
+      // If the user's behavior file exists, then...
+      if (fs.existsSync(filePath)) {
+        const exisitngBehaviorData = JSON.parse(await fsp.readFile(filePath, {encoding: 'utf8'}));
+
+        // add the new behavorial data to the old behavorial data
+        for (const header of Object.keys(exisitngBehaviorData)) {
+          finalData[header] = Number(exisitngBehaviorData[header]) + Number(newBehaviorData[header]);
+        }
+      } 
+      // if this is the first attempt at writing to the behavioral file
+      else {
+        finalData = newBehaviorData;
+      }
+      await fsp.writeFile(filePath, JSON.stringify(finalData, null, 2));
+      return
+    }
+    else {
+      var csvData = await jsonToCSV(results, false);
+    }
+
+    // write the file to the user's data folder
+    await fsp.writeFile(filePath, csvData, 'utf8');
+  }
+  // if there is an error, then write it to the error.txt file in data/consoleResponses 
+  catch (error) {
+    await fileQueueLogFile.enqueue(async () => {
+      logToFile((`Error storing ${fileName} data for user ${await blippityBloop(userId, userType)}: ` + error.message), errorPath);
+    });
+    console.error(`error storing ${fileName}: `, error.message);
+  }
+}
+
+
 // logs sign in times for a user
 async function logSignIn(userId, userType, experimentSource, experimentType) {
-  try{
-    let folderPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    const filePath = path.join(folderPath, 'signInTimes.csv');
+  
+  // try logging the user's sign in time
+  try {
 
-    // create questionnaire folder if not existent
-    if (!fs.existsSync(folderPath)){
-      await fsp.mkdir(folderPath);}
+    // set experiment source variable equal to '' if expert (it will come in as 'na' if it is an expert)
+    const source = await experimentSource === 'na' ? '' : experimentSource;
+
+    // get the path of the file we are trying to save to
+    var filePath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', 'signInTimes.csv');
     
-      let time =  new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' });
-    if (!fs.existsSync(filePath)) {
-      await fsp.appendFile(filePath, 'Date, Time (CST)\n')
-    }
-    await fsp.appendFile(filePath, time + '\n')
+    // recover the current time in CST
+    let time =  new Date().toLocaleString('en-US', {timeZone: 'America/Chicago' });
 
-  } catch (error) {
+    // if the sign in time file does not already exist, then create it and write the header to it
+    if (!fs.existsSync(filePath)) {
+      await fsp.appendFile(filePath, 'Date, Time (CST)\n');
+    }
+
+    // write the new sign in time to the file
+    await fsp.appendFile(filePath, time + '\n');
+  }
+  // if we encounter an error, then write the error to the error.txt file in data/consoleResponses
+  catch (error) {
       await fileQueueLogFile.enqueue(async () => {
-        logToFile(('Error storing login timestamp: ' + error.message), errorPath);
+        logToFile((`Error storing login timestamp for user ${await blippityBloop(userId, userType)}: ` + error.message), errorPath);
       });
       console.error('error storing login timestamp: ', error.message);
   }
 }
 
 
-// stores use demogaphic info (age, etc...)
-async function storeUserDemographic(results, userId, userType, experimentSource, experimentType){
-  try {
-    let folderPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    const filePath = path.join(folderPath, 'userDemographic.csv');
-
-    
-    // create questionnaire folder if not existent
-    if (!fs.existsSync(folderPath)){
-      await fsp.mkdir(folderPath);}
-    
-    // no overwrites allowed
-    if (fs.existsSync(filePath)) {
-      return
-    }
-
-    let csvData = await jsonToCSV(results);
-    fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
-      if (err) {
-        await fileQueueLogFile.enqueue(async () => {
-          logToFile(('Error saving user demographic data: ' + err.message), errorPath);
-        });
-        console.error('error saving user demographic data: ', err);
-      } else {
-        //logToFile(('User demographic successfully saved '), logPath);
-        console.log('user demographic data successfully saved: ', filePath);}});
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error storing user demographic data: ' + error.message), errorPath);
-    });
-    console.error('error storing user demographic: ', error.message);
-  }
-  }
-
-// stores consent screen information
-async function storeConsentInfo(results, userId, userType, experimentSource, experimentType){
-  try {
-    parsed = JSON.parse(results);
-    if (userType == 'laymen'){
-    parsed.email = await blippityBloop(parsed.email);
-    }
-    
-    let folderPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    const filePath = path.join(folderPath, 'consentInfo.json'); 
-    
-    // create questionnaire folder if not existent
-    if (!fs.existsSync(folderPath)){
-      await fsp.mkdir(folderPath);}
-    
-  
-    // create a json file for storing consent data
-    fsp.writeFile(filePath, JSON.stringify(parsed), 'utf8', async (err) => {
-      if (err) {
-        await fileQueueLogFile.enqueue(async () => {
-          logToFile(('Error saving user consent data: ' + err.message), errorPath);
-        });
-        console.error('error saving user consent data: ', err);
-      } else {
-        //logToFile(('User consent data successfully saved: '), logPath);
-        console.log('user consent data successfully saved: ', filePath);}});
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error storing consent info: ' + error.message), errorPath);
-    });
-    console.error('error storing consent info: ', error.message);
-  }
-}
-
-// stores the results to the religious demographic questionnaire (laymen only)
-async function storeReligiousDemographic(userId, userType, experimentSource, experimentType, results){
-  try {
-    let folderPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    const filePath = path.join(folderPath, 'religiousDemographic.csv');
-
-    // create questionnaire folder if not existent
-    if (!fs.existsSync(folderPath)){
-      await fsp.mkdir(folderPath);}
-
-    // if file already submitted, do not overwrite
-    if (fs.existsSync(filePath)){
-      return;}
-
-    let csvData = await jsonToCSV(results);
-    fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
-      if (err) {
-        await fileQueueLogFile.enqueue(async () => {
-          logToFile(('Error saving religious demographic data: ' + err.message), errorPath);
-        });
-        console.error('error saving religious demographic data: ', err);
-      } else {
-        console.log('religious demographic data successfully saved: ', filePath);}});
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error storing religious demographic: ' + error.message), errorPath);
-    });
-    console.error('error storing religious demographic: ', error.message);
-  }
-}
-
-// stores the results to the preaching experience questionnaire (experts only)
-async function storePreachingExperience(userId, userType, experimentSource, experimentType, results){
-  try { 
-    let folderPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    const filePath = path.join(folderPath, 'preachingExperience.csv');
-    
-    // create questionnaire folder if not existent
-    if (!fs.existsSync(folderPath)){
-      await fsp.mkdir(folderPath);}
-
-    // if file already submitted, do not overwrite
-    if (fs.existsSync(filePath)){
-      return;}
-
-    let csvData = await jsonToCSV(results);
-    fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
-      if (err) {
-        await fileQueueLogFile.enqueue(async () => {
-          logToFile(('Error saving preaching experience data: ' + err.message), errorPath);
-        });
-        console.error('error saving preaching experience data: ', err);
-      } else {
-        console.log('preaching experience data successfully saved: ', filePath);}});
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error storing preaching experience: ' + error.message), errorPath);
-    });
-    console.error('error storing preaching experience: ', error.message);
-  }
-}
-
-// stores the results of preaching experience questionnaire as csv in user's folder
-async function storeQuestionnaireResults(userId, userType, experimentSource, experimentType, homilyId, results, order){
-
-  try {
-    let folderPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    const filePath = path.join(folderPath, homilyId + '.csv');
-    const homilyProgressPath = path.join(folderPath, homilyId + '_Progress.json');
-    const questionnaireOrderPath = path.join(folderPath, homilyId + '_QuestionOrder.csv');
-    
-    // create questionnaire folder if not existent
-    if (!fs.existsSync(folderPath)){
-      await fsp.mkdir(folderPath);}
-
-    // if file already submitted, do not overwrite
-    if (fs.existsSync(filePath)){
-      return;
-    }
-
-    // if file already submitted, do not overwrite
-    if (fs.existsSync(questionnaireOrderPath)){
-      return;
-    }
-
-    // delete homily progress file after the homily is completed
-    if (fs.existsSync(homilyProgressPath)){
-      await fsp.unlink(homilyProgressPath, (err) => {
-        if (err) {
-          logToFile(('Error deleting homily progress file:', err.message), errorPath);
-        }
-        console.log('File successfully deleted');
-      });
-    }
-    
-    let csvData = await jsonToCSV(results);
-    fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
-      if (err) {
-        await fileQueueLogFile.enqueue(async () => {
-          logToFile(('Error saving questionnaire data: ' + err.message), errorPath);
-        });
-        console.error('error saving questionnaire data: ', err);
-      } else {
-        console.log('questionnaire data successfully saved: ', filePath);}});
-    
-    let orderData = await jsonToCSV(order);
-    fsp.writeFile(questionnaireOrderPath, orderData, 'utf8', async (err) => {
-      if (err) {
-        await fileQueueLogFile.enqueue(async () => {
-          logToFile(('Error saving question order data: ' + err.message), errorPath);
-        });
-        console.error('error saving question order data: ', err);
-      } else {
-        console.log('question order data successfully saved: ', filePath);}});
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error storing questionnaire results: ' + error.message), errorPath);
-    });
-    console.error('error in storing questionnaire results: ', error.message);
-  }
-}
-
-// stores the results of preaching experience questionnaire as csv in user's folder
-async function storeBehaviorInfo(userId, userType, experimentSource, experimentType, homilyId, results){
-
-  try {
-    let folderPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    const filePath = path.join(folderPath, homilyId + '_Behavior.csv');
-
-    // create questionnaire folder if not existent
-    if (!fs.existsSync(folderPath)){
-      await fsp.mkdir(folderPath);}
-
-    // if file already submitted, do not overwrite
-    //if (fs.existsSync(filePath)){
-    //  return;
-    //}
-  
-    let csvData = await jsonToCSV(results);
-    fsp.writeFile(filePath, csvData, 'utf8', async (err) => {
-      if (err) {
-        await fileQueueLogFile.enqueue(async () => {
-          logToFile(('Error saving behavior data: ' + err.message), errorPath);
-        });
-        console.error('error saving behavior data: ', err);
-      } else {
-        console.log('behavior data successfully saved: ', filePath);}});
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error storing behavior results: ' + error.message), errorPath);
-    });
-    console.error('error in storing behavior results: ', error.message);
-  }
-}
-
 // stores order in which user viewed homilies
-// logs sign in times for a user
 async function storeHomilyOrder(userId, userType, experimentSource, experimentType, homilyId) {
-  try{
-    let folderPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      folderPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    const filePath = path.join(folderPath, 'homilyOrder.csv');
-
-    // create questionnaire folder if not existent
-    if (!fs.existsSync(folderPath)){
-      await fsp.mkdir(folderPath);}
+  
+  // try writing to the file that stores the order in which the user viewed the homilies
+  try {
     
-    let time =  new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' });
-    if (!fs.existsSync(filePath)) {
-      await fsp.appendFile(filePath, 'homilyID, Date, Time (CST)\n')
-    }
-    await fsp.appendFile(filePath, String(homilyId) + ',' + time + '\n')
+    // set experiment source variable equal to '' if expert (it will come in as 'na' if it is an expert)
+    const source = await experimentSource === 'na' ? '' : experimentSource;
 
-  } catch (error) {
+    // get the path of the file we are trying to save to
+    var filePath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', 'homilyOrder.csv');
+    
+    // recover the current time in CST
+    let time =  new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' });
+
+    // if the homily order file does not already exist, then create it and write the header to it
+    if (!fs.existsSync(filePath)) {
+      await fsp.appendFile(filePath, 'Homily Number, Date, Time (CST)\n')
+    }
+
+    // write the homily number and the time at which the user completed its associated questionnaire to the file
+    await fsp.appendFile(filePath, String(homilyId) + ',' + time + '\n')
+  } 
+  // if we encounter an error, then write the error to the error.txt file in data/consoleResponses
+  catch (error) {
       await fileQueueLogFile.enqueue(async () => {
         logToFile(('Error storing homily order: ' + error.message), errorPath);
       });
       console.error('error storing homily order: ', error.message);
   }
 }
+
+
 // --------------------------------------------------------------------------------------------------
 // --------------------------------  UPDATE DATA FUNCTIONS  -----------------------------------------
 // --------------------------------------------------------------------------------------------------
 
 // update the amount of times that a homily has been used
 async function updateHomilyCount(homilyId, userType, experimentSource, experimentType) {
-  let filePath = '';
-  if (userType == 'laymen') {
-    filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), 'homilyUsage.json');
-  } else {
-    filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), 'homilyUsage.json');
-  }
+
+   // set experiment source variable equal to '' if expert (it will come in as 'na' if it is an expert)
+   const source = await experimentSource === 'na' ? '' : experimentSource;
+
+   // get the path of the homily usage file we are trying to update
+   var filePath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, 'homilyUsage.json');
+
+  // try updating the homily usage file
   try {
+
+      // enter our request into the queue so that only one user is reading/writing to the file at a time
       await fileQueueHomilyUsage.enqueue(async () => {
 
         // read, parse and update the specified homily
         const rawdata = await fsp.readFile(filePath, 'utf8');
         let usageData = await JSON.parse(rawdata);
-        console.log("usertype: ", userType);
-        console.log("homilyid: ", homilyId);
 
-
+        // extract the homily ID number based on experiment type (mp3 for audio and mp4 for av)
         if (experimentType == 'av'){
           usageData[path.basename(homilyId, '.mp4')] += 1;
         } else { 
           usageData[path.basename(homilyId, '.mp3')] += 1;
         }
 
-        // overwrite existing file
+        // overwrite existing file with updated count
         await fsp.writeFile(filePath, JSON.stringify(usageData, null, 2));
-        console.log("data successfully updated");
       });
-    } catch (error) {
+    }
+    // if we encounter an error, write it to the error.txt file in data/consoleResponses
+    catch (error) {
       await fileQueueLogFile.enqueue(async () => {
-        logToFile(('Error reading usage data file: ' + error.message), errorPath);
+        logToFile((`Error reading usage data file for user ${await blippityBloop(userId, userType)}: ` + error), errorPath);
       });
 
-      console.error('Error reading usage data file:', error);
+      console.error(`Error reading usage data file for user ${await blippityBloop(userId, userType)}:` + error);
       throw error;}
 }
 
-// updates the user-specific JSON of viewed/not viewed homilies
-async function updateViewedHomilies(userId, userType, experimentSource, experimentType, homilyId){
-  let filePath = '';
-  if (userType == 'laymen') {
-    let newUserId = await blippityBloop(String(userId));
-    filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'usedHomilies.json');
-  } else {
-    filePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'usedHomilies.json');
-  }
-  try {
-    // read existing data
-    const rawdata = await fsp.readFile(filePath, 'utf8');
-    let jsonData = await JSON.parse(rawdata);
 
-    // update the homily
-    jsonData[homilyId] = true;
-        
-    // overwrite existing file
-    await fsp.writeFile(filePath, JSON.stringify(jsonData, null, 2));
-    console.log("data successfully updated");
-  } catch (error) {
-    await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error updating used homilies: ' + error.message), errorPath);
-    });
-    console.error('Unable to update viewed homilies: ', error.message)}
-}
-
-// updates the user-specific JSON of viewed/not viewed homilies
+// updates the user-specific JSON of how far the user is in the homily (in case user needs to refresh the page)
 async function updatePlaybackTime(userId, userType, experimentSource, experimentType, homilyPath, playbackTime){
 
+  // try to update the user's progress file for a homily
   try {
-    let oldFilePath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      oldFilePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      oldFilePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    if (!fs.existsSync(oldFilePath)) {
-      await fsp.mkdir(oldFilePath);
-    }
-    //console.log(homilyPath);
-    let filePath = '';
-    if (experimentType == 'av'){
-      filePath = path.join(oldFilePath, path.basename(homilyPath, '.mp4') + '_Progress.json');
-    } else {
-      filePath = path.join(oldFilePath, path.basename(homilyPath, '.mp3') + '_Progress.json');
-    }
-    //console.log(filePath);
+
+    // set experiment source variable equal to '' if expert (it will come in as 'na' if it is an expert)
+    const source = await experimentSource === 'na' ? '' : experimentSource;
+
+    // path for the questionnaires subfolder in a user's data folder
+    var folderPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires');
     
-    if (!fs.existsSync(filePath)){
-      const jsonObj = JSON.stringify({'homilyPath': homilyPath,
-                                      'playbackTime': playbackTime,
-                                      'lastWriteTime': new Date().toISOString()});
-      await fsp.writeFile(filePath, jsonObj, 'utf8', (err) => {
-        if (err) {
-          console.error('Error writing file:', err);
-        } else {
-          console.log('File written successfully');
-          return;
-        }
-      });
+    // get the full path to their homily progress file depending on experiment type (mp4 for av and mp3 for audio)
+    if (experimentType == 'av'){
+      var filePath = path.join(folderPath, path.basename(homilyPath, '.mp4') + '_Progress.json');
     } else {
+      var filePath = path.join(folderPath, path.basename(homilyPath, '.mp3') + '_Progress.json');
+    }
 
-      // read existing data
-      const rawdata = await fsp.readFile(filePath, 'utf8');
-      let jsonData = await JSON.parse(rawdata);
-
-      // update the homily
-      jsonData['playbackTime'] = playbackTime;
-      jsonData['lastWriteTime'] = new Date().toISOString();
-        
-      // overwrite existing file
-      await fsp.writeFile(filePath, JSON.stringify(jsonData, null, 2));
-      console.log("data successfully updated");}
-  } catch (error) {
+    // Creates a json string that will be written to the progress file
+    // Includes the homily path, the user's progress through the homily (playbackTime), and the last time the file was written to
+    const jsonObj = JSON.stringify({'homilyPath': homilyPath,
+                                    'playbackTime': playbackTime,
+                                    'lastWriteTime': new Date().toISOString()});
+    
+    // Write the information to the progress file
+    await fsp.writeFile(filePath, jsonObj, 'utf8');
+  } 
+  // if we encounter an error, write the error to the error.txt file in the data/consoleResponses folder
+  catch (error) {
     await fileQueueLogFile.enqueue(async () => {
       logToFile(('Error updating playback time: ' + error.message), errorPath);
     });
@@ -1027,212 +740,146 @@ async function updatePlaybackTime(userId, userType, experimentSource, experiment
 // --------------------------------  OTHER FUNCTIONS  -----------------------------------------------
 // --------------------------------------------------------------------------------------------------
 
+// gets the homily usage data
+// helper for randomHomily(...)
+async function getHomilyUsageData(userType, experimentSource, experimentType) {
+  
+  // try to get the homily usage data
+  try {
+    // get the path for the homily usage file
+    const homilyUsagePath = path.join(__dirname, '..', '..', 'data', userType, experimentSource, experimentType, 'homilyUsage.json');
+
+    // read the homily usage data
+    const rawdata = await fsp.readFile(homilyUsagePath, 'utf8');
+    var usageData = await JSON.parse(rawdata);
+    return usageData;
+  }
+  // if there's an error, write the error to the error.txt file in the data/consoleResponses folder
+  catch (error) {
+    await fileQueueLogFile.enqueue(async () => {
+      logToFile(('Error reading usage data file: ' + error.message), errorPath);
+    });
+    console.error('Error reading usage data file:', error);}
+}
+
 // returns a video randomly from the unused homilies
 async function randomHomily(userId, userType, experimentSource, experimentType){
 
+  // tries to serve the user a homily
   try {
-    let directoryPath = '';
-    if (userType == 'laymen') {
-      let newUserId = await blippityBloop(String(userId));
-      directoryPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(newUserId), 'questionnaires');
-    } else {
-      directoryPath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), String(userId), 'questionnaires');
-    }
-    // create questionnaire folder if not existent
-    if (!fs.existsSync(directoryPath)){
-        await fsp.mkdir(directoryPath);}
+  
+    // set experiment source variable equal to '' if expert (it will come in as 'na' if it is an expert)
+    const source = await experimentSource === 'na' ? '' : experimentSource;
 
+    // path for the questionnaires subfolder in a user's data folder
+    var folderPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires');
+
+    // first we need to check for the existence of a progress file
     const keyword = '_Progress';
-    const files = await fsp.readdir(directoryPath);
+    const files = await fsp.readdir(folderPath);
       
-    // Iterate over the list of file names and check for the keyword
+    // Creates a list of all existing progress files
     const filteredFiles = files.filter(file => file.includes(keyword));
-      
+    
+    // if a progress file exists, then...
     if (filteredFiles.length > 0) {
-      console.log('Files containing the keyword:', filteredFiles);
-      // path to the homily progress file
-      const fullPath = path.join(directoryPath, filteredFiles[0]);
-      // Read the JSON file asynchronously
+
+      // contruct the path to the progress file
+      const fullPath = path.join(folderPath, filteredFiles[0]);
+
+      // Read the existing progress file
       const data = await fsp.readFile(fullPath);
-      const jsonObj = JSON.parse(data); // Parse the file content as JSON
+      const jsonObj = JSON.parse(data);
       
+      // extract the data from the existing progress file
       const lastWriteTime = new Date(jsonObj.lastWriteTime);
       const currentTime = new Date();
-      const timeDiff = (currentTime - lastWriteTime) / (1000 * 60); // Difference in minutes
 
-      if (timeDiff > 10) {
-        console.log('deleting because file too old....');
-        await fsp.unlink(fullPath);
-        let randomHomilyNum;
-        let randomIndex;
-        let usageData = {};
+      // find the amount of time since the file was last written to
+      const timeDiff = (currentTime - lastWriteTime) / (1000 * 60);
 
-        // recover the unused homilies
-        let unusedHomilies = await unviewedHomilies(userId, userType, experimentSource, experimentType); 
+      // if a progress file exists and it was last written to less than 20 minutes ago, then...
+      if (timeDiff < 20) {
 
-        // catch if all homilies have been used
-        if (unusedHomilies.length === 0){
-          return null;}
+        // in the event that a progress file still exists for a completed homily + questionnaire combo,
+        // then delete it
 
-       // randomly select an element from the array if laymen
-        //if (userType == 'laymen') {
-          // path to the homily usage data
-          const homilyUsagePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), 'homilyUsage.json');
-          console.log(homilyUsagePath);
+        // remove the "_Progress" part of the progress file name to check if the questionnaire results 
+        // file exists
+        const potentialResultsFile = fullPath.replace('_Progress.json', '.csv');
 
-          // read the homily usage data and parse it using a queue to prevent simultaneous accessing
-          try {
-            await fileQueueHomilyUsage.enqueue(async () => {
-              const rawdata = await fsp.readFile(homilyUsagePath, 'utf8');
-              usageData = await JSON.parse(rawdata);
-            })
-          // if there's an error, catch it and don't crash the whole program
-          } catch (error) {
-            await fileQueueLogFile.enqueue(async () => {
-             logToFile(('Error reading usage data file: ' + error.message), errorPath);
-            });
-            console.error('Error reading usage data file:', error);
-            throw error;}
+        // if the results file exists, then delete the progress file and the behavior JSON
+        if (fs.existsSync(potentialResultsFile)) {
+          await fsp.unlink(fullPath);
+        }
 
-          // once we recover the usage data, collect the used homilies
-          //console.log(usageData);
-          const usedHomilies = await HomiliesUsed(userId, userType, experimentSource, experimentType);
+        // recover the homily and the playback time
+        let homilyPath = jsonObj.homilyPath;
+        let playbackTime = jsonObj.playbackTime;
 
-          randomHomilyNum = await randomHomilyNumber(usageData, usedHomilies, unusedHomilies, userType, experimentType); //}
-          //else { // for experts just select any random homily
-          //  randomIndex = Math.floor(Math.random() * unusedHomilies.length());
-          //  randomHomilyNum = unusedHomilies[randomIndex];
-          //}
-
-          // send to correct folder (audioFiles vs videoFiles)
-        if (experimentType === 'av'){
-          let homilyPath = path.join('/stimuli', 'videoFiles', 'servingFiles', randomHomilyNum + '.mp4');
-          let newSavePath = path.join(directoryPath, path.basename(homilyPath, '.mp4') + '_Progress.json')
-          const jsonObj = JSON.stringify({'homilyPath': homilyPath,
-                                          'playbackTime': 0,
-                                          'lastWriteTime': new Date().toISOString()});
-          await fsp.writeFile(newSavePath, jsonObj, 'utf8', (err) => {
-            if (err) {
-              console.error('Error writing file:', err);
-            } else {
-              console.log('File written successfully');
-              return;
-            }
-            });
-          return JSON.stringify({'media' : homilyPath,
-                                'playbackTime': 0});
-        } else {
-          let homilyPath = path.join('/stimuli', 'audioFiles', 'servingFiles', randomHomilyNum + '.mp3');
-          let newSavePath = path.join(directoryPath, path.basename(homilyPath, '.mp3') + '_Progress.json')
-          const jsonObj = JSON.stringify({'homilyPath': homilyPath,
-                                          'playbackTime': 0,
-                                          'lastWriteTime': new Date().toISOString()});
-          await fsp.writeFile(newSavePath, jsonObj, 'utf8', (err) => {
-            if (err) {
-              console.error('Error writing file:', err);
-            } else {
-              console.log('File written successfully');
-              return;
-            }
-          });
-          return JSON.stringify({'media' : homilyPath,
-                                'playbackTime': 0});}
-      } else {
-        console.log('here')
-      // recover the homily ID and the playback time
-      let homilyPath = jsonObj.homilyPath;
-      let playbackTime = jsonObj.playbackTime;
-      return JSON.stringify({'media' : homilyPath,
+        // send this information to the user so that they can resume where they left off in the homily
+        return JSON.stringify({'media' : homilyPath,
                             'playbackTime': playbackTime});
+      }
+      // if there exists a progress file but it was written to more than 20 minutes ago, then delete that file
+      else {
+        await fsp.unlink(fullPath);
+      }
     }
-  } else {
-    console.log('No files contain the keyword.');
 
-    let randomHomilyNum;
-    let randomIndex;
-    let usageData = {};
+    // if there is no progress file that was written to in the last 20 minutes, then...
+    
+    // Retrieve the homily usage data
+    var usageData = await getHomilyUsageData(userType, source, experimentType);
 
-    // recover the unused homilies
-    let unusedHomilies = await unviewedHomilies(userId, userType, experimentSource, experimentType); 
+    // Retrieve which homilies have been used and not used
+    const usedHomilies = await viewedHomilies(userId, userType, source, experimentType);
+    const unusedHomilies = await unviewedHomilies(userId, userType, source, experimentType);
 
-    // catch if all homilies have been used
-    if (unusedHomilies.length === 0){
-      return null;}
 
-    // randomly select an element from the array if laymen
-    //if (userType == 'laymen') {
-      // path to the homily usage data
-      const homilyUsagePath = path.join(__dirname, '..', '..', 'data', String(userType), String(experimentSource), String(experimentType), 'homilyUsage.json');
-      console.log(homilyUsagePath);
+    // get a random homily to serve to the user
+    var randomHomilyNum = await randomHomilyNumber(usageData, usedHomilies, unusedHomilies, userType, experimentType);
 
-      // read the homily usage data and parse it using a queue to prevent simultaneous accessing
-      try {
-        await fileQueueHomilyUsage.enqueue(async () => {
-          const rawdata = await fsp.readFile(homilyUsagePath, 'utf8');
-          usageData = await JSON.parse(rawdata);
-        })
-      // if there's an error, catch it and don't crash the whole program
-      } catch (error) {
-        await fileQueueLogFile.enqueue(async () => {
-          logToFile(('Error reading usage data file: ' + error.message), errorPath);
-        });
-        console.error('Error reading usage data file:', error);
-        throw error;}
+    // if the experiment type is av, then...
+    if (experimentType === 'av') {
 
-      // once we recover the usage data, collect the used homilies
-      //console.log(usageData);
-      const usedHomilies = await HomiliesUsed(userId, userType, experimentSource, experimentType);
+      // construct the path to the homily we are serving to the user
+      var homilyPath = path.join('/stimuli', 'videoFiles', 'servingFiles', randomHomilyNum + '.mp4');
 
-      randomHomilyNum = await randomHomilyNumber(usageData, usedHomilies, unusedHomilies, userType, experimentType); //}
-      //else { // for experts just select any random homily
-      //  randomIndex = Math.floor(Math.random() * unusedHomilies.length());
-      //  randomHomilyNum = unusedHomilies[randomIndex];
-      //}
+      // construct the path to the new progress file
+      var newSavePath = path.join(folderPath, path.basename(homilyPath, '.mp4') + '_Progress.json');
 
-      // send to correct folder (audioFiles vs videoFiles)
-      if (experimentType === 'av'){
-        let homilyPath = path.join('/stimuli', 'videoFiles', 'servingFiles', randomHomilyNum + '.mp4');
-        let newSavePath = path.join(directoryPath, path.basename(homilyPath, '.mp4') + '_Progress.json')
-        const jsonObj = JSON.stringify({'homilyPath': homilyPath,
-                                        'playbackTime': 0,
-                                        'lastWriteTime': new Date().toISOString()});
-        await fsp.writeFile(newSavePath, jsonObj, 'utf8', (err) => {
-          if (err) {
-            console.error('Error writing file:', err);
-          } else {
-            console.log('File written successfully');
-            return;
-          }
-          });
-        return JSON.stringify({'media' : homilyPath,
-                              'playbackTime': 0});
-      } else {
-        let homilyPath = path.join('/stimuli', 'audioFiles', 'servingFiles', randomHomilyNum + '.mp3');
-        let newSavePath = path.join(directoryPath, path.basename(homilyPath, '.mp3') + '_Progress.json')
-        const jsonObj = JSON.stringify({'homilyPath': homilyPath,
-                                        'playbackTime': 0,
-                                        'lastWriteTime': new Date().toISOString()});
-        await fsp.writeFile(newSavePath, jsonObj, 'utf8', (err) => {
-          if (err) {
-            console.error('Error writing file:', err);
-          } else {
-            console.log('File written successfully');
-            return;
-          }
-        });
-        return JSON.stringify({'media' : homilyPath,
-                              'playbackTime': 0});}}
-  } catch (error) {
+    }
+    // if the experiment type is audio, then... 
+    else {
+      // construct the path to the homily we are serving to the user
+      var homilyPath = path.join('/stimuli', 'audioFiles', 'servingFiles', randomHomilyNum + '.mp3');
+
+      // construct the path to the new progress file
+      var newSavePath = path.join(folderPath, path.basename(homilyPath, '.mp3') + '_Progress.json');
+
+    // construct the data we will write to the new progress file
+    const jsonObj = JSON.stringify({'homilyPath': homilyPath,
+    'playbackTime': 0,
+    'lastWriteTime': new Date().toISOString()});
+
+    // write the data to the new progress file
+    await fsp.writeFile(newSavePath, jsonObj, 'utf8');
+
+    }
+
+    // return the homily number and the playback time (0) to the user so they start the given homily at the proper point
+    return JSON.stringify({'media' : homilyPath,
+                          'playbackTime': 0});
+  }
+  catch (error) {
     await fileQueueLogFile.enqueue(async () => {
-      logToFile(('Error in random homily main function: ' + error.message), errorPath);
+      logToFile(('Error selecting a random homily: ' + error.message), errorPath);
     });
-    console.error('error in random homily function: ', error.message);
+    console.error('Error selecting a random homily: ', error.message);
   }
 }
 
-module.exports = {checkExists, unviewedHomilies, updateViewedHomilies, randomHomily, 
-     storeQuestionnaireResults, storePreachingExperience, checkExperienceExists, 
-     checkReligiousDemographicExists, storeReligiousDemographic, countHomiliesUsed,
-    HomiliesUsed, updateHomilyCount, storeConsentInfo, storeUserDemographic, 
-    checkUserDemographicExists, storeBehaviorInfo, checkConsentExists, updatePlaybackTime, 
-    logToFile, logSignIn, storeHomilyOrder, fileQueueLogFile};
+module.exports = {checkFileOrFolderExists, unviewedHomilies, 
+  randomHomily, storeResponses, viewedHomilies, updateHomilyCount,
+  updatePlaybackTime, logToFile, logSignIn, storeHomilyOrder, fileQueueLogFile};

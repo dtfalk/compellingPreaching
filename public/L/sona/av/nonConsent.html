@@ -39,7 +39,7 @@
         text-align: center;
       }
         h2 {
-        font-family: 'Times New Roman', Times, serif;
+            font-family: 'Times New Roman', Times, serif;
         text-decoration: underline;
         text-align: center;
       }
@@ -53,7 +53,7 @@
         }
     </style>
 </head>
-<body id = "mainBody" onload="initialSetup()">
+<body id = "mainBody">
 
 <main id="instructionsSection">
     <center>
@@ -87,21 +87,6 @@
     sessionStorage.setItem('experimentSource', 'sona');
     sessionStorage.setItem('experimentType', 'av');
     
-    // script to be called on runtime
-    function initialSetup() {
-        document.getElementById("mainBody").focus();
-        preventBackNavigation();
-    }
-
-
-    // prevent the user from navigating backwards through the experiment
-    function preventBackNavigation() {
-    history.pushState(null, document.title, location.href);
-    window.onpopstate = function (event) {
-        console.log("Back navigation attempted");
-        history.pushState(null, document.title, location.href);
-        };
-    }
 
     // hides the screen to suggest to the user that they ought to quit out of the window
     function submitForm() {
