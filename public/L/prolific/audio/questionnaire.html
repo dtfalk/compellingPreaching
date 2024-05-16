@@ -721,10 +721,10 @@
     // ---------------------------------------------------------------------
 
     // submits the form and send data if complete, otherwise gives error message
-     function submitForm() {
+    async function submitForm() {
 
       // check to see if the user properly filled out the questionnaire
-      const isValid =  validateForm();
+      const isValid = await validateForm();
 
       // if the user did not properly fill out the questionnaire, then...
       if (!isValid) {
@@ -744,20 +744,20 @@
       else {      
         
         // collect the header and user responses so we can save on the server
-        const header =  getHeader();
-        const data =  getData();
+        const header = await getHeader();
+        const data = await getData();
 
         // send the questionnaire responses to the server
-         sendResults(header, data);
+        await sendResults(header, data);
 
         // send the order in which the questions were presented to the server
-         sendOrder(header, order);
+        await sendOrder(header, order);
 
         // update the total count of the times the homily has been viewed for this condition
-         updateHomilyCount();
+        await updateHomilyCount();
 
         // check if the user has completed all of the homilies
-        const allHomiliesCompleted =  checkHomiliesCompleted();
+        const allHomiliesCompleted = await checkHomiliesCompleted();
 
         // if the user has not completed their required number of homilies, then send
         // them to the pre-homily wait screen so that they will see another homily
@@ -773,7 +773,7 @@
 
 
     // validates that the user answered all questions
-     function validateForm() {
+    async function validateForm() {
 
       // collect all of the checkboxes in the document
       const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -859,14 +859,14 @@
       }
       
       // Highlight the unanswered questions in red and the answered questions in black
-       colorAnsweredAndUnanswered(answered, unanswered);
+      await colorAnsweredAndUnanswered(answered, unanswered);
       
       // return whether or not the user has responded to the questionnaire properly
       return valid;
     }
 
     // highlights unanswered questions in red and answered questions in black
-     function colorAnsweredAndUnanswered(answered, unanswered) {
+    async function colorAnsweredAndUnanswered(answered, unanswered) {
       
       // color all of the unanswered questions in red
       for (let unansweredQuestion of unanswered) {
@@ -960,7 +960,7 @@
     }
     
     // updates the total homily count on the server
-     function updateHomilyCount() {
+    async function updateHomilyCount() {
 
       // variables relating to user info
       const userType = sessionStorage.getItem('userType');
@@ -987,7 +987,7 @@
         try {
 
           // AJAX request to the server to store consent info
-          const response =  fetch(url, {
+          const response = await fetch(url, {
           method: 'POST',
           headers: {'Content-Type' : 'application/json'},
           body: JSON.stringify({
@@ -1000,7 +1000,7 @@
 
           // If the response was "ok" then return the server's response
           if (response.ok) {
-            return  response.json();
+            return await response.json();
           } 
           // otherwise we log the error (visible under inspect element)
           else {
@@ -1018,7 +1018,7 @@
 
 
     // sends the user response to the server to be stored as a csv
-     function sendResults(header, data){
+    async function sendResults(header, data){
 
       // retrieve information about the user
       const userId = sessionStorage.getItem('userId');
@@ -1063,7 +1063,7 @@
         try {
 
           // AJAX request to the server to store consent info
-          const response =  fetch(url, {
+          const response = await fetch(url, {
           method: 'POST',
           headers: {'Content-Type' : 'application/json'},
           body: JSON.stringify({
@@ -1077,7 +1077,7 @@
 
           // If the response was "ok" then return the server's response
           if (response.ok) {
-            return  response.json();
+            return await response.json();
           } 
           // otherwise we log the error (visible under inspect element)
           else {
@@ -1094,7 +1094,7 @@
     } 
 
     // sends the user response to the server to be stored as a csv
-     function sendOrder(header, order){
+    async function sendOrder(header, order){
 
       // retrieve information about the user
       const userId = sessionStorage.getItem('userId');
@@ -1127,7 +1127,7 @@
         try {
 
           // AJAX request to the server to store consent info
-          const response =  fetch(url, {
+          const response = await fetch(url, {
           method: 'POST',
           headers: {'Content-Type' : 'application/json'},
           body: JSON.stringify({
@@ -1141,7 +1141,7 @@
 
           // If the response was "ok" then return the server's response
           if (response.ok) {
-            return  response.json();
+            return await response.json();
           } 
           // otherwise we log the error (visible under inspect element)
           else {
@@ -1159,7 +1159,7 @@
 
 
     // checks if the the user has viewed all of the homilies for proper redirection
-     function checkHomiliesCompleted() {
+    async function checkHomiliesCompleted() {
 
       // retrieve information about the user
       const userId = sessionStorage.getItem('userId');
@@ -1178,14 +1178,14 @@
         try {
         
           // get the server's response to our request
-          const response =  fetch(url);
+          const response = await fetch(url);
           
           // if the server's response is OK (200s range), then...
           if (response.ok) {
 
             // parse the response and extract the data regarding homily completion
-            const parsedResponse =  response.json();
-            const homiliesCompleted =  parsedResponse.allHomiliesCompleted;
+            const parsedResponse = await response.json();
+            const homiliesCompleted = await parsedResponse.allHomiliesCompleted;
 
             // return this information
             return homiliesCompleted;

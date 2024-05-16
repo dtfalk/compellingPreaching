@@ -81,7 +81,7 @@
     // -----------------------------------------------------------------------------
     // -----------------------------------------------------------------------------
 
-     function initialize() {
+    async function initialize() {
 
       // recover info about user data
       const userId = sessionStorage.getItem('userId');
@@ -90,10 +90,10 @@
       const experimentType = sessionStorage.getItem('experimentType');
 
       // checks if the consent form has been completed first
-      const consentCompleted =  checkCompleted(userId, userType, experimentSource, experimentType, 'consentInfo.csv');
+      const consentCompleted = await checkCompleted(userId, userType, experimentSource, experimentType, 'consentInfo.csv');
 
       // delay to fix some local testing wackiness
-       new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise(resolve => setTimeout(resolve, 10));
 
       // if the user has not completed their homilies, then send them to another homily
       if (!consentCompleted) {
@@ -101,10 +101,10 @@
       }
       else {
         // check if the user has completed all of the homilies/associated questionnaires
-        const homiliesCompleted =  checkHomiliesCompleted(userId, userType, experimentSource, experimentType);
+        const homiliesCompleted = await checkHomiliesCompleted(userId, userType, experimentSource, experimentType);
       
         // delay to fix some local testing wackiness
-         new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise(resolve => setTimeout(resolve, 10));
 
         // if the user has not completed their homilies, then send them to another homily
         if (!homiliesCompleted) {
@@ -113,10 +113,10 @@
         else {
 
           // check if the user has completed the religious demographic
-          const religiousDemographicCompleted =  checkCompleted(userId, userType, experimentSource, experimentType, 'religiousDemographic.csv');
+          const religiousDemographicCompleted = await checkCompleted(userId, userType, experimentSource, experimentType, 'religiousDemographic.csv');
       
           // delay to fix some local testing wackiness
-           new Promise(resolve => setTimeout(resolve, 10));
+          await new Promise(resolve => setTimeout(resolve, 10));
 
           // if the user has not completed their homilies, then send them to another homily
           if (!religiousDemographicCompleted) {
@@ -304,10 +304,10 @@
     // ---------------------------------------------------------------------
 
     // submits the form and send data if complete, otherwise gives error message
-     function submitForm() {
+    async function submitForm() {
 
       // check if the user properly responded to the questionnaire
-      const isValid =  validateForm();
+      const isValid = await validateForm();
 
       // if the user did not properly respond to the questionnaire, then...
       if (!isValid) { 
@@ -328,11 +328,11 @@
       else{ 
 
           // get header and data
-          const header =  getHeader();
-          const data =  getData();
+          const header = await getHeader();
+          const data = await getData();
 
           // send the data to the server to be stored
-           sendResults(header, data);
+          await sendResults(header, data);
 
           // send the user to the experiment debrief screen
           window.location.href = 'debrief.html';
@@ -363,7 +363,7 @@
     }
     
     // validates that the user answered all questions
-     function validateForm() {
+    async function validateForm() {
 
       // extract all checkboxes, textboxes and numberboxes from the HTML document
       const checkboxes = document.querySelectorAll(`input[type="checkbox"]`);
@@ -526,14 +526,14 @@
       }
 
       // color the unanswered questions red and the answered questions black
-       colorAnsweredAndUnanswered(answered, unanswered);
+      await colorAnsweredAndUnanswered(answered, unanswered);
 
       // return whether or not the user properly answered the questionnaire
       return valid;
     }
 
     // highlights unanswered questions in red and answered questions in black
-     function colorAnsweredAndUnanswered(answered, unanswered) {
+    async function colorAnsweredAndUnanswered(answered, unanswered) {
       
       // color all of the unanswered questions in red
       for (let unansweredQuestion of unanswered) {
@@ -632,7 +632,7 @@
     }
     
     // sends the user response to the server to be stored as a csv
-     function sendResults(header, data) {
+    async function sendResults(header, data) {
 
       // collect user info
       const userId = sessionStorage.getItem('userId');
@@ -657,7 +657,7 @@
     
         try {
           // AJAX request to the server to store consent info
-          const response =  fetch(url, {
+          const response = await fetch(url, {
           method: 'POST',
           headers: {'Content-Type' : 'application/json'},
           body: JSON.stringify({
@@ -671,7 +671,7 @@
 
           // If the response was "ok" then return the server's response
           if (response.ok) {
-            return  response.json();
+            return await response.json();
           } 
           // otherwise we log the error (visible under inspect element)
           else {
@@ -688,7 +688,7 @@
     }
 
     // checks if the the user has viewed all of the homilies for proper redirection
-     function checkHomiliesCompleted(userId, userType, experimentSource, experimentType) {
+    async function checkHomiliesCompleted(userId, userType, experimentSource, experimentType) {
       
       // url for route that checks if all homilies have been completed
       const url = `/api/allHomiliesViewed/${userId}/${userType}/${experimentSource}/${experimentType}`;
@@ -701,14 +701,14 @@
         try {
         
           // get the server's response to our request
-          const response =  fetch(url);
+          const response = await fetch(url);
           
           // if the server's response is OK (200s range), then...
           if (response.ok) {
 
             // parse the response and extract the data regarding homily completion
-            const parsedResponse =  response.json();
-            const homiliesCompleted =  parsedResponse.allHomiliesCompleted;
+            const parsedResponse = await response.json();
+            const homiliesCompleted = await parsedResponse.allHomiliesCompleted;
 
             // return this information
             return homiliesCompleted;
@@ -728,7 +728,7 @@
     }
 
     // checks if user demographic or religious demographic have been completed
-     function checkCompleted(userId, userType, experimentSource, experimentType, fileName) {
+    async function checkCompleted(userId, userType, experimentSource, experimentType, fileName) {
         
         // url for route that will check for the existence of the given file name
         const url = `/api/CheckFileOrFolderExists/${userId}/${userType}/${experimentSource}/${experimentType}/${fileName}`;
@@ -741,14 +741,14 @@
           try {
           
             // get the server's response to our request
-            const response =  fetch(url);
+            const response = await fetch(url);
             
             // if the server's response is OK (200s range), then...
             if (response.ok) {
 
               // parse the response and extract the data regarding homily completion
-              const parsedResponse =  response.json();
-              const completed =  parsedResponse.fileExists;
+              const parsedResponse = await response.json();
+              const completed = await parsedResponse.fileExists;
 
               // return this information
               return completed;
