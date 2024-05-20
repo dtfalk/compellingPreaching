@@ -127,7 +127,9 @@
       
             // place the homily into the media element
             const targetPosition = homily.media.indexOf("d20h8ij");
-            mediaElement.src = homily.media.substring(targetPosition);
+            var finalURL = homily.media.substring(targetPosition);
+            console.log(finalURL);
+            mediaElement.src = finalURL;
       
             // update our variables that prevent the user from skipping forwards
             // and clock how often the user's progress file gets updated
