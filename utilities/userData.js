@@ -844,7 +844,9 @@ async function randomHomily(userId, userType, experimentSource, experimentType){
     if (experimentType === 'av') {
 
       // construct the path to the homily we are serving to the user
-      var homilyPath = path.join('d20h8ij3fgirtx.cloudfront.net/stimuli/videoFiles/servingFiles/', randomHomilyNum + '.mp4');
+      //var homilyPath = path.join('https://d20h8ij3fgirtx.cloudfront.net/stimuli/videoFiles/servingFiles/', randomHomilyNum + '.mp4');
+      var homilyPath = 'https://d20h8ij3fgirtx.cloudfront.net/stimuli/videoFiles/servingFiles/' + String(randomHomilyNum) + '.mp4';
+
 
       // construct the path to the new progress file
       var newSavePath = path.join(folderPath, path.basename(homilyPath, '.mp4') + '_Progress.json');
@@ -853,7 +855,9 @@ async function randomHomily(userId, userType, experimentSource, experimentType){
     // if the experiment type is audio, then... 
     else {
       // construct the path to the homily we are serving to the user
-      var homilyPath = path.join('d20h8ij3fgirtx.cloudfront.net/stimuli/audioFiles/servingFiles/', randomHomilyNum + '.mp3');
+      //var homilyPath = path.join('https://d20h8ij3fgirtx.cloudfront.net/stimuli/audioFiles/servingFiles/', randomHomilyNum + '.mp3');
+      var homilyPath = 'https://d20h8ij3fgirtx.cloudfront.net/stimuli/audioFiles/servingFiles/' + String(randomHomilyNum) + '.mp3';
+      
 
       // construct the path to the new progress file
       var newSavePath = path.join(folderPath, path.basename(homilyPath, '.mp3') + '_Progress.json');
