@@ -635,7 +635,7 @@ async function storeHomilyOrder(userId, userType, experimentSource, experimentTy
     var filePath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', 'homilyOrder.csv');
     
     // recover the current time in CST
-    let time =  new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' });
+    let time =  new Date().toLocaleString('en-US', {timeZone: 'America/Chicago' });
 
     // if the homily order file does not already exist, then create it and write the header to it
     if (!fs.existsSync(filePath)) {
@@ -844,7 +844,7 @@ async function randomHomily(userId, userType, experimentSource, experimentType){
     if (experimentType === 'av') {
 
       // construct the path to the homily we are serving to the user
-      var homilyPath = path.join('/stimuli', 'videoFiles', 'servingFiles', randomHomilyNum + '.mp4');
+      var homilyPath = path.join('d20h8ij3fgirtx.cloudfront.net/stimuli/videoFiles/servingFiles/', randomHomilyNum + '.mp4');
 
       // construct the path to the new progress file
       var newSavePath = path.join(folderPath, path.basename(homilyPath, '.mp4') + '_Progress.json');
@@ -853,7 +853,7 @@ async function randomHomily(userId, userType, experimentSource, experimentType){
     // if the experiment type is audio, then... 
     else {
       // construct the path to the homily we are serving to the user
-      var homilyPath = path.join('/stimuli', 'audioFiles', 'servingFiles', randomHomilyNum + '.mp3');
+      var homilyPath = path.join('d20h8ij3fgirtx.cloudfront.net/stimuli/audioFiles/servingFiles/', randomHomilyNum + '.mp3');
 
       // construct the path to the new progress file
       var newSavePath = path.join(folderPath, path.basename(homilyPath, '.mp3') + '_Progress.json');
