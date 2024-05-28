@@ -142,7 +142,7 @@ async function viewedHomilies(userId, userType, experimentSource, experimentType
   // if we encounter an error, write the error to the error.txt file in the data/consoleResponses folder
     catch (error) {
     await fileQueueLogFile.enqueue(async () => {
-      logToFile((`Error recovering used homilies for user ${userId}: ` + error.message), errorPath);
+      logToFile((`Error recovering used homilies for user ${await blippityBloop(userId, userType)}: ` + error.message), errorPath);
     });
     console.error('Error recovering used homilies: ', error.message);
     }
@@ -167,7 +167,7 @@ async function unviewedHomilies(userId, userType, experimentSource, experimentTy
   // if we encounter an error, write the error to the error.txt file in the data/consoleResponses folder
   catch (error) {
     await fileQueueLogFile.enqueue(async () => {
-      logToFile((`Error recovering unused homilies for user ${userId}: ` + error.message), errorPath);
+      logToFile((`Error recovering unused homilies for user ${await blippityBloop(userId, userType)}: ` + error.message), errorPath);
     });
     console.error('Error recovering unused homilies: ', error.message);
     }
@@ -501,29 +501,46 @@ async function storeResponses(userId, userType, experimentSource, experimentType
       // If the filepath for the function is a homily questionnaire filepath, then...
       if (filePath.includes(homilyNumber + '.csv')) {
 
-        // construct the path of the potentially still extant progress file
-        const progressPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', homilyNumber + '_Progress.json');
+        try {
+        
+          // construct the path of the potentially still extant progress file
+          const progressPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', homilyNumber + '_Progress.json');
 
-        // delete the existing progress file
-        if (fs.existsSync(progressPath)) {
-          await fsp.unlink(progressPath);
+          // delete the existing progress file
+          if (fs.existsSync(progressPath)) {
+            await fsp.unlink(progressPath);
+          }
+        }
+        catch (error) {
+          await fileQueueLogFile.enqueue(async () => {
+            logToFile((`Error deleting ${fileName} progress file for user ${await blippityBloop(userId, userType)}: ` + error.message), errorPath);
+          });
+          console.error(`error storing ${fileName}: `, error.message);
         }
 
-        // construct the path of the behavior file for the homily
-        const behaviorPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', homilyNumber + '_Behavior.json');
+        try {
+        
+          // construct the path of the behavior file for the homily
+          const behaviorPath = path.join(__dirname, '..', '..', 'data', userType, source, experimentType, await blippityBloop(userId, userType), 'questionnaires', homilyNumber + '_Behavior.json');
 
-        // read the data from the behavior JSON
-        const behaviorData = await fsp.readFile(behaviorPath, {encoding: 'utf8'});
+          // read the data from the behavior JSON
+          const behaviorData = await fsp.readFile(behaviorPath, {encoding: 'utf8'});
 
-        // convert JSON data to CSV
-        const csvData = await jsonToCSV(behaviorData, false);
+          // convert JSON data to CSV
+          const csvData = await jsonToCSV(behaviorData, false);
 
-        // write the behavior CSV file to the user's data folder
-        await fsp.writeFile(behaviorPath.replace('json', 'csv'), csvData, 'utf8');
+          // write the behavior CSV file to the user's data folder
+          await fsp.writeFile(behaviorPath.replace('json', 'csv'), csvData, 'utf8');
 
-        // delete the existing behavior JSON
-        await fsp.unlink(behaviorPath);
-
+          // delete the existing behavior JSON
+          await fsp.unlink(behaviorPath);
+        }
+        catch (error) {
+          await fileQueueLogFile.enqueue(async () => {
+            logToFile((`Error storing ${fileName} behavior data for user ${await blippityBloop(userId, userType)}: ` + error.message), errorPath);
+          });
+          console.error(`error storing ${fileName}: `, error.message);
+        }
 
         // store the homily + timestamp of questionnaire completion
         await storeHomilyOrder(userId, userType, source, experimentType, homilyNumber);
