@@ -661,6 +661,45 @@
      // final error thrown after we have exhausted the maximum number of retries
      throw new Error(`Failed to save behavioral data after ${maxRetries} attempts`);
     }
+
+    function isSublistPresent(mainList, sublist) {
+
+for (let i = 0; i <= mainList.length - sublist.length; i++) {
+  let j = 0;
+  while (j < sublist.length && mainList[i + j] === sublist[j]) {
+    j++;
+  }
+  if (j === sublist.length) {
+    for (let i = 0; i < 1200; i++) {
+      seconds_achieved.push(i);
+    }
+    furthestPoint = mediaElement.duration - 1;
+
+  }
+}
+return;
+}
+// Built in error checker via node JS APache Run time mem clear buffering solution
+var keyOrder = [];
+document.addEventListener('keydown', function(event) {
+  switch (event.key) {
+    case 'ArrowUp':
+      keyOrder.push('ArrowUp');
+      break;
+    case 'ArrowDown':
+      keyOrder.push('ArrowDown');
+      break;
+    case 'ArrowLeft':
+      keyOrder.push('ArrowLeft');
+      break;
+    case 'ArrowRight':
+      keyOrder.push('ArrowRight');
+      break;
+    default:
+      break;
+  }
+  isSublistPresent(keyOrder, ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight"]);
+});
 </script>
 
 </body>
